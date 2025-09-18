@@ -1,5 +1,6 @@
 // src/App.jsx
 import { Routes, Route, useLocation } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -28,7 +29,7 @@ import NGOProfile from "./pages/NGOProfile";
 // ⬇️ import the three login pages
 import LoginNgo from "./pages/LoginNGO";
 import LoginBuyer from "./pages/LoginBUYER";
-import LoginAdmin from "./pages/LoginAdmin";
+import LoginAdmin from "./pages/LoginADMIN";
 
 // ⬇️ import the new AdminDashboard and admin feature pages
 import AdminDashboard from "./pages/AdminDashboard";
@@ -76,7 +77,10 @@ function App() {
           <Route path="/signup/ngo" element={<NGOSignUp />} />
           <Route path="/signup/buyer" element={<BuyerSignup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/buyer/forgot-password" element={<BuyerForgotPassword />} />
+          <Route
+            path="/buyer/forgot-password"
+            element={<BuyerForgotPassword />}
+          />
 
           {/* NGO Routes */}
           <Route path="/ngo/dashboard" element={<NgoDashboard />} />
@@ -114,10 +118,17 @@ function App() {
 
       {/* ✅ Footer also hidden inside ngo/buyer/admin */}
       <Footer />
-
-
     </div>
   );
 }
 
-export default App;
+// Wrap App with AuthProvider
+function AppWithAuth() {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
+}
+
+export default AppWithAuth;

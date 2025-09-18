@@ -22,5 +22,14 @@ Editor directories and files
 .ntvs
 *.nj
 
+# Environment variables (contains sensitive data)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+frontend/.env
+
 # Summary file for Gemini
 backend/refactoring_summary.md

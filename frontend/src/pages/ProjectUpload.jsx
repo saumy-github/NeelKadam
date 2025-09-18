@@ -1,13 +1,15 @@
 import { useState } from "react";
 
+// Form field names follow snake_case convention to align with the backend API contract.
+// This ensures consistent data format between frontend and database schema.
 export default function ProjectUpload() {
   const [formData, setFormData] = useState({
-    plantationArea: "",
+    plantation_area: "",
     location: "",
-    treeType: "",
-    plantationPeriod: "",
-    treeNo: "",
-    estimatedCC: "",
+    tree_type: "",
+    plantation_period: "",
+    tree_no: "",
+    estimated_cc: "",
     photos: [],
   });
 
@@ -57,8 +59,8 @@ export default function ProjectUpload() {
           </label>
           <input
             type="text"
-            name="plantationArea"
-            value={formData.plantationArea}
+            name="plantation_area"
+            value={formData.plantation_area}
             onChange={handleChange}
             placeholder="e.g., 25 hectares"
             className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -83,8 +85,8 @@ export default function ProjectUpload() {
           </label>
           <input
             type="text"
-            name="treeType"
-            value={formData.treeType}
+            name="tree_type"
+            value={formData.tree_type}
             onChange={handleChange}
             placeholder="e.g., Mangroves, Coconut"
             className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -96,8 +98,8 @@ export default function ProjectUpload() {
           </label>
           <input
             type="text"
-            name="plantationPeriod"
-            value={formData.plantationPeriod}
+            name="plantation_period"
+            value={formData.plantation_period}
             onChange={handleChange}
             placeholder="e.g., June 2023 – Dec 2023"
             className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -109,8 +111,8 @@ export default function ProjectUpload() {
           </label>
           <input
             type="number"
-            name="treeNo"
-            value={formData.treeNo}
+            name="tree_no"
+            value={formData.tree_no}
             onChange={handleChange}
             placeholder="e.g., 5000"
             className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -146,8 +148,8 @@ export default function ProjectUpload() {
           </label>
           <input
             type="number"
-            name="estimatedCC"
-            value={formData.estimatedCC}
+            name="estimated_cc"
+            value={formData.estimated_cc}
             onChange={handleChange}
             placeholder="e.g., 1200"
             className="w-full p-3 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"

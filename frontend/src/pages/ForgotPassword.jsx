@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Form field names follow snake_case convention to align with the backend API contract.
+// This ensures consistent data format between frontend and database schema.
 export default function ForgotPassword() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    emailOrPhone: "",
+    email_or_phone: "",
     otp: "",
-    newPassword: "",
-    confirmPassword: "",
+    new_password: "",
+    confirm_password: "",
   });
 
   const handleChange = (e) => {
@@ -16,20 +18,20 @@ export default function ForgotPassword() {
   };
 
   const handleSendOtp = () => {
-    if (!formData.emailOrPhone) {
+    if (!formData.email_or_phone) {
       alert("Please enter email or phone!");
       return;
     }
 
-    const isEmail = /\S+@\S+\.\S+/.test(formData.emailOrPhone);
-    const isPhone = /^\d{10}$/.test(formData.emailOrPhone);
+    const isEmail = /\S+@\S+\.\S+/.test(formData.email_or_phone);
+    const isPhone = /^\d{10}$/.test(formData.email_or_phone);
 
     if (!isEmail && !isPhone) {
       alert("Enter a valid email or 10-digit phone number!");
       return;
     }
 
-    alert(`OTP sent to ${formData.emailOrPhone} (demo).`);
+    alert(`OTP sent to ${formData.email_or_phone} (demo).`);
     setStep(2);
   };
 
@@ -44,21 +46,21 @@ export default function ForgotPassword() {
 
   const handleResetPassword = (e) => {
     e.preventDefault();
-    const { newPassword, confirmPassword } = formData;
+    const { new_password, confirm_password } = formData;
 
-    if (newPassword.length < 8) {
+    if (new_password.length < 8) {
       alert("Password must be at least 8 characters!");
       return;
     }
-    if (!/[A-Z]/.test(newPassword)) {
+    if (!/[A-Z]/.test(new_password)) {
       alert("Password must include at least 1 uppercase letter!");
       return;
     }
-    if (!/[0-9]/.test(newPassword)) {
+    if (!/[0-9]/.test(new_password)) {
       alert("Password must include at least 1 number!");
       return;
     }
-    if (newPassword !== confirmPassword) {
+    if (new_password !== confirm_password) {
       alert("Passwords do not match!");
       return;
     }
@@ -84,9 +86,9 @@ export default function ForgotPassword() {
             <>
               <input
                 type="text"
-                name="emailOrPhone"
+                name="email_or_phone"
                 placeholder="Enter Email or Phone"
-                value={formData.emailOrPhone}
+                value={formData.email_or_phone}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
@@ -128,18 +130,18 @@ export default function ForgotPassword() {
             <>
               <input
                 type="password"
-                name="newPassword"
+                name="new_password"
                 placeholder="New Password (min 8 chars, 1 uppercase, 1 number)"
-                value={formData.newPassword}
+                value={formData.new_password}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
               />
               <input
                 type="password"
-                name="confirmPassword"
+                name="confirm_password"
                 placeholder="Confirm New Password"
-                value={formData.confirmPassword}
+                value={formData.confirm_password}
                 onChange={handleChange}
                 className="w-full p-3 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 required

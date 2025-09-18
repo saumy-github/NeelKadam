@@ -1,43 +1,64 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { buyerAuth } from "../api/auth";
 
+// Form field names follow snake_case convention to align with the backend API contract.
+// This ensures consistent data format between frontend and database schema.
 export default function BuyerLogin() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
-    emailOrPhone: "",
+    email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Clear error when user starts typing
+    if (error) setError("");
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
-    if (!formData.emailOrPhone || !formData.password) {
-      alert("Both fields are required!");
-      return;
+    try {
+      // Basic validation
+      if (!formData.email || !formData.password) {
+        throw new Error("Both email and password are required!");
+      }
+
+      // Email validation
+      const isEmail = /\S+@\S+\.\S+/.test(formData.email);
+      if (!isEmail) {
+        throw new Error("Please enter a valid email address!");
+      }
+
+      if (formData.password.length < 8) {
+        throw new Error("Password must be at least 8 characters!");
+      }
+
+      // Call the API
+      const response = await buyerAuth.login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      // Store authentication data
+      login(response.token, response.buyer);
+
+      // Navigate to dashboard
+      navigate("/buyer/dashboard");
+    } catch (err) {
+      setError(err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    // Email validation
-    const isEmail = /\S+@\S+\.\S+/.test(formData.emailOrPhone);
-    // Phone validation
-    const isPhone = /^\d{10}$/.test(formData.emailOrPhone);
-
-    if (!isEmail && !isPhone) {
-      alert("Enter a valid email or 10-digit phone number!");
-      return;
-    }
-
-    if (formData.password.length < 8) {
-      alert("Password must be at least 8 characters!");
-      return;
-    }
-
-    // TODO: Add real login verification logic
-    alert("Buyer login successful (demo)!");
-    navigate("/buyer/dashboard");
   };
 
   return (
@@ -53,15 +74,23 @@ export default function BuyerLogin() {
             Buyer Login
           </h1>
 
-          {/* Email or Phone */}
+          {/* Error display */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {/* Email */}
           <input
-            type="text"
-            name="emailOrPhone"
-            placeholder="Enter Email or Phone"
-            value={formData.emailOrPhone}
+            type="email"
+            name="email"
+            placeholder="Enter Email Address"
+            value={formData.email}
             onChange={handleChange}
             className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             required
+            disabled={loading}
           />
 
           {/* Password */}
@@ -73,14 +102,16 @@ export default function BuyerLogin() {
             onChange={handleChange}
             className="w-full p-3 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             required
+            disabled={loading}
           />
 
           {/* Login button */}
           <button
             type="submit"
-            className="w-full bg-purple-700 text-white py-3 rounded-lg font-semibold hover:bg-purple-800 transition"
+            disabled={loading}
+            className="w-full bg-purple-700 text-white py-3 rounded-lg font-semibold hover:bg-purple-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           {/* Footer links */}

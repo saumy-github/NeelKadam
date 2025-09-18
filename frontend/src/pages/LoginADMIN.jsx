@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
+// Form field names follow snake_case convention to align with the backend API contract.
+// This ensures consistent data format between frontend and database schema.
 export default function AdminLogin() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    emailOrPhone: "",
+    email_or_phone: "",
     password: "",
   });
 
@@ -15,15 +17,15 @@ export default function AdminLogin() {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    if (!formData.emailOrPhone || !formData.password) {
+    if (!formData.email_or_phone || !formData.password) {
       alert("Both fields are required!");
       return;
     }
 
     // Email validation
-    const isEmail = /\S+@\S+\.\S+/.test(formData.emailOrPhone);
+    const isEmail = /\S+@\S+\.\S+/.test(formData.email_or_phone);
     // Phone validation
-    const isPhone = /^\d{10}$/.test(formData.emailOrPhone);
+    const isPhone = /^\d{10}$/.test(formData.email_or_phone);
 
     if (!isEmail && !isPhone) {
       alert("Enter a valid email or 10-digit phone number!");
@@ -56,9 +58,9 @@ export default function AdminLogin() {
           {/* Email or Phone */}
           <input
             type="text"
-            name="emailOrPhone"
+            name="email_or_phone"
             placeholder="Enter Email or Phone"
-            value={formData.emailOrPhone}
+            value={formData.email_or_phone}
             onChange={handleChange}
             className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             required
@@ -84,7 +86,6 @@ export default function AdminLogin() {
           </button>
 
           {/* Footer links */}
-          
         </form>
       </main>
     </div>

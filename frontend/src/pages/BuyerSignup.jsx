@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Form field names follow snake_case convention to align with the backend API contract.
+// This ensures consistent data format between frontend and database schema.
 // Validation helpers
 const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 const validatePassword = (password) =>
@@ -20,9 +22,9 @@ export default function BuyerSignup() {
     email: "",
     phone: "",
     password: "",
-    confirmPassword: "",
-    emailOtp: "",
-    phoneOtp: "",
+    confirm_password: "",
+    email_otp: "",
+    phone_otp: "",
     pan_no: "",
     wallet_address: "",
     is_verified: false,
@@ -53,18 +55,18 @@ export default function BuyerSignup() {
         alert("Password must be 8+ chars, include number & special character.");
         return;
       }
-      if (formData.password !== formData.confirmPassword) {
+      if (formData.password !== formData.confirm_password) {
         alert("Passwords do not match!");
         return;
       }
     }
 
     if (step === 2) {
-      if (!/^\d{6}$/.test(formData.emailOtp)) {
+      if (!/^\d{6}$/.test(formData.email_otp)) {
         alert("Email OTP must be 6 digits!");
         return;
       }
-      if (!/^\d{6}$/.test(formData.phoneOtp)) {
+      if (!/^\d{6}$/.test(formData.phone_otp)) {
         alert("Phone OTP must be 6 digits!");
         return;
       }
@@ -118,7 +120,9 @@ export default function BuyerSignup() {
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex justify-between text-sm font-medium text-gray-600 mb-2">
-              <span>Step {step} of {totalSteps}</span>
+              <span>
+                Step {step} of {totalSteps}
+              </span>
               <span>{Math.round((step / totalSteps) * 100)}%</span>
             </div>
             <div className="w-full bg-gray-200 h-2 rounded-full">
@@ -132,33 +136,111 @@ export default function BuyerSignup() {
           {/* Step 1: Account Setup */}
           {step === 1 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 1: Account Setup</h2>
-              <input name="buyer_id" placeholder="Buyer ID" value={formData.buyer_id} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
-              <input name="company_name" placeholder="Company Name" value={formData.company_name} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
-              <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
-              <input type="tel" name="phone" placeholder="Phone (10 digits)" value={formData.phone} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
-              <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
-              <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
+              <h2 className="text-2xl font-bold text-green-700 mb-6">
+                Step 1: Account Setup
+              </h2>
+              <input
+                name="buyer_id"
+                placeholder="Buyer ID"
+                value={formData.buyer_id}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+              <input
+                name="company_name"
+                placeholder="Company Name"
+                value={formData.company_name}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone (10 digits)"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+              <input
+                type="password"
+                name="confirm_password"
+                placeholder="Confirm Password"
+                value={formData.confirm_password}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
             </div>
           )}
 
           {/* Step 2: OTP Verification */}
           {step === 2 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 2: OTP Verification</h2>
-              <input type="text" name="emailOtp" placeholder="Enter Email OTP" value={formData.emailOtp} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
-              <input type="text" name="phoneOtp" placeholder="Enter Phone OTP" value={formData.phoneOtp} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
+              <h2 className="text-2xl font-bold text-green-700 mb-6">
+                Step 2: OTP Verification
+              </h2>
+              <input
+                type="text"
+                name="email_otp"
+                placeholder="Enter Email OTP"
+                value={formData.email_otp}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+              <input
+                type="text"
+                name="phone_otp"
+                placeholder="Enter Phone OTP"
+                value={formData.phone_otp}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
             </div>
           )}
 
           {/* Step 3: Verification Details */}
           {step === 3 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 3: Verification Details</h2>
-              <input name="pan_no" placeholder="PAN Number (e.g., ABCDE1234F)" value={formData.pan_no} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg uppercase" />
-              <input name="wallet_address" placeholder="Wallet Address" value={formData.wallet_address} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
+              <h2 className="text-2xl font-bold text-green-700 mb-6">
+                Step 3: Verification Details
+              </h2>
+              <input
+                name="pan_no"
+                placeholder="PAN Number (e.g., ABCDE1234F)"
+                value={formData.pan_no}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg uppercase"
+              />
+              <input
+                name="wallet_address"
+                placeholder="Wallet Address"
+                value={formData.wallet_address}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
               <label className="flex items-center mb-4">
-                <input type="checkbox" name="is_verified" checked={formData.is_verified} onChange={handleChange} className="mr-2" />
+                <input
+                  type="checkbox"
+                  name="is_verified"
+                  checked={formData.is_verified}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
                 Verified Buyer?
               </label>
             </div>
@@ -167,37 +249,95 @@ export default function BuyerSignup() {
           {/* Step 4: Account Details */}
           {step === 4 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 4: Account Details</h2>
-              <input name="account_holder_name" placeholder="Account Holder Name" value={formData.account_holder_name} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
-              <input name="account_number" placeholder="Account Number" value={formData.account_number} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
-              <input name="confirm_account_number" placeholder="Confirm Account Number" value={formData.confirm_account_number} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
+              <h2 className="text-2xl font-bold text-green-700 mb-6">
+                Step 4: Account Details
+              </h2>
+              <input
+                name="account_holder_name"
+                placeholder="Account Holder Name"
+                value={formData.account_holder_name}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+              <input
+                name="account_number"
+                placeholder="Account Number"
+                value={formData.account_number}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+              <input
+                name="confirm_account_number"
+                placeholder="Confirm Account Number"
+                value={formData.confirm_account_number}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
             </div>
           )}
 
           {/* Step 5: Bank Details */}
           {step === 5 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 5: Bank Details</h2>
-              <input name="bank_name" placeholder="Bank Name" value={formData.bank_name} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
-              <input name="branch_name" placeholder="Branch Name" value={formData.branch_name} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
-              <input name="ifsc_code" placeholder="IFSC Code" value={formData.ifsc_code} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg uppercase" />
-              <input type="number" name="total_cc" placeholder="Total CC" value={formData.total_cc} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" />
+              <h2 className="text-2xl font-bold text-green-700 mb-6">
+                Step 5: Bank Details
+              </h2>
+              <input
+                name="bank_name"
+                placeholder="Bank Name"
+                value={formData.bank_name}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+              <input
+                name="branch_name"
+                placeholder="Branch Name"
+                value={formData.branch_name}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+              <input
+                name="ifsc_code"
+                placeholder="IFSC Code"
+                value={formData.ifsc_code}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg uppercase"
+              />
+              <input
+                type="number"
+                name="total_cc"
+                placeholder="Total CC"
+                value={formData.total_cc}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
             </div>
           )}
 
           {/* Buttons */}
           <div className="flex justify-between mt-6">
             {step > 1 && (
-              <button type="button" onClick={() => setStep((prev) => prev - 1)} className="px-6 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition">
+              <button
+                type="button"
+                onClick={() => setStep((prev) => prev - 1)}
+                className="px-6 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition"
+              >
                 Back
               </button>
             )}
             {step < totalSteps ? (
-              <button type="button" onClick={handleNext} className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition ml-auto">
+              <button
+                type="button"
+                onClick={handleNext}
+                className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition ml-auto"
+              >
                 Next
               </button>
             ) : (
-              <button type="submit" className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition ml-auto">
+              <button
+                type="submit"
+                className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition ml-auto"
+              >
                 Submit
               </button>
             )}

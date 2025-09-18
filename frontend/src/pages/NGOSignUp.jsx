@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Form field names follow snake_case convention to align with the backend API contract.
+// This ensures consistent data format between frontend and database schema.
 // Validation helpers
 const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 const validatePhone = (phone) => /^\d{10}$/.test(phone);
 const validatePassword = (password) =>
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+    password
+  );
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -16,27 +20,27 @@ export default function SignUp() {
     email: "",
     phone: "",
     password: "",
-    confirmPassword: "",
-    emailOtp: "",
-    phoneOtp: "",
-    ngoName: "",
-    licenseNo: "",
-    spokespersonName: "",
-    spokespersonMobile: "",
-    panNo: "",
-    accountHolder: "",
-    accountNumber: "",
-    confirmAccountNumber: "",
-    ifsc: "",
+    confirm_password: "",
+    email_otp: "",
+    phone_otp: "",
+    ngo_name: "",
+    license_no: "",
+    spokesperson_name: "",
+    spokesperson_mobile: "",
+    pan_no: "",
+    account_holder_name: "",
+    account_number: "",
+    confirm_account_number: "",
+    ifsc_code: "",
     branch: "",
-    zilaId: "",
+    zila_id_ward_no: "",
     address: "",
-    contactEmail: "",
-    contactPhone: "",
-    communityDetails: "",
-    communitySpokesperson: "",
-    communityMobile: "",
-    communityVerification: "",
+    contact_email: "",
+    contact_phone: "",
+    community_name: "",
+    community_spokesperson_name: "",
+    community_spokesperson_mobile: "",
+    community_verification: "",
   });
 
   const handleChange = (e) => {
@@ -60,25 +64,25 @@ export default function SignUp() {
         );
         return;
       }
-      if (formData.password !== formData.confirmPassword) {
+      if (formData.password !== formData.confirm_password) {
         alert("Passwords do not match!");
         return;
       }
     }
 
     if (step === 2) {
-      if (!/^\d{6}$/.test(formData.emailOtp)) {
+      if (!/^\d{6}$/.test(formData.email_otp)) {
         alert("Email OTP must be 6 digits!");
         return;
       }
-      if (!/^\d{6}$/.test(formData.phoneOtp)) {
+      if (!/^\d{6}$/.test(formData.phone_otp)) {
         alert("Phone OTP must be 6 digits!");
         return;
       }
     }
 
     if (step === 4) {
-      if (formData.accountNumber !== formData.confirmAccountNumber) {
+      if (formData.account_number !== formData.confirm_account_number) {
         alert("Account numbers do not match!");
         return;
       }
@@ -87,10 +91,110 @@ export default function SignUp() {
     setStep((prev) => prev + 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Signup successful!");
-    navigate("/login/ngo");
+    console.log("📝 Form submitted with data:", formData);
+    console.log("📝 Selected user type:", userType);
+
+    try {
+      // Add any final validation checks
+      if (formData.account_number !== formData.confirm_account_number) {
+        console.error("❌ Account numbers don't match");
+        alert("Account numbers do not match!");
+        return;
+      }
+
+      if (formData.password !== formData.confirm_password) {
+        console.error("❌ Passwords don't match");
+        alert("Passwords do not match!");
+        return;
+      }
+
+      console.log("🔄 Preparing data for API submission...");
+
+      // Prepare the appropriate data object based on user type
+      let apiData = {};
+      let apiEndpoint = "";
+
+      if (userType === "ngo") {
+        apiData = {
+          license_no: formData.license_no,
+          ngo_name: formData.ngo_name,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+          spokesperson_name: formData.spokesperson_name,
+          spokesperson_mobile: formData.spokesperson_mobile,
+          pan_no: formData.pan_no,
+          account_holder_name: formData.account_holder_name,
+          account_number: formData.account_number,
+          ifsc_code: formData.ifsc_code,
+        };
+        apiEndpoint = "http://localhost:3000/api/auth/ngo/register";
+      } else if (userType === "panchayat") {
+        apiData = {
+          zila_id_ward_no: formData.zila_id_ward_no,
+          address: formData.address,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone || formData.contact_phone,
+          pan_no: formData.pan_no,
+          account_holder_name: formData.account_holder_name,
+          account_number: formData.account_number,
+          ifsc_code: formData.ifsc_code,
+        };
+        apiEndpoint = "http://localhost:3000/api/auth/panchayat/register";
+      } else if (userType === "community") {
+        apiData = {
+          community_name: formData.community_name,
+          spokesperson_name: formData.community_spokesperson_name,
+          spokesperson_mobile: formData.community_spokesperson_mobile,
+          email: formData.email,
+          password: formData.password,
+          pan_no: formData.pan_no,
+          account_holder_name: formData.account_holder_name,
+          account_number: formData.account_number,
+          ifsc_code: formData.ifsc_code,
+        };
+        apiEndpoint = "http://localhost:3000/api/auth/community/register";
+      }
+
+      console.log(`🚀 Sending ${userType} data to API:`, apiData);
+      console.log(`🌐 Using endpoint: ${apiEndpoint}`);
+
+      // Make the API call
+      const response = await fetch(apiEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      const data = await response.json();
+      console.log("📥 API response:", data);
+
+      if (!response.ok) {
+        // Detailed error logging
+        console.error("❌ API error response:", {
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+        });
+        throw new Error(
+          data.error || data.message || `${userType} registration failed`
+        );
+      }
+
+      console.log("✅ Registration successful!");
+      alert(`${userType.toUpperCase()} account created successfully!`);
+
+      // Redirect to the appropriate login page
+      navigate(`/login/${userType.toLowerCase()}`);
+    } catch (error) {
+      console.error("❌ Registration error:", error);
+      alert("Registration failed: " + error.message);
+    }
   };
 
   return (
@@ -107,7 +211,9 @@ export default function SignUp() {
           {/* ✅ Progress Bar */}
           <div className="mb-8">
             <div className="flex justify-between text-sm font-medium text-gray-600 mb-2">
-              <span>Step {step} of {totalSteps}</span>
+              <span>
+                Step {step} of {totalSteps}
+              </span>
               <span>{Math.round((step / totalSteps) * 100)}%</span>
             </div>
             <div className="w-full bg-gray-200 h-2 rounded-full">
@@ -150,9 +256,9 @@ export default function SignUp() {
               />
               <input
                 type="password"
-                name="confirmPassword"
+                name="confirm_password"
                 placeholder="Confirm Password"
-                value={formData.confirmPassword}
+                value={formData.confirm_password}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
@@ -167,17 +273,17 @@ export default function SignUp() {
               </h2>
               <input
                 type="text"
-                name="emailOtp"
+                name="email_otp"
                 placeholder="Enter Email OTP"
-                value={formData.emailOtp}
+                value={formData.email_otp}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
               <input
                 type="text"
-                name="phoneOtp"
+                name="phone_otp"
                 placeholder="Enter Phone OTP"
-                value={formData.phoneOtp}
+                value={formData.phone_otp}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
@@ -205,38 +311,38 @@ export default function SignUp() {
               {userType === "ngo" && (
                 <>
                   <input
-                    name="ngoName"
+                    name="ngo_name"
                     placeholder="NGO Name"
-                    value={formData.ngoName}
+                    value={formData.ngo_name}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
                   <input
-                    name="licenseNo"
+                    name="license_no"
                     placeholder="License No."
-                    value={formData.licenseNo}
+                    value={formData.license_no}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
                   <input
-                    name="spokespersonName"
+                    name="spokesperson_name"
                     placeholder="Spokesperson Name"
-                    value={formData.spokespersonName}
+                    value={formData.spokesperson_name}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
                   <input
                     type="tel"
-                    name="spokespersonMobile"
+                    name="spokesperson_mobile"
                     placeholder="Spokesperson Mobile"
-                    value={formData.spokespersonMobile}
+                    value={formData.spokesperson_mobile}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
                   <input
-                    name="panNo"
+                    name="pan_no"
                     placeholder="PAN No."
-                    value={formData.panNo}
+                    value={formData.pan_no}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
@@ -246,9 +352,9 @@ export default function SignUp() {
               {userType === "panchayat" && (
                 <>
                   <input
-                    name="zilaId"
+                    name="zila_id_ward_no"
                     placeholder="Zila ID / Ward No."
-                    value={formData.zilaId}
+                    value={formData.zila_id_ward_no}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
@@ -261,17 +367,17 @@ export default function SignUp() {
                   />
                   <input
                     type="email"
-                    name="contactEmail"
+                    name="contact_email"
                     placeholder="Contact Email"
-                    value={formData.contactEmail}
+                    value={formData.contact_email}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
                   <input
                     type="tel"
-                    name="contactPhone"
+                    name="contact_phone"
                     placeholder="Contact Phone"
-                    value={formData.contactPhone}
+                    value={formData.contact_phone}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
@@ -281,31 +387,31 @@ export default function SignUp() {
               {userType === "community" && (
                 <>
                   <input
-                    name="communityDetails"
-                    placeholder="Community Details"
-                    value={formData.communityDetails}
+                    name="community_name"
+                    placeholder="Community Name"
+                    value={formData.community_name}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
                   <input
-                    name="communitySpokesperson"
+                    name="community_spokesperson_name"
                     placeholder="Spokesperson Name"
-                    value={formData.communitySpokesperson}
+                    value={formData.community_spokesperson_name}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
                   <input
                     type="tel"
-                    name="communityMobile"
+                    name="community_spokesperson_mobile"
                     placeholder="Spokesperson Mobile"
-                    value={formData.communityMobile}
+                    value={formData.community_spokesperson_mobile}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
                   <input
-                    name="communityVerification"
+                    name="community_verification"
                     placeholder="Further Verification (initially unverified)"
-                    value={formData.communityVerification}
+                    value={formData.community_verification}
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
@@ -321,30 +427,30 @@ export default function SignUp() {
                 Step 4: Bank Details
               </h2>
               <input
-                name="accountHolder"
+                name="account_holder_name"
                 placeholder="Account Holder Name"
-                value={formData.accountHolder}
+                value={formData.account_holder_name}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
               <input
-                name="accountNumber"
+                name="account_number"
                 placeholder="Account Number"
-                value={formData.accountNumber}
+                value={formData.account_number}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
               <input
-                name="confirmAccountNumber"
+                name="confirm_account_number"
                 placeholder="Confirm Account Number"
-                value={formData.confirmAccountNumber}
+                value={formData.confirm_account_number}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
               <input
-                name="ifsc"
+                name="ifsc_code"
                 placeholder="IFSC Code"
-                value={formData.ifsc}
+                value={formData.ifsc_code}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />

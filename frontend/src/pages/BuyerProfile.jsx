@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
+// Object properties follow snake_case convention to align with the backend API contract.
+// This ensures consistent data format between frontend and database schema.
 export default function BuyerProfile() {
   const navigate = useNavigate();
 
@@ -10,20 +12,20 @@ export default function BuyerProfile() {
 
   // ✅ Demo Buyer data (later replace with backend)
   const buyerDetails = {
-    companyName: "Example Corp",
+    company_name: "Example Corp",
     email: "buyer@example.com",
-    pan: "ABCDE1234F",
+    pan_no: "ABCDE1234F",
     bank: {
-      accountHolder: "Example Corp",
-      accountNumber: "9876543210",
-      ifsc: "HDFC0005678",
+      account_holder_name: "Example Corp",
+      account_number: "9876543210",
+      ifsc_code: "HDFC0005678",
     },
-    walletAddress: "0x1234abcd5678efgh",
+    wallet_address: "0x1234abcd5678efgh",
   };
 
   const wallet = {
     balance: 120,
-    totalCreditsBought: 300,
+    total_cc: 300,
   };
 
   const transactions = [
@@ -39,38 +41,70 @@ export default function BuyerProfile() {
       <nav className="bg-green-700 text-white p-4 flex justify-between items-center shadow">
         <h1 className="text-xl font-bold">Buyer Dashboard</h1>
         <ul className="flex gap-6 text-sm font-medium">
-          <li><Link to="/" className="hover:underline">Home</Link></li>
-          <li><Link to="/about" className="hover:underline">About</Link></li>
-          <li><Link to="/buyer/profile" className="hover:underline">Profile</Link></li>
-          <li><Link to="/blog" className="hover:underline">Blog</Link></li>
+          <li>
+            <Link to="/" className="hover:underline">
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link to="/about" className="hover:underline">
+              About
+            </Link>
+          </li>
+          <li>
+            <Link to="/buyer/profile" className="hover:underline">
+              Profile
+            </Link>
+          </li>
+          <li>
+            <Link to="/blog" className="hover:underline">
+              Blog
+            </Link>
+          </li>
         </ul>
       </nav>
 
       {/* ✅ Main content area */}
       <main className="flex-grow p-8 space-y-8">
-        <h1 className="text-3xl font-bold text-green-700 mb-6">Buyer Profile</h1>
+        <h1 className="text-3xl font-bold text-green-700 mb-6">
+          Buyer Profile
+        </h1>
 
         {/* ✅ Buyer Details */}
         <section className="bg-white p-6 rounded-xl shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Buyer Details</h2>
           <ul className="space-y-2 text-gray-700">
-            <li><strong>Company Name:</strong> {buyerDetails.companyName}</li>
-            <li><strong>Email:</strong> {buyerDetails.email}</li>
-            <li><strong>PAN No:</strong> {buyerDetails.pan}</li>
             <li>
-              <strong>Bank Details:</strong><br />
-              {buyerDetails.bank.accountHolder}, A/C: {buyerDetails.bank.accountNumber},<br />
-              IFSC: {buyerDetails.bank.ifsc}
+              <strong>Company Name:</strong> {buyerDetails.company_name}
             </li>
-            <li><strong>Wallet Address:</strong> {buyerDetails.walletAddress}</li>
+            <li>
+              <strong>Email:</strong> {buyerDetails.email}
+            </li>
+            <li>
+              <strong>PAN No:</strong> {buyerDetails.pan_no}
+            </li>
+            <li>
+              <strong>Bank Details:</strong>
+              <br />
+              {buyerDetails.bank.account_holder_name}, A/C:{" "}
+              {buyerDetails.bank.account_number},<br />
+              IFSC: {buyerDetails.bank.ifsc_code}
+            </li>
+            <li>
+              <strong>Wallet Address:</strong> {buyerDetails.wallet_address}
+            </li>
           </ul>
         </section>
 
         {/* ✅ Wallet Info */}
         <section className="bg-white p-6 rounded-xl shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Wallet</h2>
-          <p className="text-gray-700"><strong>Balance:</strong> {wallet.balance} CC</p>
-          <p className="text-gray-700"><strong>Total Credits Bought:</strong> {wallet.totalCreditsBought} CC</p>
+          <p className="text-gray-700">
+            <strong>Balance:</strong> {wallet.balance} CC
+          </p>
+          <p className="text-gray-700">
+            <strong>Total Credits Bought:</strong> {wallet.total_cc} CC
+          </p>
         </section>
 
         {/* ✅ Transactions */}
@@ -82,7 +116,9 @@ export default function BuyerProfile() {
                 key={tx.id}
                 className="flex justify-between p-3 border rounded-lg bg-gray-50"
               >
-                <span>{tx.type} – {tx.amount}</span>
+                <span>
+                  {tx.type} – {tx.amount}
+                </span>
                 <span
                   className={
                     tx.status === "Completed"
@@ -98,19 +134,18 @@ export default function BuyerProfile() {
         </section>
 
         <div className="flex justify-center mt-10">
-  <button
-    onClick={() => {
-      localStorage.clear();
-      sessionStorage.clear();
-      alert("Signed out successfully!");
-      window.location.href = "/"; // ✅ always go to main home page
-    }}
-    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-  >
-    Sign Out
-  </button>
-</div>
-
+          <button
+            onClick={() => {
+              localStorage.clear();
+              sessionStorage.clear();
+              alert("Signed out successfully!");
+              window.location.href = "/"; // ✅ always go to main home page
+            }}
+            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >
+            Sign Out
+          </button>
+        </div>
       </main>
     </div>
   );
