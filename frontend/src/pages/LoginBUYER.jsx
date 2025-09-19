@@ -18,7 +18,6 @@ export default function BuyerLogin() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // Clear error when user starts typing
     if (error) setError("");
   };
 
@@ -26,32 +25,26 @@ export default function BuyerLogin() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
     try {
       // Basic validation
       if (!formData.email || !formData.password) {
         throw new Error("Both email and password are required!");
       }
-
       // Email validation
       const isEmail = /\S+@\S+\.\S+/.test(formData.email);
       if (!isEmail) {
         throw new Error("Please enter a valid email address!");
       }
-
       if (formData.password.length < 8) {
         throw new Error("Password must be at least 8 characters!");
       }
-
       // Call the API
       const response = await buyerAuth.login({
         email: formData.email,
         password: formData.password,
       });
-
       // Store authentication data
       login(response.token, response.buyer);
-
       // Navigate to dashboard
       navigate("/buyer/dashboard");
     } catch (err) {
@@ -60,28 +53,23 @@ export default function BuyerLogin() {
       setLoading(false);
     }
   };
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#fcedd3]">
-      {/* Center form slightly higher */}
       <main className="flex-grow flex justify-center items-start pt-32">
         <form
           onSubmit={handleLogin}
           className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md border border-gray-200"
         >
-          {/* Title */}
           <h1 className="text-3xl font-bold text-center mb-8 text-purple-700">
             Buyer Login
           </h1>
-
-          {/* Error display */}
           {error && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
               {error}
             </div>
           )}
-
-          {/* Email */}
           <input
             type="email"
             name="email"
@@ -92,8 +80,6 @@ export default function BuyerLogin() {
             required
             disabled={loading}
           />
-
-          {/* Password */}
           <input
             type="password"
             name="password"
@@ -104,8 +90,6 @@ export default function BuyerLogin() {
             required
             disabled={loading}
           />
-
-          {/* Login button */}
           <button
             type="submit"
             disabled={loading}
@@ -113,8 +97,6 @@ export default function BuyerLogin() {
           >
             {loading ? "Logging in..." : "Login"}
           </button>
-
-          {/* Footer links */}
           <div className="mt-6 text-center text-sm text-gray-700 space-y-2">
             <p>
               Don’t have an account?{" "}
@@ -139,4 +121,4 @@ export default function BuyerLogin() {
       </main>
     </div>
   );
-}
+

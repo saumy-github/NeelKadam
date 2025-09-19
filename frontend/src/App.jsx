@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import BlockchainConnector from "./components/BlockchainConnector";
 
 import Landing from "./pages/Landing";
 import NGO from "./pages/NGO";
@@ -116,8 +117,8 @@ function App() {
         </Routes>
       </main>
 
-      {/* ✅ Footer also hidden inside ngo/buyer/admin */}
-      <Footer />
+  {/* ✅ Footer also hidden inside ngo/buyer/admin */}
+  <Footer />
     </div>
   );
 }

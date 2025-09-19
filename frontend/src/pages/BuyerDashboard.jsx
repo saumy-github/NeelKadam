@@ -1,6 +1,14 @@
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import useWalletConnect from "../hooks/useWalletConnect";
 
 export default function BuyerDashboard() {
+  const { account, connectWallet } = useWalletConnect();
+
+  useEffect(() => {
+    connectWallet();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#fcedd3]">
       {/* ✅ Taskbar */}
@@ -103,6 +111,16 @@ export default function BuyerDashboard() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Wallet Connection Status */}
+        <div className="bg-white p-6 rounded-xl shadow">
+          <h3 className="text-lg font-semibold mb-4">Wallet Connection</h3>
+          {account ? (
+            <p className="text-green-600">Connected wallet: {account}</p>
+          ) : (
+            <p className="text-red-600">Connecting to MetaMask...</p>
+          )}
         </div>
       </main>
     </div>

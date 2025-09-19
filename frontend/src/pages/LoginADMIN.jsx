@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import React from "react";
+import useWalletConnect from "../hooks/useWalletConnect";
 
 // Form field names follow snake_case convention to align with the backend API contract.
 // This ensures consistent data format between frontend and database schema.
 export default function AdminLogin() {
   const navigate = useNavigate();
+  const { account, connectWallet } = useWalletConnect();
   const [formData, setFormData] = useState({
     email_or_phone: "",
     password: "",
@@ -14,7 +17,7 @@ export default function AdminLogin() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!formData.email_or_phone || !formData.password) {
@@ -40,6 +43,13 @@ export default function AdminLogin() {
     // TODO: Add real admin login verification logic
     alert("Admin login successful (demo)!");
     navigate("/admin/dashboard");
+
+    const loginSuccess = true; // Replace with real validation
+
+    if (loginSuccess) {
+      await connectWallet(); // This will trigger MetaMask popup
+      // ...redirect or show dashboard...
+    }
   };
 
   return (
