@@ -53,7 +53,6 @@ export default function BuyerLogin() {
       setLoading(false);
     }
   };
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#fcedd3]">
@@ -121,4 +120,5 @@ export default function BuyerLogin() {
       </main>
     </div>
   );
+}
 
