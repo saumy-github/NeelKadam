@@ -100,10 +100,40 @@ export default function BuyerSignup() {
     setStep((prev) => prev + 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("✅ Buyer Account Created Successfully!");
-    navigate("/login/buyer");
+
+    try {
+      // Import buyerAuth from the auth API module
+      const { buyerAuth } = await import("../api/auth");
+
+      // Prepare the data for API request (only include fields required by backend)
+      const buyerData = {
+        company_name: formData.company_name,
+        email: formData.email,
+        password: formData.password,
+        pan_no: formData.pan_no,
+        account_holder_name: formData.account_holder_name,
+        account_number: formData.account_number,
+        ifsc_code: formData.ifsc_code,
+        phone: formData.phone,
+        wallet_address: formData.wallet_address,
+        bank_name: formData.bank_name,
+        branch_name: formData.branch_name,
+      };
+
+      // Call the API to register the buyer
+      const response = await buyerAuth.register(buyerData);
+
+      console.log("Registration successful:", response);
+      alert("✅ Buyer Account Created Successfully!");
+      navigate("/login/buyer");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      alert(
+        `Registration failed: ${error.message || "Unknown error occurred"}`
+      );
+    }
   };
 
   return (
