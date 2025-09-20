@@ -1,16 +1,25 @@
+
 import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import SellCCModal from "../components/SellCCModal";
+import useWalletConnect from "../hooks/useWalletConnect";
 
 export default function NGODashboard() {
   const navigate = useNavigate();
+  const [sellModalOpen, setSellModalOpen] = useState(false);
+  const { account, connectWallet } = useWalletConnect();
 
   const handleSignOut = () => {
-  localStorage.clear();  // optional if you store tokens
-  sessionStorage.clear(); // optional if you store sessions
+    localStorage.clear();
+    sessionStorage.clear();
+    alert("Signed out successfully!");
+    window.location.href = "/";
+  };
 
-  alert("Signed out successfully!");
-  window.location.href = "/"; // ✅ force redirect to landing page
-};
-
+  const handleSellCCClick = async () => {
+    if (!account) await connectWallet();
+    setSellModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fcedd3]">
@@ -66,14 +75,15 @@ export default function NGODashboard() {
               <p className="text-gray-600">View your approved and pending projects here.</p>
             </Link>
 
-            <Link
-              to="/ngo/sell-cc"
-              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition block"
+            <button
+              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition block text-left w-full"
+              onClick={handleSellCCClick}
             >
               <h4 className="text-lg font-semibold mb-2">💰 Sell CC</h4>
               <p className="text-gray-600">Sell your carbon credits securely.</p>
-            </Link>
+            </button>
           </div>
+          <SellCCModal open={sellModalOpen} onClose={() => setSellModalOpen(false)} account={account} />
         </div>
 
         {/* ✅ Recent Activity */}

@@ -1,9 +1,15 @@
-import { Link, useNavigate } from "react-router-dom";
 
-// Object properties follow snake_case convention to align with the backend API contract.
-// This ensures consistent data format between frontend and database schema.
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import useWalletConnect from "../hooks/useWalletConnect";
+
 export default function BuyerProfile() {
   const navigate = useNavigate();
+  const { account, contract, connectWallet } = useWalletConnect();
+  const [walletBalance, setWalletBalance] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [txLoading, setTxLoading] = useState(false);
+  const [txError, setTxError] = useState("");
 
   const handleSignOut = () => {
     alert("Signed out successfully!");
@@ -14,19 +20,47 @@ export default function BuyerProfile() {
   const buyerDetails = {
     company_name: "Example Corp",
     email: "buyer@example.com",
-    wallet_address: "0x1234abcd5678efgh",
+    pan_no: "ABCDE1234F",
+    bank: {
+      account_holder_name: "Example Corp",
+      account_number: "9876543210",
+      ifsc_code: "HDFC0005678",
+    },
+    wallet_address: account || "0x1234abcd5678efgh",
   };
 
-  const wallet = {
-    balance: 120,
-  };
-
-  const transactions = [
-    { id: 1, type: "Purchase", amount: "50 CC", status: "Completed" },
-    { id: 2, type: "Sale", amount: "30 CC", status: "Completed" },
-    { id: 3, type: "Purchase", amount: "40 CC", status: "Pending" },
-    { id: 4, type: "Purchase", amount: "100 CC", status: "Completed" },
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      await connectWallet();
+      if (contract && account) {
+        // Fetch wallet balance
+        try {
+          const balance = await contract.getWalletBalance(account);
+          setWalletBalance(Number(balance));
+        } catch (err) {
+          setWalletBalance("Error");
+        }
+        // Fetch all transactions
+        setTxLoading(true);
+        setTxError("");
+        try {
+          const allTx = await contract.getAllTransactions();
+          // Filter only those where from or to is the current account
+          const filtered = allTx.filter(
+            (tx) =>
+              (tx.from && tx.from.toLowerCase() === account.toLowerCase()) ||
+              (tx.to && tx.to.toLowerCase() === account.toLowerCase())
+          );
+          setTransactions(filtered);
+        } catch (err) {
+          setTxError("Could not fetch transactions");
+        }
+        setTxLoading(false);
+      }
+    }
+    fetchData();
+    // eslint-disable-next-line
+  }, [account, contract]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fcedd3]">
@@ -84,34 +118,36 @@ export default function BuyerProfile() {
         <section className="bg-white p-6 rounded-xl shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Wallet</h2>
           <p className="text-gray-700">
-            <strong>Balance:</strong> {wallet.balance} CC
+            <strong>Balance:</strong> {walletBalance === null ? "Loading..." : walletBalance === "Error" ? "Error" : `${walletBalance} CC`}
           </p>
         </section>
 
         {/* ✅ Transactions */}
         <section className="bg-white p-6 rounded-xl shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Transaction History</h2>
-          <div className="space-y-2">
-            {transactions.map((tx) => (
-              <div
-                key={tx.id}
-                className="flex justify-between p-3 border rounded-lg bg-gray-50"
-              >
-                <span>
-                  {tx.type} – {tx.amount}
-                </span>
-                <span
-                  className={
-                    tx.status === "Completed"
-                      ? "text-green-600"
-                      : "text-yellow-600"
-                  }
+          {txLoading ? (
+            <div>Loading transactions...</div>
+          ) : txError ? (
+            <div className="text-red-600">{txError}</div>
+          ) : transactions.length === 0 ? (
+            <div>No transaction found</div>
+          ) : (
+            <div className="space-y-2">
+              {transactions.map((tx, idx) => (
+                <div
+                  key={tx.id ? tx.id.toString() : idx}
+                  className="flex flex-col md:flex-row md:justify-between p-3 border rounded-lg bg-gray-50"
                 >
-                  {tx.status}
-                </span>
-              </div>
-            ))}
-          </div>
+                  <span>
+                    <strong>Type:</strong> {tx.txType} | <strong>Credit ID:</strong> {tx.creditId?.toString?.() || "-"} <br/>
+                    <strong>From:</strong> {tx.from} <br/>
+                    <strong>To:</strong> {tx.to} <br/>
+                    <strong>Timestamp:</strong> {tx.timestamp ? new Date(Number(tx.timestamp) * 1000).toLocaleString() : "-"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <div className="flex justify-center mt-10">

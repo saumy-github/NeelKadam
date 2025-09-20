@@ -79,6 +79,9 @@ export default function BuyerSignup() {
           <h1 className="text-3xl font-bold text-center mb-6 text-green-700">
             Buyer Sign Up
           </h1>
+          <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg">
+            Please create a MetaMask wallet/account before signing up.
+          </div>
 
           {/* Progress Bar */}
           <div className="mb-8">

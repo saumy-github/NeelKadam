@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { buyerAuth } from "../api/auth";
+import useWalletConnect from "../hooks/useWalletConnect";
 
 export default function BuyerLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { connectWallet } = useWalletConnect();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,6 +25,9 @@ export default function BuyerLogin() {
     setLoading(true);
     setError("");
     try {
+      if (!window.ethereum) {
+        throw new Error("Please install MetaMask first and create a wallet.");
+      }
       // Basic validation
       if (!formData.email || !formData.password) {
         throw new Error("Both email and password are required!");
@@ -42,7 +47,8 @@ export default function BuyerLogin() {
 
       // Store authentication data
       login(response.token, response.buyer);
-
+      // Connect MetaMask after successful login
+      await connectWallet();
       // Navigate to dashboard
       navigate("/buyer/dashboard");
     } catch (err) {

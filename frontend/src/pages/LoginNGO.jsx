@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { ngoAuth } from "../api/auth";
+import useWalletConnect from "../hooks/useWalletConnect";
 
 // Form field names follow snake_case convention to align with the backend API contract.
 // This ensures consistent data format between frontend and database schema.
 export default function NGOLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { connectWallet } = useWalletConnect();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -28,6 +30,11 @@ export default function NGOLogin() {
     setError("");
 
     try {
+      // Check for MetaMask
+      if (!window.ethereum) {
+        throw new Error("Please install MetaMask first and create a wallet.");
+      }
+
       // Basic validation
       if (!formData.email || !formData.password) {
         throw new Error("Both email and password are required!");
@@ -48,6 +55,9 @@ export default function NGOLogin() {
 
       // Store authentication data
       login(response.token, response.ngo);
+
+      // Connect MetaMask after successful login
+      await connectWallet();
 
       // Navigate to dashboard
       navigate("/ngo/dashboard");
@@ -125,7 +135,7 @@ export default function NGOLogin() {
             <p>
               <button
                 type="button"
-                onClick={() => navigate("/forgot-password")} // ✅ connected
+                onClick={() => navigate("/forgot-password")}
                 className="text-green-600 hover:underline"
               >
                 Forgot Password?

@@ -7,48 +7,50 @@ import useWalletConnect from "../hooks/useWalletConnect";
 // This ensures consistent data format between frontend and database schema.
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const { account, connectWallet } = useWalletConnect();
+  const { connectWallet } = useWalletConnect();
   const [formData, setFormData] = useState({
     email_or_phone: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError("");
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (!formData.email_or_phone || !formData.password) {
-      alert("Both fields are required!");
-      return;
-    }
-
-    // Email validation
-    const isEmail = /\S+@\S+\.\S+/.test(formData.email_or_phone);
-    // Phone validation
-    const isPhone = /^\d{10}$/.test(formData.email_or_phone);
-
-    if (!isEmail && !isPhone) {
-      alert("Enter a valid email or 10-digit phone number!");
-      return;
-    }
-
-    if (formData.password.length < 8) {
-      alert("Password must be at least 8 characters!");
-      return;
-    }
-
-    // TODO: Add real admin login verification logic
-    alert("Admin login successful (demo)!");
-    navigate("/admin/dashboard");
-
-    const loginSuccess = true; // Replace with real validation
-
-    if (loginSuccess) {
-      await connectWallet(); // This will trigger MetaMask popup
-      // ...redirect or show dashboard...
+    setLoading(true);
+    setError("");
+    try {
+      // Check for MetaMask
+      if (!window.ethereum) {
+        throw new Error("Please install MetaMask first and create a wallet.");
+      }
+      if (!formData.email_or_phone || !formData.password) {
+        throw new Error("Both fields are required!");
+      }
+      // Email validation
+      const isEmail = /\S+@\S+\.\S+/.test(formData.email_or_phone);
+      // Phone validation
+      const isPhone = /^\d{10}$/.test(formData.email_or_phone);
+      if (!isEmail && !isPhone) {
+        throw new Error("Enter a valid email or 10-digit phone number!");
+      }
+      if (formData.password.length < 8) {
+        throw new Error("Password must be at least 8 characters!");
+      }
+      // TODO: Add real admin login verification logic
+      // Connect MetaMask after successful login
+      await connectWallet();
+      // Navigate to dashboard
+      navigate("/admin/dashboard");
+    } catch (err) {
+      setError(err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,7 +66,11 @@ export default function AdminLogin() {
           <h1 className="text-3xl font-bold text-center mb-8 text-red-700">
             Admin Login
           </h1>
-
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
           {/* Email or Phone */}
           <input
             type="text"
@@ -75,7 +81,6 @@ export default function AdminLogin() {
             className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             required
           />
-
           {/* Password */}
           <input
             type="password"
@@ -86,16 +91,36 @@ export default function AdminLogin() {
             className="w-full p-3 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             required
           />
-
           {/* Login button */}
           <button
             type="submit"
-            className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800 transition"
+            disabled={loading}
+            className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           {/* Footer links */}
+          <div className="mt-6 text-center text-sm text-gray-700 space-y-2">
+            <p>
+              Don’t have an account?{" "}
+              <Link
+                to="/signup/admin"
+                className="text-red-700 font-bold hover:underline"
+              >
+                Sign up
+              </Link>
+            </p>
+            <p>
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password")}
+                className="text-red-600 hover:underline"
+              >
+                Forgot Password?
+              </button>
+            </p>
+          </div>
         </form>
       </main>
     </div>

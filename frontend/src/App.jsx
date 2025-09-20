@@ -22,6 +22,7 @@ import BuyerForgotPassword from "./pages/BuyerForgotPassword";
 import BuyerSignup from "./pages/BuyerSignup";
 import BuyerDashboard from "./pages/BuyerDashboard";
 import BuyerProfile from "./pages/BuyerProfile";
+import BuyerTransactions from "./pages/BuyerTransactions";
 import NGOProfile from "./pages/NGOProfile";
 
 // import BuyerWallet from "./pages/BuyerWallet";
@@ -91,6 +92,7 @@ function App() {
           {/* Buyer Routes */}
           <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
           <Route path="/buyer/profile" element={<BuyerProfile />} />
+          <Route path="/buyer/transactions" element={<BuyerTransactions />} />
 
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />

@@ -1,13 +1,28 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import SellCCModal from "../components/SellCCModal";
 import useWalletConnect from "../hooks/useWalletConnect";
 
 export default function BuyerDashboard() {
-  const { account, connectWallet } = useWalletConnect();
+  const { account, contract, connectWallet } = useWalletConnect();
+  const [walletBalance, setWalletBalance] = useState(null);
+  const [sellModalOpen, setSellModalOpen] = useState(false);
 
   useEffect(() => {
-    connectWallet();
-  }, []);
+    async function fetchBalance() {
+      await connectWallet();
+      if (contract && account) {
+        try {
+          const balance = await contract.getWalletBalance(account);
+          setWalletBalance(Number(balance));
+        } catch (err) {
+          setWalletBalance("Error");
+        }
+      }
+    }
+    fetchBalance();
+    // eslint-disable-next-line
+  }, [account, contract]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fcedd3]">
@@ -31,7 +46,9 @@ export default function BuyerDashboard() {
         <div className="grid md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
             <h3 className="text-lg font-semibold text-green-700">Wallet Balance</h3>
-            <p className="text-3xl font-bold mt-2 text-blue-600">500 CC</p>
+            <p className="text-3xl font-bold mt-2 text-blue-600">
+              {walletBalance === null ? "Loading..." : walletBalance === "Error" ? "Error" : `${walletBalance} CC`}
+            </p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
             <h3 className="text-lg font-semibold text-green-700">Transactions</h3>
@@ -57,13 +74,14 @@ export default function BuyerDashboard() {
             </Link>
 
             {/* Sell Carbon Credits */}
-            <Link
-              to="/buyer/sell-cc"
-              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition block"
+            <button
+              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition block text-left w-full"
+              onClick={() => setSellModalOpen(true)}
             >
               <h4 className="text-lg font-semibold mb-2">💰 Sell CC</h4>
               <p className="text-gray-600">List and sell your carbon credits in the market.</p>
-            </Link>
+            </button>
+            <SellCCModal open={sellModalOpen} onClose={() => setSellModalOpen(false)} account={account} />
 
             {/* Transaction History */}
             <Link

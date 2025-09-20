@@ -137,14 +137,17 @@ export default function SignUp() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#fcedd3]">
-      <main className="flex-grow flex justify-center items-start pt-20">
+      <main className="flex-grow flex justify-center items-start pt-32">
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-xl rounded-xl p-10 w-full max-w-2xl border border-gray-200"
+          className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md border border-gray-200"
         >
           <h1 className="text-3xl font-bold text-center mb-6 text-green-700">
             Seller Sign Up
           </h1>
+          <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg">
+            Please create a MetaMask wallet/account before signing up.
+          </div>
 
           {/* Progress Bar */}
           <div className="mb-8">
