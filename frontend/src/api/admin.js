@@ -34,6 +34,16 @@ export const adminApi = {
     }
   },
 
+  // Get all Projects
+  getAllProjects: async () => {
+    try {
+      const response = await apiClient.get("/admin/projects");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
   // Get all Panchayats
   getAllPanchayats: async (filters = {}) => {
     try {

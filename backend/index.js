@@ -23,6 +23,7 @@ const buyerAuthRoutes = require("./routes/auth/buyer");
 // Import other routes
 const projectRoutes = require("./routes/projects");
 const adminRoutes = require("./routes/admin");
+const adminProtectedRoutes = require("./routes/admin_route");
 const dashboardRoutes = require("./routes/dashboard_route");
 const buyerRoutes = require("./routes/buyer_route");
 
@@ -35,6 +36,7 @@ app.use("/api/auth/buyer", buyerAuthRoutes);
 // Use other routes
 app.use("/api/projects", projectRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/admin", adminProtectedRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/buyer", buyerRoutes);
 
