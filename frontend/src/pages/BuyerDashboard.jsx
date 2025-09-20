@@ -2,12 +2,43 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SellCCModal from "../components/SellCCModal";
 import useWalletConnect from "../hooks/useWalletConnect";
+import buyerApi from "../api/buyer";
 
 export default function BuyerDashboard() {
   const { account, contract, connectWallet } = useWalletConnect();
   const [walletBalance, setWalletBalance] = useState(null);
   const [sellModalOpen, setSellModalOpen] = useState(false);
 
+  // State for dashboard data
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch dashboard data from API
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        setLoading(true);
+        const response = await buyerApi.getBuyerDashboard();
+        if (response.success) {
+          setDashboardData(response.dashboard);
+        } else {
+          setError("Failed to fetch dashboard data");
+        }
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+        setError(
+          err.message || "An error occurred while fetching dashboard data"
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboardData();
+  }, []); // Empty dependency array - runs only once on mount
+
+  // Fetch blockchain wallet balance
   useEffect(() => {
     async function fetchBalance() {
       await connectWallet();
@@ -30,35 +61,79 @@ export default function BuyerDashboard() {
       <nav className="bg-green-700 text-white p-4 flex justify-between items-center shadow">
         <h1 className="text-xl font-bold">Buyer Dashboard</h1>
         <ul className="flex gap-6 text-sm font-medium">
-          <li><Link to="/" className="hover:underline">Home</Link></li>
-          <li><Link to="/about" className="hover:underline">About</Link></li>
-          <li><Link to="/buyer/profile" className="hover:underline">Profile</Link></li>
-          <li><Link to="/blog" className="hover:underline">Blog</Link></li>
+          <li>
+            <Link to="/" className="hover:underline">
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link to="/about" className="hover:underline">
+              About
+            </Link>
+          </li>
+          <li>
+            <Link to="/buyer/profile" className="hover:underline">
+              Profile
+            </Link>
+          </li>
+          <li>
+            <Link to="/blog" className="hover:underline">
+              Blog
+            </Link>
+          </li>
         </ul>
       </nav>
 
       {/* ✅ Main content area */}
       <main className="flex-grow p-8 space-y-10 overflow-y-auto">
-        {/* Welcome */}
-        <h2 className="text-2xl font-bold mb-4">Welcome back</h2>
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-700"></div>
+          </div>
+        ) : error ? (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <p>{error}</p>
+          </div>
+        ) : (
+          <>
+            {/* Welcome */}
+            <h2 className="text-2xl font-bold mb-4">
+              Welcome back, {dashboardData?.profile?.company_name || "Buyer"}
+            </h2>
 
-        {/* ✅ Wallet & Transaction Stats */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-lg font-semibold text-green-700">Wallet Balance</h3>
-            <p className="text-3xl font-bold mt-2 text-blue-600">
-              {walletBalance === null ? "Loading..." : walletBalance === "Error" ? "Error" : `${walletBalance} CC`}
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-lg font-semibold text-green-700">Transactions</h3>
-            <p className="text-3xl font-bold mt-2">24</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-lg font-semibold text-green-700">Verified Purchases</h3>
-            <p className="text-3xl font-bold mt-2 text-green-600">12</p>
-          </div>
-        </div>
+            {/* ✅ Wallet & Transaction Stats */}
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
+                <h3 className="text-lg font-semibold text-green-700">
+                  Wallet Balance
+                </h3>
+                <p className="text-3xl font-bold mt-2 text-blue-600">
+                  {walletBalance === null
+                    ? "Loading..."
+                    : walletBalance === "Error"
+                    ? "Error"
+                    : `${walletBalance} CC`}
+                </p>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
+                <h3 className="text-lg font-semibold text-green-700">
+                  Carbon Credits
+                </h3>
+                <p className="text-3xl font-bold mt-2">
+                  {dashboardData?.stats?.total_credits_owned || 0}
+                </p>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
+                <h3 className="text-lg font-semibold text-green-700">
+                  Verified Purchases
+                </h3>
+                <p className="text-3xl font-bold mt-2 text-green-600">
+                  {dashboardData?.transactions?.length || 0}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* ✅ Quick Actions */}
         <div>
@@ -70,7 +145,9 @@ export default function BuyerDashboard() {
               className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition block"
             >
               <h4 className="text-lg font-semibold mb-2">💳 Buy CC</h4>
-              <p className="text-gray-600">Purchase carbon credits securely from verified projects.</p>
+              <p className="text-gray-600">
+                Purchase carbon credits securely from verified projects.
+              </p>
             </Link>
 
             {/* Sell Carbon Credits */}
@@ -79,9 +156,15 @@ export default function BuyerDashboard() {
               onClick={() => setSellModalOpen(true)}
             >
               <h4 className="text-lg font-semibold mb-2">💰 Sell CC</h4>
-              <p className="text-gray-600">List and sell your carbon credits in the market.</p>
+              <p className="text-gray-600">
+                List and sell your carbon credits in the market.
+              </p>
             </button>
-            <SellCCModal open={sellModalOpen} onClose={() => setSellModalOpen(false)} account={account} />
+            <SellCCModal
+              open={sellModalOpen}
+              onClose={() => setSellModalOpen(false)}
+              account={account}
+            />
 
             {/* Transaction History */}
             <Link
@@ -89,7 +172,9 @@ export default function BuyerDashboard() {
               className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition block"
             >
               <h4 className="text-lg font-semibold mb-2">📜 Transactions</h4>
-              <p className="text-gray-600">View your complete transaction history here.</p>
+              <p className="text-gray-600">
+                View your complete transaction history here.
+              </p>
             </Link>
           </div>
         </div>
@@ -98,11 +183,21 @@ export default function BuyerDashboard() {
         <div>
           <h3 className="text-xl font-semibold mb-4">Recent Activity</h3>
           <div className="bg-white p-6 rounded-xl shadow space-y-4 max-h-64 overflow-y-auto">
-            <p className="text-sm text-gray-700">✅ Purchased 100 CC from "Coastal Mangrove Project".</p>
-            <p className="text-sm text-gray-700">💰 Bid placed for 75 CC in "Seagrass Plantation".</p>
-            <p className="text-sm text-gray-700">📜 Invoice generated for transaction #4521.</p>
-            <p className="text-sm text-gray-700">⚠️ Pending payment confirmation for 50 CC.</p>
-            <p className="text-sm text-gray-700">✅ Wallet topped up with ₹20,000 for future purchases.</p>
+            <p className="text-sm text-gray-700">
+              ✅ Purchased 100 CC from "Coastal Mangrove Project".
+            </p>
+            <p className="text-sm text-gray-700">
+              💰 Bid placed for 75 CC in "Seagrass Plantation".
+            </p>
+            <p className="text-sm text-gray-700">
+              📜 Invoice generated for transaction #4521.
+            </p>
+            <p className="text-sm text-gray-700">
+              ⚠️ Pending payment confirmation for 50 CC.
+            </p>
+            <p className="text-sm text-gray-700">
+              ✅ Wallet topped up with ₹20,000 for future purchases.
+            </p>
           </div>
         </div>
 
