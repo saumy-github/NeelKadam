@@ -23,6 +23,8 @@ const buyerAuthRoutes = require("./routes/auth/buyer");
 // Import other routes
 const projectRoutes = require("./routes/projects");
 const adminRoutes = require("./routes/admin");
+const dashboardRoutes = require("./routes/dashboard_route");
+const buyerRoutes = require("./routes/buyer_route");
 
 // Use auth routes with specific prefixes
 app.use("/api/auth/ngo", ngoAuthRoutes);
@@ -33,6 +35,8 @@ app.use("/api/auth/buyer", buyerAuthRoutes);
 // Use other routes
 app.use("/api/projects", projectRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/buyer", buyerRoutes);
 
 // Root route - welcome message
 app.get("/", (req, res) => {
@@ -44,6 +48,8 @@ app.get("/", (req, res) => {
       auth: "/api/auth/*",
       projects: "/api/projects",
       admin: "/api/admin",
+      dashboard: "/api/dashboard",
+      buyer: "/api/buyer",
       test: "/api/test_connection",
     },
   });
