@@ -1,36 +1,42 @@
-// Buyer authentication routes
 const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
 const bcrypt = require("bcryptjs");
 
-// POST /api/auth/buyer/register - Buyer Registration
+// ================= REGISTER =================
 router.post("/register", async (req, res) => {
   const {
     company_name,
     email,
+    phone,
     password,
     pan_no,
     account_holder_name,
     account_number,
     ifsc_code,
+    wallet_address, // ✅ now included
   } = req.body;
 
   try {
-    // Hash the password
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newBuyer = await pool.query(
-      `INSERT INTO buyer (company_name, email, password, pan_no, account_holder_name, account_number, ifsc_code) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      `INSERT INTO buyer 
+        (company_name, email, phone, password, pan_no, account_holder_name, account_number, ifsc_code, wallet_address, total_cc, is_verified, created_at, updated_at) 
+       VALUES 
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, 0, false, NOW(), NOW()) 
+       RETURNING *`,
       [
         company_name,
         email,
+        phone,
         hashedPassword,
         pan_no,
         account_holder_name,
         account_number,
         ifsc_code,
+        wallet_address || null, // can be null at signup
       ]
     );
 
@@ -39,103 +45,85 @@ router.post("/register", async (req, res) => {
       buyer: newBuyer.rows[0],
     });
   } catch (error) {
-    console.error(error.message);
+    console.error("Register error:", error.message);
     if (error.code === "23505") {
-      return res.status(400).json({
-        error: "Email already exists",
-      });
+      return res.status(400).json({ error: "Email or Phone already exists" });
     }
-    res.status(500).json({
-      error: "Server error",
-    });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// POST /api/auth/buyer/login - Buyer Login
+// ================= LOGIN =================
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { emailOrPhone, password } = req.body;
 
   try {
-    // 1. Check if Buyer exists
-    const buyer = await pool.query("SELECT * FROM buyer WHERE email = $1", [
-      email,
-    ]);
+    // Detect if input is email or phone
+    const isEmail = /\S+@\S+\.\S+/.test(emailOrPhone);
+    const query = isEmail
+      ? "SELECT * FROM buyer WHERE email = $1"
+      : "SELECT * FROM buyer WHERE phone = $1";
+
+    const buyer = await pool.query(query, [emailOrPhone]);
 
     if (buyer.rows.length === 0) {
-      return res.status(400).json({
-        error: "Invalid credentials",
-      });
+      return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    // 2. Check password
+    // Check password
     const isMatch = await bcrypt.compare(password, buyer.rows[0].password);
-
     if (!isMatch) {
-      return res.status(400).json({
-        error: "Invalid credentials",
-      });
+      return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    // 3. Return buyer data (without password)
+    // Remove password before sending response
     const buyerData = { ...buyer.rows[0] };
     delete buyerData.password;
 
     res.json({
       message: "Login successful",
       buyer: buyerData,
-      token: "dummy-token", // You can implement JWT here
+      token: "dummy-token", // Replace with JWT later
     });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({
-      error: "Server error",
-    });
+    console.error("Login error:", error.message);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// GET /api/auth/buyer/profile - Get Buyer Profile
+// ================= PROFILE GET =================
 router.get("/profile", async (req, res) => {
   try {
-    // In a real app, you'd get the buyer_id from the JWT token
     const { buyer_id } = req.query;
 
     if (!buyer_id) {
-      return res.status(400).json({
-        error: "Buyer ID is required",
-      });
+      return res.status(400).json({ error: "Buyer ID is required" });
     }
 
     const buyer = await pool.query(
-      "SELECT buyer_id, company_name, email, phone, company_type, pan_no, account_holder_name, account_number, ifsc_code, is_verified, created_at FROM buyer WHERE buyer_id = $1",
+      `SELECT buyer_id, company_name, email, phone, pan_no, account_holder_name, account_number, ifsc_code, wallet_address, total_cc, is_verified, created_at, updated_at 
+       FROM buyer WHERE buyer_id = $1`,
       [buyer_id]
     );
 
     if (buyer.rows.length === 0) {
-      return res.status(404).json({
-        error: "Buyer not found",
-      });
+      return res.status(404).json({ error: "Buyer not found" });
     }
 
-    res.json({
-      buyer: buyer.rows[0],
-    });
+    res.json({ buyer: buyer.rows[0] });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({
-      error: "Server error",
-    });
+    console.error("Profile error:", error.message);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// PUT /api/auth/buyer/profile - Update Buyer Profile
+// ================= PROFILE UPDATE =================
 router.put("/profile", async (req, res) => {
   const { buyer_id, ...updateData } = req.body;
 
   try {
     if (!buyer_id) {
-      return res.status(400).json({
-        error: "Buyer ID is required",
-      });
+      return res.status(400).json({ error: "Buyer ID is required" });
     }
 
     const setClause = Object.keys(updateData)
@@ -145,14 +133,14 @@ router.put("/profile", async (req, res) => {
     const values = [buyer_id, ...Object.values(updateData)];
 
     const updatedBuyer = await pool.query(
-      `UPDATE buyer SET ${setClause} WHERE buyer_id = $1 RETURNING buyer_id, company_name, email, phone, company_type, pan_no, account_holder_name, account_number, ifsc_code, is_verified, created_at`,
+      `UPDATE buyer SET ${setClause}, updated_at = NOW() 
+       WHERE buyer_id = $1 
+       RETURNING buyer_id, company_name, email, phone, pan_no, account_holder_name, account_number, ifsc_code, wallet_address, total_cc, is_verified, created_at, updated_at`,
       values
     );
 
     if (updatedBuyer.rows.length === 0) {
-      return res.status(404).json({
-        error: "Buyer not found",
-      });
+      return res.status(404).json({ error: "Buyer not found" });
     }
 
     res.json({
@@ -160,10 +148,8 @@ router.put("/profile", async (req, res) => {
       buyer: updatedBuyer.rows[0],
     });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({
-      error: "Server error",
-    });
+    console.error("Update profile error:", error.message);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
