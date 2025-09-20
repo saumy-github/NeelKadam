@@ -8,7 +8,6 @@ router.post("/register", async (req, res) => {
   const {
     company_name,
     email,
-    phone,
     password,
     pan_no,
     account_holder_name,
@@ -23,14 +22,13 @@ router.post("/register", async (req, res) => {
 
     const newBuyer = await pool.query(
       `INSERT INTO buyer 
-        (company_name, email, phone, password, pan_no, account_holder_name, account_number, ifsc_code, wallet_address, total_cc, is_verified, created_at, updated_at) 
+        (company_name, email, password, pan_no, account_holder_name, account_number, ifsc_code, wallet_address, total_cc, is_verified, created_at, updated_at) 
        VALUES 
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, 0, false, NOW(), NOW()) 
+        ($1, $2, $3, $4, $5, $6, $7, $8, 0, false, NOW(), NOW()) 
        RETURNING *`,
       [
         company_name,
         email,
-        phone,
         hashedPassword,
         pan_no,
         account_holder_name,
@@ -47,7 +45,7 @@ router.post("/register", async (req, res) => {
   } catch (error) {
     console.error("Register error:", error.message);
     if (error.code === "23505") {
-      return res.status(400).json({ error: "Email or Phone already exists" });
+      return res.status(400).json({ error: "Email already exists" });
     }
     res.status(500).json({ error: "Server error" });
   }
@@ -55,16 +53,10 @@ router.post("/register", async (req, res) => {
 
 // ================= LOGIN =================
 router.post("/login", async (req, res) => {
-  const { emailOrPhone, password } = req.body;
+  const { email, password } = req.body;
 
   try {
-    // Detect if input is email or phone
-    const isEmail = /\S+@\S+\.\S+/.test(emailOrPhone);
-    const query = isEmail
-      ? "SELECT * FROM buyer WHERE email = $1"
-      : "SELECT * FROM buyer WHERE phone = $1";
-
-    const buyer = await pool.query(query, [emailOrPhone]);
+    const buyer = await pool.query("SELECT * FROM buyer WHERE email = $1", [email]);
 
     if (buyer.rows.length === 0) {
       return res.status(400).json({ error: "Invalid credentials" });
@@ -101,7 +93,7 @@ router.get("/profile", async (req, res) => {
     }
 
     const buyer = await pool.query(
-      `SELECT buyer_id, company_name, email, phone, pan_no, account_holder_name, account_number, ifsc_code, wallet_address, total_cc, is_verified, created_at, updated_at 
+      `SELECT buyer_id, company_name, email, pan_no, account_holder_name, account_number, ifsc_code, wallet_address, total_cc, is_verified, created_at, updated_at 
        FROM buyer WHERE buyer_id = $1`,
       [buyer_id]
     );

@@ -15,9 +15,7 @@ router.post("/register", async (req, res) => {
     ngo_name,
     email,
     password,
-    phone,
     spokesperson_name,
-    spokesperson_mobile,
     pan_no,
     account_holder_name,
     account_number,
@@ -43,17 +41,15 @@ router.post("/register", async (req, res) => {
     // Insert the new NGO into the database
     const newNgo = await pool.query(
       `INSERT INTO ngo (
-        license_no, ngo_name, email, password, phone, spokesperson_name, 
-        spokesperson_mobile, pan_no, account_holder_name, account_number, ifsc_code
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+        license_no, ngo_name, email, password, spokesperson_name, 
+        pan_no, account_holder_name, account_number, ifsc_code
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
       [
         license_no,
         ngo_name,
         email,
         hashedPassword,
-        phone,
         spokesperson_name,
-        spokesperson_mobile,
         pan_no,
         account_holder_name,
         account_number,

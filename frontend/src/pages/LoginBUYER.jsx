@@ -7,7 +7,7 @@ export default function BuyerLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    emailOrPhone: "",
+    email: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
@@ -24,23 +24,19 @@ export default function BuyerLogin() {
     setError("");
     try {
       // Basic validation
-      if (!formData.emailOrPhone || !formData.password) {
-        throw new Error("Both email/phone and password are required!");
+      if (!formData.email || !formData.password) {
+        throw new Error("Both email and password are required!");
       }
 
-      // Email or Phone validation
-      const isEmail = /\S+@\S+\.\S+/.test(formData.emailOrPhone);
-      const isPhone = /^[0-9]{10}$/.test(formData.emailOrPhone); // 10-digit phone
-
-      if (!isEmail && !isPhone) {
-        throw new Error("Please enter a valid email address or phone number!");
-      }
+      // Email validation
+      const isEmail = /\S+@\S+\.\S+/.test(formData.email);
+      if (!isEmail) throw new Error("Please enter a valid email address!");
 
       // ✅ Removed password minimum length check
 
       // Call the API
       const response = await buyerAuth.login({
-        emailOrPhone: formData.emailOrPhone, // unified field
+        email: formData.email,
         password: formData.password,
       });
 
@@ -71,12 +67,12 @@ export default function BuyerLogin() {
               {error}
             </div>
           )}
-          {/* Email or Phone */}
+          {/* Email */}
           <input
-            type="text"
-            name="emailOrPhone"
+            type="email"
+            name="email"
             placeholder="Enter Email Address"
-            value={formData.emailOrPhone}
+            value={formData.email}
             onChange={handleChange}
             className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             required

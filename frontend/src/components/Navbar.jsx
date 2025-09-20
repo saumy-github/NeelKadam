@@ -55,7 +55,7 @@ export default function Navbar() {
     >
       <div className="flex items-center justify-between w-full px-6">
         {/* Logo */}
-        <div className="flex items-center space-x-3">
+        <Link to="/" className="flex items-center space-x-3 hover:opacity-90">
           <div className="h-12 w-12 rounded-full bg-white flex items-center justify-center shadow-md">
             <img
               src="/Logo12.png"
@@ -63,10 +63,8 @@ export default function Navbar() {
               className="h-10 w-10 object-contain filter brightness-125 contrast-125 drop-shadow"
             />
           </div>
-          <span className="text-2xl font-bold flex items-center">
-            NEELKADAM
-          </span>
-        </div>
+          <span className="text-2xl font-bold flex items-center">NEELKADAM</span>
+        </Link>
 
         {/* Links */}
         <div className="flex space-x-6 text-lg font-medium items-center">

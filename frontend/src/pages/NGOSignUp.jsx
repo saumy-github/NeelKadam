@@ -9,34 +9,30 @@ export default function SignUp() {
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
-    email: "",
-    phone: "",
-    password: "",
-    confirm_password: "",
-    email_otp: "",
-    phone_otp: "",
-    ngo_name: "",
-    license_no: "",
-    spokesperson_name: "",
-    spokesperson_mobile: "",
-    pan_no: "",
-    account_holder_name: "",
-    account_number: "",
-    ifsc_code: "",
-    zila_id_ward_no: "",
-    address: "",
-    contact_email: "",
-    contact_phone: "",
-    community_name: "",
-    community_spokesperson_name: "",
-    community_spokesperson_mobile: "",
+  email: "",
+  password: "",
+  confirm_password: "",
+  email_otp: "",
+  ngo_name: "",
+  license_no: "",
+  spokesperson_name: "",
+  spokesperson_mobile: "",
+  pan_no: "",
+  account_holder_name: "",
+  account_number: "",
+  ifsc_code: "",
+  zila_id_ward_no: "",
+  address: "",
+  contact_email: "",
+  community_name: "",
+  community_spokesperson_name: "",
+  community_spokesperson_mobile: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // OTP method
-  const [otpMethod, setOtpMethod] = useState("");
+  // Removed OTP method selection, only email OTP is used
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,8 +43,8 @@ export default function SignUp() {
     setError(""); // clear error
 
     if (step === 1) {
-      if (!formData.email || !formData.phone) {
-        setError("Email and Phone are required.");
+      if (!formData.email) {
+        setError("Email is required.");
         return;
       }
       if (formData.password !== formData.confirm_password) {
@@ -58,8 +54,8 @@ export default function SignUp() {
     }
 
     if (step === 2) {
-      if (!otpMethod) {
-        setError("Please select an OTP method.");
+      if (!formData.email_otp) {
+        setError("Please enter the OTP sent to your email.");
         return;
       }
     }
@@ -87,7 +83,6 @@ export default function SignUp() {
           ngo_name: formData.ngo_name,
           email: formData.email,
           password: formData.password,
-          phone: formData.phone,
           spokesperson_name: formData.spokesperson_name,
           spokesperson_mobile: formData.spokesperson_mobile,
           pan_no: formData.pan_no,
@@ -102,7 +97,6 @@ export default function SignUp() {
           address: formData.address,
           email: formData.email,
           password: formData.password,
-          phone: formData.phone || formData.contact_phone,
           pan_no: formData.pan_no,
           account_holder_name: formData.account_holder_name,
           account_number: formData.account_number,
@@ -183,14 +177,7 @@ export default function SignUp() {
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Phone (10 digits)"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
+
 
               {/* Password */}
               <div className="relative mb-4">
@@ -234,55 +221,20 @@ export default function SignUp() {
 
           {/* Step 2 */}
           {step === 2 && (
-            <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 2: OTP Verification</h2>
-              <p className="font-medium text-gray-700 mb-2">Choose how you want to receive OTP:</p>
-              <div className="flex gap-6 mb-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="otpMethod"
-                    value="email"
-                    checked={otpMethod === "email"}
-                    onChange={() => setOtpMethod("email")}
-                    className="mr-2"
-                  />
-                  Email
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="otpMethod"
-                    value="phone"
-                    checked={otpMethod === "phone"}
-                    onChange={() => setOtpMethod("phone")}
-                    className="mr-2"
-                  />
-                  Phone
-                </label>
-              </div>
-              {otpMethod === "email" && (
-                <input
-                  type="text"
-                  name="email_otp"
-                  placeholder="Enter Email OTP"
-                  value={formData.email_otp}
-                  onChange={handleChange}
-                  className="w-full p-3 mb-4 border rounded-lg"
-                />
-              )}
-              {otpMethod === "phone" && (
-                <input
-                  type="text"
-                  name="phone_otp"
-                  placeholder="Enter Phone OTP"
-                  value={formData.phone_otp}
-                  onChange={handleChange}
-                  className="w-full p-3 mb-4 border rounded-lg"
-                />
-              )}
-            </div>
-          )}
+  <div>
+    <h2 className="text-2xl font-bold text-green-700 mb-6">Step 2: OTP Verification</h2>
+    <p className="font-medium text-gray-700 mb-2">Enter the OTP sent to your Email:</p>
+    <input
+      type="text"
+      name="email_otp"
+      placeholder="Enter Email OTP"
+      value={formData.email_otp}
+      onChange={handleChange}
+      className="w-full p-3 mb-4 border rounded-lg"
+    />
+  </div>
+)}
+
 
           {/* Step 3 */}
           {step === 3 && (

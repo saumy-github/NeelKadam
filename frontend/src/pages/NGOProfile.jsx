@@ -29,7 +29,6 @@ export default function NGOProfile() {
 
   const wallet = {
     balance: 350,
-    total_cc: 500,
   };
 
   const transactions = [
@@ -90,16 +89,7 @@ export default function NGOProfile() {
             <li>
               <strong>Spokesperson:</strong> {ngoDetails.spokesperson_name}
             </li>
-            <li>
-              <strong>PAN No:</strong> {ngoDetails.pan_no}
-            </li>
-            <li>
-              <strong>Bank Details:</strong>
-              <br />
-              {ngoDetails.bank.account_holder_name}, A/C:{" "}
-              {ngoDetails.bank.account_number},<br />
-              IFSC: {ngoDetails.bank.ifsc_code}, MICR: {ngoDetails.bank.micr}
-            </li>
+            
           </ul>
         </section>
 
@@ -109,9 +99,7 @@ export default function NGOProfile() {
           <p className="text-gray-700">
             <strong>Balance:</strong> {wallet.balance} CC
           </p>
-          <p className="text-gray-700">
-            <strong>Total Credits Earned:</strong> {wallet.total_cc} CC
-          </p>
+          
         </section>
 
         {/* ✅ Transactions */}

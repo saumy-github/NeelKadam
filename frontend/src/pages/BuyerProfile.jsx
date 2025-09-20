@@ -14,18 +14,11 @@ export default function BuyerProfile() {
   const buyerDetails = {
     company_name: "Example Corp",
     email: "buyer@example.com",
-    pan_no: "ABCDE1234F",
-    bank: {
-      account_holder_name: "Example Corp",
-      account_number: "9876543210",
-      ifsc_code: "HDFC0005678",
-    },
     wallet_address: "0x1234abcd5678efgh",
   };
 
   const wallet = {
     balance: 120,
-    total_cc: 300,
   };
 
   const transactions = [
@@ -80,16 +73,7 @@ export default function BuyerProfile() {
             <li>
               <strong>Email:</strong> {buyerDetails.email}
             </li>
-            <li>
-              <strong>PAN No:</strong> {buyerDetails.pan_no}
-            </li>
-            <li>
-              <strong>Bank Details:</strong>
-              <br />
-              {buyerDetails.bank.account_holder_name}, A/C:{" "}
-              {buyerDetails.bank.account_number},<br />
-              IFSC: {buyerDetails.bank.ifsc_code}
-            </li>
+            
             <li>
               <strong>Wallet Address:</strong> {buyerDetails.wallet_address}
             </li>
@@ -101,9 +85,6 @@ export default function BuyerProfile() {
           <h2 className="text-xl font-semibold mb-4">Wallet</h2>
           <p className="text-gray-700">
             <strong>Balance:</strong> {wallet.balance} CC
-          </p>
-          <p className="text-gray-700">
-            <strong>Total Credits Bought:</strong> {wallet.total_cc} CC
           </p>
         </section>
 

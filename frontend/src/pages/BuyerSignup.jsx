@@ -9,11 +9,9 @@ export default function BuyerSignup() {
   const [formData, setFormData] = useState({
     company_name: "",
     email: "",
-    phone: "",
     password: "",
     confirm_password: "",
     email_otp: "",
-    phone_otp: "",
     pan_no: "",
     is_verified: false,
     account_holder_name: "",
@@ -27,8 +25,7 @@ export default function BuyerSignup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // OTP method selection
-  const [otpMethod, setOtpMethod] = useState("");
+  // Removed OTP method selection
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -43,7 +40,7 @@ export default function BuyerSignup() {
       if (!formData.email || !formData.password || !formData.confirm_password) return;
       if (formData.password !== formData.confirm_password) return;
     }
-    if (step === 2 && !otpMethod) return;
+    if (step === 2 && !formData.email_otp) return;
     if (step === 3 && !formData.pan_no) return;
 
     setStep((prev) => Math.min(prev + 1, totalSteps));
@@ -120,14 +117,7 @@ export default function BuyerSignup() {
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Phone (10 digits)"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
+              {/* Removed phone input */}
 
               {/* Password */}
               <div className="relative mb-4">
@@ -175,55 +165,14 @@ export default function BuyerSignup() {
               <h2 className="text-2xl font-bold text-green-700 mb-6">
                 Step 2: OTP Verification
               </h2>
-              <div className="mb-4">
-                <p className="font-medium text-gray-700 mb-2">
-                  Choose how you want to receive OTP:
-                </p>
-                <div className="flex gap-6">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="otpMethod"
-                      value="email"
-                      checked={otpMethod === "email"}
-                      onChange={() => setOtpMethod("email")}
-                      className="mr-2"
-                    />
-                    Email
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="otpMethod"
-                      value="phone"
-                      checked={otpMethod === "phone"}
-                      onChange={() => setOtpMethod("phone")}
-                      className="mr-2"
-                    />
-                    Phone
-                  </label>
-                </div>
-              </div>
-              {otpMethod === "email" && (
-                <input
-                  type="text"
-                  name="email_otp"
-                  placeholder="Enter Email OTP"
-                  value={formData.email_otp}
-                  onChange={handleChange}
-                  className="w-full p-3 mb-4 border rounded-lg"
-                />
-              )}
-              {otpMethod === "phone" && (
-                <input
-                  type="text"
-                  name="phone_otp"
-                  placeholder="Enter Phone OTP"
-                  value={formData.phone_otp}
-                  onChange={handleChange}
-                  className="w-full p-3 mb-4 border rounded-lg"
-                />
-              )}
+              <input
+                type="text"
+                name="email_otp"
+                placeholder="Enter Email OTP"
+                value={formData.email_otp}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
             </div>
           )}
 
