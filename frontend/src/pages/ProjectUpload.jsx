@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { projectApi } from "../api/projects";
 
 // Form field names follow snake_case convention to align with the backend API contract.
 // This ensures consistent data format between frontend and database schema.
 export default function ProjectUpload() {
+  const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     plantation_area: "",
     location: "",
@@ -35,18 +38,68 @@ export default function ProjectUpload() {
     setPreviewImages(previews);
   };
 
-  const handleSubmit = (e) => {
+  const handle_submit = async (e) => {
     e.preventDefault();
-    // TODO: Connect with backend API
-    console.log("Submitted Project:", formData);
-    alert("Project uploaded successfully (demo)!");
+
+    try {
+      // If not authenticated, show error and return
+      if (!isAuthenticated) {
+        alert("You must be logged in to upload a project.");
+        return;
+      }
+
+      // Create a copy of the form data without photos for the initial project creation
+      const { photos, ...projectData } = formData;
+
+      // Convert string values to numbers for numeric fields
+      projectData.tree_no = +projectData.tree_no;
+      projectData.estimated_cc = +projectData.estimated_cc;
+
+      // Submit the project data to the API
+      const response = await projectApi.createProject(projectData);
+
+      // If there are photos and project was created successfully, upload them
+      if (photos.length > 0 && response.id) {
+        try {
+          await projectApi.uploadPhotos(response.id, photos);
+          console.log("Photos uploaded successfully");
+        } catch (photoError) {
+          console.error("Error uploading photos:", photoError);
+          alert(
+            "Project was created, but there was an error uploading photos."
+          );
+        }
+      }
+
+      // Clear the form on success
+      setFormData({
+        plantation_area: "",
+        location: "",
+        tree_type: "",
+        plantation_period: "",
+        tree_no: "",
+        estimated_cc: "",
+        photos: [],
+      });
+      setPreviewImages([]);
+
+      // Show success message
+      alert("Project uploaded successfully!");
+      console.log("Project created:", response);
+    } catch (error) {
+      // Show error message
+      alert(
+        `Error uploading project: ${error.message || "Unknown error occurred"}`
+      );
+      console.error("Project upload error:", error);
+    }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#fcedd3]">
       <main className="flex-grow flex justify-center items-start pt-10">
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handle_submit}
           className="bg-white shadow-xl rounded-xl p-10 w-full max-w-3xl border border-gray-200"
         >
           <h1 className="text-3xl font-bold text-center mb-8 text-green-700">

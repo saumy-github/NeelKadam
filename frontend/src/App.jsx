@@ -4,7 +4,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
-
 import Landing from "./pages/Landing";
 import NGO from "./pages/NGO";
 import Blog from "./pages/Blog";

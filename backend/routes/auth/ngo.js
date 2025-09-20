@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../db"); // Assuming db.js is in the parent directory
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken"); // Add JWT
 
 // POST /api/auth/ngo/register - NGO Registration
 router.post("/register", async (req, res) => {
@@ -144,10 +145,22 @@ router.post("/login", async (req, res) => {
       email: ngo.email,
     });
 
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        seller_id: ngo.ngo_id,
+        seller_type: "ngo",
+        email: ngo.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
     // 3. Login successful
     res.status(200).json({
       success: true,
       message: "NGO logged in successfully!",
+      token, // Send the token to the client
       ngo: {
         ngo_id: ngo.ngo_id,
         ngo_name: ngo.ngo_name,

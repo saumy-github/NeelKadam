@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken"); // Add JWT
 
 // POST /api/auth/panchayat/register - Panchayat Registration
 router.post("/register", async (req, res) => {
@@ -149,11 +150,22 @@ router.post("/login", async (req, res) => {
     const panchayatData = { ...panchayat.rows[0] };
     delete panchayatData.password;
 
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        seller_id: panchayatData.cp_id,
+        seller_type: "panchayat",
+        email: panchayatData.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
     res.json({
       success: true,
       message: "Login successful",
       panchayat: panchayatData,
-      token: "dummy-token", // You can implement JWT here
+      token: token,
     });
   } catch (error) {
     console.error("❌ Error in Panchayat login:", error.message);

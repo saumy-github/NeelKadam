@@ -2,21 +2,49 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
+const jwt = require("jsonwebtoken");
 
-// POST /api/projects - Create new project
-router.post("/", async (req, res) => {
-  const {
-    seller_id,
-    seller_type,
-    plantation_area,
-    location,
-    tree_type,
-    tree_no,
-    plantation_period,
-    estimated_cc,
-  } = req.body;
+// Authentication middleware
+const authMiddleware = (req, res, next) => {
+  // Get token from the Authorization header
+  const authHeader = req.header("Authorization");
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Access denied. No token provided." });
+  }
+
+  const token = authHeader.replace("Bearer ", "");
 
   try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Add user info to request
+    req.user = decoded;
+
+    next();
+  } catch (error) {
+    console.error("Token verification failed:", error.message);
+    res.status(401).json({ error: "Invalid token." });
+  }
+};
+
+// POST /api/projects - Create new project with authentication
+router.post("/", authMiddleware, async (req, res) => {
+  try {
+    // Extract user info from JWT token payload (added by auth middleware)
+    const seller_id = req.user.seller_id;
+    const seller_type = req.user.seller_type; // Get the seller type from the JWT token
+
+    const {
+      plantation_area,
+      location,
+      tree_type,
+      tree_no,
+      plantation_period,
+      estimated_cc,
+    } = req.body;
+
     const newProject = await pool.query(
       `INSERT INTO project (seller_id, seller_type, plantation_area, location, tree_type, tree_no, plantation_period, estimated_cc, status) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending') RETURNING *`,
@@ -41,6 +69,71 @@ router.post("/", async (req, res) => {
     res.status(500).json({
       error: "Server error",
     });
+  }
+});
+
+// POST /api/projects/submit - Protected route for logged-in NGOs to submit projects
+router.post("/submit", authMiddleware, async (req, res) => {
+  try {
+    // Extract user info from JWT token payload (added by auth middleware)
+    const seller_id = req.user.seller_id;
+    const seller_type = req.user.seller_type; // Get the seller type from the JWT token
+
+    // Extract project data from request body
+    const {
+      plantation_area,
+      location,
+      tree_type,
+      tree_no,
+      plantation_period,
+      estimated_cc,
+    } = req.body;
+
+    // Validate required fields
+    if (
+      !plantation_area ||
+      !location ||
+      !tree_type ||
+      !tree_no ||
+      !plantation_period ||
+      !estimated_cc
+    ) {
+      return res.status(400).json({ error: "All project fields are required" });
+    }
+
+    // Insert new project into database
+    const newProject = await pool.query(
+      `INSERT INTO project (
+        seller_id, 
+        seller_type, 
+        plantation_area, 
+        location, 
+        tree_type, 
+        tree_no, 
+        plantation_period, 
+        estimated_cc, 
+        status
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending') RETURNING *`,
+      [
+        seller_id,
+        seller_type,
+        plantation_area,
+        location,
+        tree_type,
+        tree_no,
+        plantation_period,
+        estimated_cc,
+      ]
+    );
+
+    // Return success response with created project
+    res.status(201).json({
+      message: "Project submitted successfully",
+      project: newProject.rows[0],
+    });
+  } catch (error) {
+    console.error("Error submitting project:", error.message);
+    res.status(500).json({ error: "Server error while submitting project" });
   }
 });
 

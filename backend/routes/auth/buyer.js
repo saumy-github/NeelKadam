@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken"); // Add JWT
 
 // ================= REGISTER =================
 router.post("/register", async (req, res) => {
@@ -56,7 +57,9 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const buyer = await pool.query("SELECT * FROM buyer WHERE email = $1", [email]);
+    const buyer = await pool.query("SELECT * FROM buyer WHERE email = $1", [
+      email,
+    ]);
 
     if (buyer.rows.length === 0) {
       return res.status(400).json({ error: "Invalid credentials" });
@@ -72,10 +75,21 @@ router.post("/login", async (req, res) => {
     const buyerData = { ...buyer.rows[0] };
     delete buyerData.password;
 
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        seller_id: buyerData.buyer_id,
+        seller_type: "buyer",
+        email: buyerData.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
     res.json({
       message: "Login successful",
       buyer: buyerData,
-      token: "dummy-token", // Replace with JWT later
+      token: token,
     });
   } catch (error) {
     console.error("Login error:", error.message);

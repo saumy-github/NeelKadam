@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken"); // Add JWT
 
 // POST /api/auth/community/register - Community Registration
 router.post("/register", async (req, res) => {
@@ -147,11 +148,22 @@ router.post("/login", async (req, res) => {
     const communityData = { ...community.rows[0] };
     delete communityData.password;
 
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        seller_id: communityData.comm_id,
+        seller_type: "community",
+        email: communityData.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
     res.json({
       success: true,
       message: "Login successful",
       community: communityData,
-      token: "dummy-token", // You can implement JWT here
+      token: token,
     });
   } catch (error) {
     console.error("❌ Error in Community login:", error.message);
