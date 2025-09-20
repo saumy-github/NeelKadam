@@ -51,7 +51,7 @@ function App() {
   const shouldHideNavbar = hideNavbarPrefixes.some((prefix) =>
     location.pathname.toLowerCase().startsWith(prefix)
   );
-
+  const shouldHideFooter = location.pathname.toLowerCase() === "/about";
   return (
     <div className="min-h-screen flex flex-col bg-[#fcedd3]">
       {/* ✅ Navbar visible everywhere except NGO/Buyer/Admin routes */}
@@ -118,9 +118,9 @@ function App() {
           />
         </Routes>
       </main>
-
+       {!shouldHideFooter && <Footer />}
   {/* ✅ Footer also hidden inside ngo/buyer/admin */}
-  <Footer />
+
     </div>
   );
 }

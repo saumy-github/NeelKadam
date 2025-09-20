@@ -188,32 +188,33 @@ export default function About() {
     </section>
   );
 
-  return (
-    <div className="flex bg-[#fcedd3]">
-  {/* Sidebar - sticky on left, scrollable within viewport */}
-  <aside className="w-72 bg-white border-r shadow-md sticky top-20 self-start p-6 max-h-[calc(100vh-5rem)] overflow-auto">
-        <h2 className="font-bold mb-6 text-xl text-gray-900">About Us</h2>
-        <ul className="space-y-2">
-          {sections.map((s) => (
-            <li
-              key={s.id}
-              onClick={() => handleScrollTo(s.id)}
-              className={`cursor-pointer flex items-center px-3 py-2 rounded-md transition-all duration-200 ${
-                active === s.id
-                  ? "bg-green-600 text-white font-semibold"
-                  : "hover:bg-green-100 text-gray-800"
-              }`}
-            >
-              {s.icon} {s.title}
-            </li>
-          ))}
-        </ul>
-      </aside>
+return (
+  <div className="relative min-h-screen bg-[#fcedd3]">
+    {/* Sidebar - fixed on left, always visible */}
+    <aside className="fixed left-0 top-0 w-72 h-screen bg-white border-r shadow-md p-6 overflow-auto">
+      <h2 className="font-bold mb-6 text-xl text-gray-900">About Us</h2>
+      <ul className="space-y-2">
+        {sections.map((s) => (
+          <li
+            key={s.id}
+            onClick={() => handleScrollTo(s.id)}
+            className={`cursor-pointer flex items-center px-3 py-2 rounded-md transition-all duration-200 ${
+              active === s.id
+                ? "bg-green-600 text-white font-semibold"
+                : "hover:bg-green-100 text-gray-800"
+            }`}
+          >
+            {s.icon} {s.title}
+          </li>
+        ))}
+      </ul>
+    </aside>
 
-      {/* Scrollable Content */}
-      <main className="ml-72 flex-1">
-        {sections.map((s, idx) => renderSection(s, idx))}
-      </main>
-    </div>
-  );
+    {/* Scrollable Content */}
+    <main className="ml-72 flex-1 overflow-y-auto">
+      {sections.map((s, idx) => renderSection(s, idx))}
+    </main>
+  </div>
+);
+
 }
