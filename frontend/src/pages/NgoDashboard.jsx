@@ -16,7 +16,7 @@ export default function NGODashboard() {
     <div className="min-h-screen flex flex-col bg-[#fcedd3]">
       {/* ✅ Taskbar */}
       <nav className="bg-green-700 text-white p-4 flex justify-between items-center shadow">
-        <h1 className="text-xl font-bold">NGO Dashboard</h1>
+        <h1 className="text-xl font-bold">Seller Dashboard</h1>
         <ul className="flex gap-6 text-sm font-medium items-center">
           <li><Link to="/" className="hover:underline">Home</Link></li>
           <li><Link to="/about" className="hover:underline">About</Link></li>
@@ -99,7 +99,7 @@ export default function NGODashboard() {
               </button>
             </div>
             <div className="flex items-center justify-between">
-              <span>Update NGO profile documents</span>
+              <span>Update Seller profile documents</span>
               <button className="px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">
                 Mark Done
               </button>

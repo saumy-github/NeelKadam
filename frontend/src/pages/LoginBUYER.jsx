@@ -1,16 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { buyerAuth } from "../api/auth";
 
-// Form field names follow snake_case convention to align with the backend API contract.
-// This ensures consistent data format between frontend and database schema.
 export default function BuyerLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    email: "",
+    emailOrPhone: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
@@ -27,24 +24,29 @@ export default function BuyerLogin() {
     setError("");
     try {
       // Basic validation
-      if (!formData.email || !formData.password) {
-        throw new Error("Both email and password are required!");
+      if (!formData.emailOrPhone || !formData.password) {
+        throw new Error("Both email/phone and password are required!");
       }
-      // Email validation
-      const isEmail = /\S+@\S+\.\S+/.test(formData.email);
-      if (!isEmail) {
-        throw new Error("Please enter a valid email address!");
+
+      // Email or Phone validation
+      const isEmail = /\S+@\S+\.\S+/.test(formData.emailOrPhone);
+      const isPhone = /^[0-9]{10}$/.test(formData.emailOrPhone); // 10-digit phone
+
+      if (!isEmail && !isPhone) {
+        throw new Error("Please enter a valid email address or phone number!");
       }
-      if (formData.password.length < 8) {
-        throw new Error("Password must be at least 8 characters!");
-      }
+
+      // ✅ Removed password minimum length check
+
       // Call the API
       const response = await buyerAuth.login({
-        email: formData.email,
+        emailOrPhone: formData.emailOrPhone, // unified field
         password: formData.password,
       });
+
       // Store authentication data
       login(response.token, response.buyer);
+
       // Navigate to dashboard
       navigate("/buyer/dashboard");
     } catch (err) {
@@ -69,16 +71,18 @@ export default function BuyerLogin() {
               {error}
             </div>
           )}
+          {/* Email or Phone */}
           <input
-            type="email"
-            name="email"
+            type="text"
+            name="emailOrPhone"
             placeholder="Enter Email Address"
-            value={formData.email}
+            value={formData.emailOrPhone}
             onChange={handleChange}
             className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             required
             disabled={loading}
           />
+          {/* Password */}
           <input
             type="password"
             name="password"
@@ -121,4 +125,3 @@ export default function BuyerLogin() {
     </div>
   );
 }
-

@@ -69,11 +69,11 @@ export default function NGOProfile() {
 
       {/* ✅ Main content area */}
       <main className="flex-grow p-8 space-y-8">
-        <h1 className="text-3xl font-bold text-green-700 mb-6">NGO Profile</h1>
+        <h1 className="text-3xl font-bold text-green-700 mb-6">Seller Profile</h1>
 
         {/* ✅ NGO Details */}
         <section className="bg-white p-6 rounded-xl shadow mb-6">
-          <h2 className="text-xl font-semibold mb-4">NGO Details</h2>
+          <h2 className="text-xl font-semibold mb-4">Seller Details</h2>
           <ul className="space-y-2 text-gray-700">
             <li>
               <strong>Name:</strong> {ngoDetails.ngo_name}

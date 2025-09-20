@@ -39,10 +39,7 @@ export default function NGOLogin() {
         throw new Error("Please enter a valid email address!");
       }
 
-      if (formData.password.length < 8) {
-        throw new Error("Password must be at least 8 characters!");
-      }
-
+      
       // Call the API
       const response = await ngoAuth.login({
         email: formData.email,
@@ -71,7 +68,7 @@ export default function NGOLogin() {
         >
           {/* Title */}
           <h1 className="text-3xl font-bold text-center mb-8 text-green-700">
-            NGO Login
+            Seller Login
           </h1>
 
           {/* Error display */}

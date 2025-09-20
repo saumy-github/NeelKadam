@@ -1,23 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Form field names follow snake_case convention to align with the backend API contract.
-// This ensures consistent data format between frontend and database schema.
-// Validation helpers
-const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-const validatePassword = (password) =>
-  /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(password);
-const validatePAN = (pan) => /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan);
-const validateAccountNumber = (acc) => /^[0-9]{9,18}$/.test(acc);
-const validateIFSC = (ifsc) => /^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc);
-
 export default function BuyerSignup() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const totalSteps = 5;
+  const totalSteps = 4;
 
   const [formData, setFormData] = useState({
-    buyer_id: "",
     company_name: "",
     email: "",
     phone: "",
@@ -26,16 +15,20 @@ export default function BuyerSignup() {
     email_otp: "",
     phone_otp: "",
     pan_no: "",
-    wallet_address: "",
     is_verified: false,
     account_holder_name: "",
     account_number: "",
-    confirm_account_number: "",
     ifsc_code: "",
-    bank_name: "",
-    branch_name: "",
-    total_cc: "",
   });
+
+  const [loading, setLoading] = useState(false);
+
+  // Password toggles
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // OTP method selection
+  const [otpMethod, setOtpMethod] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -47,109 +40,52 @@ export default function BuyerSignup() {
 
   const handleNext = () => {
     if (step === 1) {
-      if (!validateEmail(formData.email)) {
-        alert("Invalid email format!");
-        return;
-      }
-      if (!validatePassword(formData.password)) {
-        alert("Password must be 8+ chars, include number & special character.");
-        return;
-      }
-      if (formData.password !== formData.confirm_password) {
-        alert("Passwords do not match!");
-        return;
-      }
+      if (!formData.email || !formData.password || !formData.confirm_password) return;
+      if (formData.password !== formData.confirm_password) return;
     }
+    if (step === 2 && !otpMethod) return;
+    if (step === 3 && !formData.pan_no) return;
 
-    if (step === 2) {
-      if (!/^\d{6}$/.test(formData.email_otp)) {
-        alert("Email OTP must be 6 digits!");
-        return;
-      }
-      if (!/^\d{6}$/.test(formData.phone_otp)) {
-        alert("Phone OTP must be 6 digits!");
-        return;
-      }
-    }
-
-    if (step === 3) {
-      if (!validatePAN(formData.pan_no)) {
-        alert("Invalid PAN number format (e.g., ABCDE1234F)!");
-        return;
-      }
-    }
-
-    if (step === 4) {
-      if (!validateAccountNumber(formData.account_number)) {
-        alert("Account number must be 9–18 digits!");
-        return;
-      }
-      if (formData.account_number !== formData.confirm_account_number) {
-        alert("Account numbers do not match!");
-        return;
-      }
-    }
-
-    if (step === 5) {
-      if (!validateIFSC(formData.ifsc_code)) {
-        alert("Invalid IFSC code (e.g., HDFC0001234)!");
-        return;
-      }
-    }
-
-    setStep((prev) => prev + 1);
+    setStep((prev) => Math.min(prev + 1, totalSteps));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleFinish = async () => {
+    setLoading(true);
     try {
-      // Import buyerAuth from the auth API module
-      const { buyerAuth } = await import("../api/auth");
+      const response = await fetch("http://localhost:3000/api/auth/buyer/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-      // Prepare the data for API request (only include fields required by backend)
-      const buyerData = {
-        company_name: formData.company_name,
-        email: formData.email,
-        password: formData.password,
-        pan_no: formData.pan_no,
-        account_holder_name: formData.account_holder_name,
-        account_number: formData.account_number,
-        ifsc_code: formData.ifsc_code,
-        phone: formData.phone,
-        wallet_address: formData.wallet_address,
-        bank_name: formData.bank_name,
-        branch_name: formData.branch_name,
-      };
+      const data = await response.json();
 
-      // Call the API to register the buyer
-      const response = await buyerAuth.register(buyerData);
-
-      console.log("Registration successful:", response);
-      alert("✅ Buyer Account Created Successfully!");
-      navigate("/login/buyer");
+      if (response.ok) {
+        console.log("✅ Registration successful:", data);
+        navigate("/login/buyer");
+      } else {
+        console.error("❌ Registration failed:", data.error || data.message);
+        alert(data.error || data.message || "Registration failed");
+      }
     } catch (error) {
-      console.error("Registration failed:", error);
-      alert(
-        `Registration failed: ${error.message || "Unknown error occurred"}`
-      );
+      console.error("❌ Error during registration:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#fcedd3]">
       <main className="flex-grow flex justify-center items-start pt-10">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white shadow-xl rounded-xl p-10 w-full max-w-2xl border border-gray-200"
-        >
+        <div className="bg-white shadow-xl rounded-xl p-10 w-full max-w-2xl border border-gray-200">
           <h1 className="text-3xl font-bold text-center mb-6 text-green-700">
             Buyer Sign Up
           </h1>
 
           {/* Progress Bar */}
           <div className="mb-8">
-            <div className="flex justify-between text-sm font-medium text-gray-600 mb-2">
+            <div className="flex justify-between text-sm text-gray-600 mb-2">
               <span>
                 Step {step} of {totalSteps}
               </span>
@@ -159,23 +95,16 @@ export default function BuyerSignup() {
               <div
                 className="bg-green-600 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${(step / totalSteps) * 100}%` }}
-              ></div>
+              />
             </div>
           </div>
 
-          {/* Step 1: Account Setup */}
+          {/* Step 1 */}
           {step === 1 && (
             <div>
               <h2 className="text-2xl font-bold text-green-700 mb-6">
                 Step 1: Account Setup
               </h2>
-              <input
-                name="buyer_id"
-                placeholder="Buyer ID"
-                value={formData.buyer_id}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
               <input
                 name="company_name"
                 placeholder="Company Name"
@@ -199,51 +128,106 @@ export default function BuyerSignup() {
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
-              <input
-                type="password"
-                name="confirm_password"
-                placeholder="Confirm Password"
-                value={formData.confirm_password}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
+
+              {/* Password */}
+              <div className="relative mb-4">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-3 top-3 text-sm text-gray-600"
+                >
+                  {showPassword ? "Hide" : "View"}
+                </button>
+              </div>
+
+              {/* Confirm Password */}
+              <div className="relative mb-4">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirm_password"
+                  placeholder="Confirm Password"
+                  value={formData.confirm_password}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((s) => !s)}
+                  className="absolute right-3 top-3 text-sm text-gray-600"
+                >
+                  {showConfirmPassword ? "Hide" : "View"}
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Step 2: OTP Verification */}
+          {/* Step 2 */}
           {step === 2 && (
             <div>
               <h2 className="text-2xl font-bold text-green-700 mb-6">
                 Step 2: OTP Verification
               </h2>
-              <input
-                type="text"
-                name="email_otp"
-                placeholder="Enter Email OTP"
-                value={formData.email_otp}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
-              <input
-                type="text"
-                name="phone_otp"
-                placeholder="Enter Phone OTP"
-                value={formData.phone_otp}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
+              <div className="mb-4">
+                <p className="font-medium text-gray-700 mb-2">
+                  Choose how you want to receive OTP:
+                </p>
+                <div className="flex gap-6">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="otpMethod"
+                      value="email"
+                      checked={otpMethod === "email"}
+                      onChange={() => setOtpMethod("email")}
+                      className="mr-2"
+                    />
+                    Email
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="otpMethod"
+                      value="phone"
+                      checked={otpMethod === "phone"}
+                      onChange={() => setOtpMethod("phone")}
+                      className="mr-2"
+                    />
+                    Phone
+                  </label>
+                </div>
+              </div>
+              {otpMethod === "email" && (
+                <input
+                  type="text"
+                  name="email_otp"
+                  placeholder="Enter Email OTP"
+                  value={formData.email_otp}
+                  onChange={handleChange}
+                  className="w-full p-3 mb-4 border rounded-lg"
+                />
+              )}
+              {otpMethod === "phone" && (
+                <input
+                  type="text"
+                  name="phone_otp"
+                  placeholder="Enter Phone OTP"
+                  value={formData.phone_otp}
+                  onChange={handleChange}
+                  className="w-full p-3 mb-4 border rounded-lg"
+                />
+              )}
             </div>
           )}
 
-          {/* Step 3: Verification Details */}
+          {/* Step 3 */}
           {step === 3 && (
             <div>
               <h2 className="text-2xl font-bold text-green-700 mb-6">
@@ -251,15 +235,8 @@ export default function BuyerSignup() {
               </h2>
               <input
                 name="pan_no"
-                placeholder="PAN Number (e.g., ABCDE1234F)"
+                placeholder="PAN Number"
                 value={formData.pan_no}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg uppercase"
-              />
-              <input
-                name="wallet_address"
-                placeholder="Wallet Address"
-                value={formData.wallet_address}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
@@ -276,7 +253,7 @@ export default function BuyerSignup() {
             </div>
           )}
 
-          {/* Step 4: Account Details */}
+          {/* Step 4 */}
           {step === 4 && (
             <div>
               <h2 className="text-2xl font-bold text-green-700 mb-6">
@@ -297,49 +274,11 @@ export default function BuyerSignup() {
                 className="w-full p-3 mb-4 border rounded-lg"
               />
               <input
-                name="confirm_account_number"
-                placeholder="Confirm Account Number"
-                value={formData.confirm_account_number}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
-            </div>
-          )}
-
-          {/* Step 5: Bank Details */}
-          {step === 5 && (
-            <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">
-                Step 5: Bank Details
-              </h2>
-              <input
-                name="bank_name"
-                placeholder="Bank Name"
-                value={formData.bank_name}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
-              <input
-                name="branch_name"
-                placeholder="Branch Name"
-                value={formData.branch_name}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
-              <input
                 name="ifsc_code"
                 placeholder="IFSC Code"
                 value={formData.ifsc_code}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg uppercase"
-              />
-              <input
-                type="number"
-                name="total_cc"
-                placeholder="Total CC"
-                value={formData.total_cc}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
               />
             </div>
           )}
@@ -349,7 +288,7 @@ export default function BuyerSignup() {
             {step > 1 && (
               <button
                 type="button"
-                onClick={() => setStep((prev) => prev - 1)}
+                onClick={() => setStep((prev) => Math.max(prev - 1, 1))}
                 className="px-6 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition"
               >
                 Back
@@ -365,14 +304,16 @@ export default function BuyerSignup() {
               </button>
             ) : (
               <button
-                type="submit"
-                className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition ml-auto"
+                type="button"
+                onClick={handleFinish}
+                disabled={loading}
+                className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition ml-auto disabled:opacity-50"
               >
-                Submit
+                {loading ? "Submitting..." : "Finish"}
               </button>
             )}
           </div>
-        </form>
+        </div>
       </main>
     </div>
   );

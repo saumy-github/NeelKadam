@@ -7,10 +7,11 @@ export default function Footer() {
       <div className="container mx-auto px-6 grid md:grid-cols-5 gap-10">
         {/* Brand */}
         <div>
-          <h1 className="text-2xl font-bold text-white mb-4">iCR</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">Neelkadam</h1>
           <p className="text-sm">
-            Building a sustainable future by connecting NGOs, Buyers, and Admins
-            through a transparent carbon registry platform.
+            Neelkadam is a platform dedicated to promoting sustainable practices
+            and empowering communities by connecting people, organizations, and
+            initiatives that make a difference.
           </p>
         </div>
 
@@ -18,17 +19,17 @@ export default function Footer() {
         <div>
           <h3 className="text-white font-semibold mb-4">COMPANY</h3>
           <ul className="space-y-2">
-            <li><Link to="/about" className="hover:text-white">About</Link></li>
+            <li><Link to="/About.jsx" className="hover:text-white">About</Link></li>
             <li><Link to="/contact" className="hover:text-white">Contact Us</Link></li>
           </ul>
         </div>
 
-        {/* Features */}
+        {/* Features → Blogs / Login */}
         <div>
-          <h3 className="text-white font-semibold mb-4">FEATURES</h3>
+          <h3 className="text-white font-semibold mb-4">EXPLORE</h3>
           <ul className="space-y-2">
-            <li><Link to="/platform" className="hover:text-white">Platform</Link></li>
-            <li><Link to="/pricing" className="hover:text-white">Pricing</Link></li>
+            <li><Link to="/blogs" className="hover:text-white">Blogs</Link></li>
+            <li><Link to="/login" className="hover:text-white">Login</Link></li>
           </ul>
         </div>
 
@@ -54,7 +55,7 @@ export default function Footer() {
       {/* Divider */}
       <div className="border-t border-gray-700 mt-10 pt-6 container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
         <p className="text-sm">
-          © {new Date().getFullYear()} International Carbon Registry – All rights reserved.
+          © {new Date().getFullYear()} Neelkadam – All rights reserved.
         </p>
 
         {/* Social Icons with SVG */}

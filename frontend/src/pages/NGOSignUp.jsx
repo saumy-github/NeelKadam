@@ -1,21 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Form field names follow snake_case convention to align with the backend API contract.
-// This ensures consistent data format between frontend and database schema.
-// Validation helpers
-const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-const validatePhone = (phone) => /^\d{10}$/.test(phone);
-const validatePassword = (password) =>
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-    password
-  );
-
 export default function SignUp() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const totalSteps = 4;
   const [userType, setUserType] = useState("ngo");
+  const [error, setError] = useState("");
+
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
@@ -30,9 +22,7 @@ export default function SignUp() {
     pan_no: "",
     account_holder_name: "",
     account_number: "",
-    confirm_account_number: "",
     ifsc_code: "",
-    branch: "",
     zila_id_ward_no: "",
     address: "",
     contact_email: "",
@@ -40,8 +30,13 @@ export default function SignUp() {
     community_name: "",
     community_spokesperson_name: "",
     community_spokesperson_mobile: "",
-    community_verification: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // OTP method
+  const [otpMethod, setOtpMethod] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,70 +44,40 @@ export default function SignUp() {
   };
 
   const handleNext = () => {
+    setError(""); // clear error
+
     if (step === 1) {
-      if (!validateEmail(formData.email)) {
-        alert("Invalid email format!");
-        return;
-      }
-      if (!validatePhone(formData.phone)) {
-        alert("Phone must be 10 digits!");
-        return;
-      }
-      if (!validatePassword(formData.password)) {
-        alert(
-          "Password must be 8+ chars, include uppercase, lowercase, number & special char."
-        );
+      if (!formData.email || !formData.phone) {
+        setError("Email and Phone are required.");
         return;
       }
       if (formData.password !== formData.confirm_password) {
-        alert("Passwords do not match!");
+        setError("Passwords do not match.");
         return;
       }
     }
 
     if (step === 2) {
-      if (!/^\d{6}$/.test(formData.email_otp)) {
-        alert("Email OTP must be 6 digits!");
-        return;
-      }
-      if (!/^\d{6}$/.test(formData.phone_otp)) {
-        alert("Phone OTP must be 6 digits!");
+      if (!otpMethod) {
+        setError("Please select an OTP method.");
         return;
       }
     }
 
-    if (step === 4) {
-      if (formData.account_number !== formData.confirm_account_number) {
-        alert("Account numbers do not match!");
-        return;
-      }
-    }
-
-    setStep((prev) => prev + 1);
+    setStep((prev) => Math.min(prev + 1, totalSteps));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("📝 Form submitted with data:", formData);
-    console.log("📝 Selected user type:", userType);
+    setError("");
+
+    // ✅ validate Step 4 fields before sending to backend
+    if (!formData.account_holder_name || !formData.account_number || !formData.ifsc_code) {
+      setError("All bank details are required.");
+      return;
+    }
 
     try {
-      // Add any final validation checks
-      if (formData.account_number !== formData.confirm_account_number) {
-        console.error("❌ Account numbers don't match");
-        alert("Account numbers do not match!");
-        return;
-      }
-
-      if (formData.password !== formData.confirm_password) {
-        console.error("❌ Passwords don't match");
-        alert("Passwords do not match!");
-        return;
-      }
-
-      console.log("🔄 Preparing data for API submission...");
-
-      // Prepare the appropriate data object based on user type
       let apiData = {};
       let apiEndpoint = "";
 
@@ -159,41 +124,20 @@ export default function SignUp() {
         apiEndpoint = "http://localhost:3000/api/auth/community/register";
       }
 
-      console.log(`🚀 Sending ${userType} data to API:`, apiData);
-      console.log(`🌐 Using endpoint: ${apiEndpoint}`);
-
-      // Make the API call
       const response = await fetch(apiEndpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(apiData),
       });
 
       const data = await response.json();
-      console.log("📥 API response:", data);
+      if (!response.ok) throw new Error(data.error || "Registration failed");
 
-      if (!response.ok) {
-        // Detailed error logging
-        console.error("❌ API error response:", {
-          status: response.status,
-          statusText: response.statusText,
-          data: data,
-        });
-        throw new Error(
-          data.error || data.message || `${userType} registration failed`
-        );
-      }
-
-      console.log("✅ Registration successful!");
-      alert(`${userType.toUpperCase()} account created successfully!`);
-
-      // Redirect to the appropriate login page
-      navigate(`/login/${userType.toLowerCase()}`);
-    } catch (error) {
-      console.error("❌ Registration error:", error);
-      alert("Registration failed: " + error.message);
+      // ✅ Smooth redirect after success
+      navigate(`/login/${userType}`, { state: { success: true } });
+    } catch (err) {
+      console.error("❌ Error:", err);
+      setError(err.message);
     }
   };
 
@@ -205,10 +149,10 @@ export default function SignUp() {
           className="bg-white shadow-xl rounded-xl p-10 w-full max-w-2xl border border-gray-200"
         >
           <h1 className="text-3xl font-bold text-center mb-6 text-green-700">
-            Sign Up
+            Seller Sign Up
           </h1>
 
-          {/* ✅ Progress Bar */}
+          {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex justify-between text-sm font-medium text-gray-600 mb-2">
               <span>
@@ -220,16 +164,17 @@ export default function SignUp() {
               <div
                 className="bg-green-600 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${(step / totalSteps) * 100}%` }}
-              ></div>
+              />
             </div>
           </div>
+
+          {/* Error message */}
+          {error && <p className="mb-4 text-red-600 text-sm font-medium">{error}</p>}
 
           {/* Step 1 */}
           {step === 1 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">
-                Step 1: Account Setup
-              </h2>
+              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 1: Account Setup</h2>
               <input
                 type="email"
                 name="email"
@@ -246,47 +191,96 @@ export default function SignUp() {
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
-              <input
-                type="password"
-                name="confirm_password"
-                placeholder="Confirm Password"
-                value={formData.confirm_password}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
+
+              {/* Password */}
+              <div className="relative mb-4">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-3 top-3 text-sm text-gray-600"
+                >
+                  {showPassword ? "Hide" : "View"}
+                </button>
+              </div>
+
+              {/* Confirm Password */}
+              <div className="relative mb-4">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirm_password"
+                  placeholder="Confirm Password"
+                  value={formData.confirm_password}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((s) => !s)}
+                  className="absolute right-3 top-3 text-sm text-gray-600"
+                >
+                  {showConfirmPassword ? "Hide" : "View"}
+                </button>
+              </div>
             </div>
           )}
 
           {/* Step 2 */}
           {step === 2 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">
-                Step 2: OTP Verification
-              </h2>
-              <input
-                type="text"
-                name="email_otp"
-                placeholder="Enter Email OTP"
-                value={formData.email_otp}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
-              <input
-                type="text"
-                name="phone_otp"
-                placeholder="Enter Phone OTP"
-                value={formData.phone_otp}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
+              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 2: OTP Verification</h2>
+              <p className="font-medium text-gray-700 mb-2">Choose how you want to receive OTP:</p>
+              <div className="flex gap-6 mb-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="otpMethod"
+                    value="email"
+                    checked={otpMethod === "email"}
+                    onChange={() => setOtpMethod("email")}
+                    className="mr-2"
+                  />
+                  Email
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="otpMethod"
+                    value="phone"
+                    checked={otpMethod === "phone"}
+                    onChange={() => setOtpMethod("phone")}
+                    className="mr-2"
+                  />
+                  Phone
+                </label>
+              </div>
+              {otpMethod === "email" && (
+                <input
+                  type="text"
+                  name="email_otp"
+                  placeholder="Enter Email OTP"
+                  value={formData.email_otp}
+                  onChange={handleChange}
+                  className="w-full p-3 mb-4 border rounded-lg"
+                />
+              )}
+              {otpMethod === "phone" && (
+                <input
+                  type="text"
+                  name="phone_otp"
+                  placeholder="Enter Phone OTP"
+                  value={formData.phone_otp}
+                  onChange={handleChange}
+                  className="w-full p-3 mb-4 border rounded-lg"
+                />
+              )}
             </div>
           )}
 
@@ -296,7 +290,6 @@ export default function SignUp() {
               <h2 className="text-2xl font-bold text-green-700 mb-6">
                 Step 3: Organization / Community Details
               </h2>
-
               <select
                 name="userType"
                 value={userType}
@@ -408,13 +401,6 @@ export default function SignUp() {
                     onChange={handleChange}
                     className="w-full p-3 mb-4 border rounded-lg"
                   />
-                  <input
-                    name="community_verification"
-                    placeholder="Further Verification (initially unverified)"
-                    value={formData.community_verification}
-                    onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
-                  />
                 </>
               )}
             </div>
@@ -423,9 +409,7 @@ export default function SignUp() {
           {/* Step 4 */}
           {step === 4 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">
-                Step 4: Bank Details
-              </h2>
+              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 4: Bank Details</h2>
               <input
                 name="account_holder_name"
                 placeholder="Account Holder Name"
@@ -441,25 +425,11 @@ export default function SignUp() {
                 className="w-full p-3 mb-4 border rounded-lg"
               />
               <input
-                name="confirm_account_number"
-                placeholder="Confirm Account Number"
-                value={formData.confirm_account_number}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
-              <input
                 name="ifsc_code"
                 placeholder="IFSC Code"
                 value={formData.ifsc_code}
                 onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
-              />
-              <input
-                name="branch"
-                placeholder="Branch Name (auto-fetch via IFSC)"
-                value={formData.branch}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
+                className="w-full p-3 mb-4 border rounded-lg uppercase"
               />
             </div>
           )}

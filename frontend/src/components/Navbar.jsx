@@ -94,7 +94,7 @@ export default function Navbar() {
                   to="/login/ngo"
                   className="px-4 py-1.5 hover:text-green-400 transition transform hover:translate-x-1"
                 >
-                  NGO
+                  SELLER
                 </Link>
                 <Link
                   to="/login/buyer"
