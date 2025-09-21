@@ -21,6 +21,7 @@ router.post("/register", async (req, res) => {
     account_holder_name,
     account_number,
     ifsc_code,
+    wallet_address,
   } = req.body;
 
   // Validate required fields
@@ -43,8 +44,8 @@ router.post("/register", async (req, res) => {
     const newNgo = await pool.query(
       `INSERT INTO ngo (
         license_no, ngo_name, email, password, spokesperson_name, 
-        pan_no, account_holder_name, account_number, ifsc_code
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+        pan_no, account_holder_name, account_number, ifsc_code, wallet_address
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
       [
         license_no,
         ngo_name,
@@ -55,6 +56,7 @@ router.post("/register", async (req, res) => {
         account_holder_name,
         account_number,
         ifsc_code,
+        wallet_address,
       ]
     );
 

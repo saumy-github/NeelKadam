@@ -17,7 +17,6 @@ export default function BuyerSignup() {
     account_holder_name: "",
     account_number: "",
     ifsc_code: "",
-    wallet_address: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -43,7 +42,6 @@ export default function BuyerSignup() {
     }
     if (step === 2 && !formData.email_otp) return;
     if (step === 3 && !formData.pan_no) return;
-    if (step === 4 && !formData.wallet_address) return;
 
     setStep((prev) => Math.min(prev + 1, totalSteps));
   };
@@ -233,13 +231,6 @@ export default function BuyerSignup() {
                 value={formData.ifsc_code}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg uppercase"
-              />
-              <input
-                name="wallet_address"
-                placeholder="Wallet Address"
-                value={formData.wallet_address}
-                onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
               />
             </div>
           )}

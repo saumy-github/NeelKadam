@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { buyerAuth } from "../api/auth";
-import useWalletConnect from "../hooks/useWalletConnect";
 
+// Form field names follow snake_case convention to align with the backend API contract.
+// This ensures consistent data format between frontend and database schema.
 export default function BuyerLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { connectWallet } = useWalletConnect();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -25,30 +26,25 @@ export default function BuyerLogin() {
     setLoading(true);
     setError("");
     try {
-      if (!window.ethereum) {
-        throw new Error("Please install MetaMask first and create a wallet.");
-      }
       // Basic validation
       if (!formData.email || !formData.password) {
         throw new Error("Both email and password are required!");
       }
-
       // Email validation
       const isEmail = /\S+@\S+\.\S+/.test(formData.email);
-      if (!isEmail) throw new Error("Please enter a valid email address!");
-
-      // ✅ Removed password minimum length check
-
+      if (!isEmail) {
+        throw new Error("Please enter a valid email address!");
+      }
+      if (formData.password.length < 8) {
+        throw new Error("Password must be at least 8 characters!");
+      }
       // Call the API
       const response = await buyerAuth.login({
         email: formData.email,
         password: formData.password,
       });
-
       // Store authentication data
       login(response.token, response.buyer);
-      // Connect MetaMask after successful login
-      await connectWallet();
       // Navigate to dashboard
       navigate("/buyer/dashboard");
     } catch (err) {
@@ -73,7 +69,6 @@ export default function BuyerLogin() {
               {error}
             </div>
           )}
-          {/* Email */}
           <input
             type="email"
             name="email"
@@ -84,7 +79,6 @@ export default function BuyerLogin() {
             required
             disabled={loading}
           />
-          {/* Password */}
           <input
             type="password"
             name="password"
@@ -127,3 +121,4 @@ export default function BuyerLogin() {
     </div>
   );
 }
+

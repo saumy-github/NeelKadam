@@ -21,6 +21,7 @@ export default function SignUp() {
   account_holder_name: "",
   account_number: "",
   ifsc_code: "",
+  wallet_address: "",
   zila_id_ward_no: "",
   address: "",
   contact_email: "",
@@ -68,8 +69,8 @@ export default function SignUp() {
     setError("");
 
     // ✅ validate Step 4 fields before sending to backend
-    if (!formData.account_holder_name || !formData.account_number || !formData.ifsc_code) {
-      setError("All bank details are required.");
+    if (!formData.account_holder_name || !formData.account_number || !formData.ifsc_code || !formData.wallet_address) {
+      setError("All bank details and wallet address are required.");
       return;
     }
 
@@ -89,6 +90,7 @@ export default function SignUp() {
           account_holder_name: formData.account_holder_name,
           account_number: formData.account_number,
           ifsc_code: formData.ifsc_code,
+          wallet_address: formData.wallet_address,
         };
         apiEndpoint = "http://localhost:3000/api/auth/ngo/register";
       } else if (userType === "panchayat") {
@@ -101,6 +103,7 @@ export default function SignUp() {
           account_holder_name: formData.account_holder_name,
           account_number: formData.account_number,
           ifsc_code: formData.ifsc_code,
+          wallet_address: formData.wallet_address,
         };
         apiEndpoint = "http://localhost:3000/api/auth/panchayat/register";
       } else if (userType === "community") {
@@ -114,6 +117,7 @@ export default function SignUp() {
           account_holder_name: formData.account_holder_name,
           account_number: formData.account_number,
           ifsc_code: formData.ifsc_code,
+          wallet_address: formData.wallet_address,
         };
         apiEndpoint = "http://localhost:3000/api/auth/community/register";
       }
@@ -137,17 +141,14 @@ export default function SignUp() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#fcedd3]">
-      <main className="flex-grow flex justify-center items-start pt-32">
+      <main className="flex-grow flex justify-center items-start pt-20">
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md border border-gray-200"
+          className="bg-white shadow-xl rounded-xl p-10 w-full max-w-2xl border border-gray-200"
         >
           <h1 className="text-3xl font-bold text-center mb-6 text-green-700">
             Seller Sign Up
           </h1>
-          <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg">
-            Please create a MetaMask wallet/account before signing up.
-          </div>
 
           {/* Progress Bar */}
           <div className="mb-8">
@@ -385,6 +386,13 @@ export default function SignUp() {
                 value={formData.ifsc_code}
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg uppercase"
+              />
+              <input
+                name="wallet_address"
+                placeholder="Wallet Address"
+                value={formData.wallet_address}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
               />
             </div>
           )}
