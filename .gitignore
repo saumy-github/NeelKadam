@@ -33,3 +33,7 @@ frontend/.env
 
 # Summary file for Gemini
 backend/refactoring_summary.md
+
+# Project reports
+reports/
+reports/*.md

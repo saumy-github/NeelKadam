@@ -12,6 +12,8 @@ export default function AdminProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     async function fetchProjects() {
@@ -30,11 +32,47 @@ export default function AdminProjects() {
     fetchProjects();
   }, []);
 
-  const updateStatus = (id, status) => {
-    setProjects((prev) =>
-      prev.map((p) => (p.project_id === id ? { ...p, status } : p))
-    );
-    // TODO: POST /admin/project/:id/status
+  const updateStatus = async (id, status) => {
+    try {
+      setActionLoading(true);
+
+      // Call the backend to approve/reject the project
+      const approved = status === "approved";
+      const result = await adminApi.approveProject(id, approved);
+
+      // Update local state with the response
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.project_id === id
+            ? {
+                ...p,
+                status: result.project.status,
+                actual_cc: result.project.actual_cc || p.actual_cc,
+              }
+            : p
+        )
+      );
+
+      // Show success notification
+      setNotification({
+        type: "success",
+        message: result.message,
+      });
+    } catch (err) {
+      console.error("Error updating project status:", err);
+      setNotification({
+        type: "error",
+        message:
+          err.error || "Failed to update project status. Please try again.",
+      });
+    } finally {
+      setActionLoading(false);
+
+      // Clear notification after 5 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+    }
   };
 
   return (
@@ -45,6 +83,19 @@ export default function AdminProjects() {
           Back to Admin
         </Link>
       </div>
+
+      {/* Notification display */}
+      {notification && (
+        <div
+          className={`mb-4 p-4 rounded-lg ${
+            notification.type === "success"
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+          }`}
+        >
+          {notification.message}
+        </div>
+      )}
 
       {loading ? (
         <div className="flex justify-center items-center h-40">
@@ -68,6 +119,7 @@ export default function AdminProjects() {
                   <p className="text-sm text-gray-600">
                     Seller: {p.seller_name} • Type: {p.seller_type} • Estimated
                     CC: {p.estimated_cc || 0}
+                    {p.actual_cc ? ` • Actual CC: ${p.actual_cc}` : ""}
                   </p>
                   <p className="text-sm text-gray-600">
                     Location: {p.location || "Not specified"} • Trees:{" "}
@@ -81,26 +133,33 @@ export default function AdminProjects() {
                         ? "bg-green-100 text-green-700"
                         : p.status === "rejected"
                         ? "bg-red-100 text-red-700"
+                        : p.status === "minted"
+                        ? "bg-blue-100 text-blue-700"
                         : "bg-yellow-100 text-yellow-700"
                     }`}
                   >
                     {p.status}
                   </span>
-                  {p.status === "pending" && (
+                  {p.status === "pending" && !actionLoading && (
                     <>
                       <button
                         onClick={() => updateStatus(p.project_id, "approved")}
-                        className="px-3 py-1 bg-green-600 text-white rounded"
+                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                        disabled={actionLoading}
                       >
                         Approve
                       </button>
                       <button
                         onClick={() => updateStatus(p.project_id, "rejected")}
-                        className="px-3 py-1 bg-red-600 text-white rounded"
+                        className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                        disabled={actionLoading}
                       >
                         Reject
                       </button>
                     </>
+                  )}
+                  {actionLoading && (
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-700"></div>
                   )}
                 </div>
               </div>

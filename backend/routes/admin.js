@@ -357,27 +357,171 @@ router.patch("/projects/:id/approve", async (req, res) => {
     const { id } = req.params;
     const { approved } = req.body;
 
-    const status = approved ? "approved" : "rejected";
+    // If not approved, simply reject the project
+    if (!approved) {
+      const updatedProject = await pool.query(
+        "UPDATE project SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE project_id = $2 RETURNING project_id, plantation_area, status",
+        ["rejected", id]
+      );
 
-    const updatedProject = await pool.query(
-      "UPDATE project SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE project_id = $2 RETURNING project_id, plantation_area, status",
-      [status, id]
-    );
+      if (updatedProject.rows.length === 0) {
+        return res.status(404).json({
+          error: "Project not found",
+        });
+      }
 
-    if (updatedProject.rows.length === 0) {
-      return res.status(404).json({
-        error: "Project not found",
+      return res.json({
+        message: "Project rejected successfully",
+        project: updatedProject.rows[0],
       });
     }
 
-    res.json({
-      message: `Project ${approved ? "approved" : "rejected"} successfully`,
-      project: updatedProject.rows[0],
-    });
+    // Start a database transaction
+    const client = await pool.connect();
+
+    try {
+      await client.query("BEGIN");
+
+      // 1. Get project details
+      const projectResult = await client.query(
+        "SELECT p.*, " +
+          "CASE " +
+          "  WHEN p.seller_type = 'ngo' THEN n.wallet_address " +
+          "  WHEN p.seller_type = 'panchayat' THEN cp.wallet_address " +
+          "  WHEN p.seller_type = 'community' THEN c.wallet_address " +
+          "END AS seller_wallet_address " +
+          "FROM project p " +
+          "LEFT JOIN ngo n ON p.seller_id = n.ngo_id AND p.seller_type = 'ngo' " +
+          "LEFT JOIN coastal_panchayat cp ON p.seller_id = cp.cp_id AND p.seller_type = 'panchayat' " +
+          "LEFT JOIN community c ON p.seller_id = c.comm_id AND p.seller_type = 'community' " +
+          "WHERE p.project_id = $1",
+        [id]
+      );
+
+      if (projectResult.rows.length === 0) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      const project = projectResult.rows[0];
+      const walletAddress = project.seller_wallet_address;
+
+      if (!walletAddress) {
+        await client.query("ROLLBACK");
+        return res
+          .status(400)
+          .json({ error: "Seller has no wallet address registered" });
+      }
+
+      // 2. Calculate carbon credits (CC) based on tree_no as per plan
+      const actualCC = project.tree_no;
+
+      if (!actualCC || actualCC <= 0) {
+        await client.query("ROLLBACK");
+        return res
+          .status(400)
+          .json({ error: "Invalid tree count for carbon credit calculation" });
+      }
+
+      // 3. Update project status to "approved" and save actual_cc
+      await client.query(
+        "UPDATE project SET status = 'approved', actual_cc = $1, updated_at = CURRENT_TIMESTAMP WHERE project_id = $2",
+        [actualCC, id]
+      );
+
+      // 4. Import blockchain utility
+      const { mintCarbonCredits } = require("../utils/blockchain");
+
+      // Update project to approved status first
+      await client.query(
+        "UPDATE project SET status = 'approved', actual_cc = $1, updated_at = CURRENT_TIMESTAMP WHERE project_id = $2",
+        [actualCC, id]
+      );
+
+      // Commit the transaction immediately to avoid long DB locks
+      await client.query("COMMIT");
+
+      // 5. Start minting carbon credits on the blockchain (non-blocking)
+      // This runs in the background and doesn't block the API response
+      mintCarbonCredits(walletAddress, actualCC)
+        .then(async (mintResult) => {
+          // Get a new client for follow-up DB updates
+          const followUpClient = await pool.connect();
+          try {
+            if (mintResult.success) {
+              // 6. If minting is successful, update project status to "minted"
+              await followUpClient.query(
+                "UPDATE project SET status = 'minted', updated_at = CURRENT_TIMESTAMP WHERE project_id = $1",
+                [id]
+              );
+              // Transaction hash: ${mintResult.txHash} - could add this to the database if a column exists
+              console.log(
+                `Project ${id} successfully minted with tx: ${mintResult.txHash}`
+              );
+            } else {
+              console.error(
+                `Minting failed for project ${id}: ${mintResult.error}`
+              );
+              // Optionally update status to indicate failed minting
+              await followUpClient.query(
+                "UPDATE project SET status = 'mint_failed', updated_at = CURRENT_TIMESTAMP WHERE project_id = $1",
+                [id]
+              );
+            }
+          } catch (err) {
+            console.error("Error in post-minting update:", err);
+          } finally {
+            followUpClient.release();
+          }
+        })
+        .catch((err) => {
+          console.error("Unhandled error in background minting:", err);
+        });
+
+      // 7. Update seller's total_cc
+      let sellerTable;
+      let sellerId;
+
+      if (project.seller_type === "ngo") {
+        sellerTable = "ngo";
+        sellerId = "ngo_id";
+      } else if (project.seller_type === "panchayat") {
+        sellerTable = "coastal_panchayat";
+        sellerId = "cp_id";
+      } else if (project.seller_type === "community") {
+        sellerTable = "community";
+        sellerId = "comm_id";
+      }
+
+      await client.query(
+        `UPDATE ${sellerTable} SET total_cc = total_cc + $1 WHERE ${sellerId} = $2`,
+        [actualCC, project.seller_id]
+      );
+
+      // Commit the transaction
+      await client.query("COMMIT");
+
+      // Return success response - now indicates "approved" with minting in progress
+      res.json({
+        message: "Project approved and carbon credit minting initiated",
+        project: {
+          project_id: project.project_id,
+          status: "approved", // Status is now "approved" until minting completes in background
+          actual_cc: actualCC,
+          minting_initiated: true,
+        },
+      });
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   } catch (error) {
     console.error(error.message);
     res.status(500).json({
       error: "Server error",
+      details: error.message,
     });
   }
 });

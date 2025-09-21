@@ -143,7 +143,7 @@ export const adminApi = {
     }
   },
 
-  // Approve Project
+  // Approve/Reject Project
   approveProject: async (projectId, approved) => {
     try {
       const response = await apiClient.patch(

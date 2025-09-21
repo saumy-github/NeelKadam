@@ -21,6 +21,34 @@ export default function NGOProfile() {
     navigate("/login/ngo");
   };
 
+  // Function to refresh wallet balance
+  const refreshWalletBalance = async () => {
+    try {
+      setWalletBalance(null); // Set to loading state
+
+      if (!contract || !account) {
+        await connectWallet();
+      }
+
+      if (contract && account) {
+        const balance = await contract.getWalletBalance(account);
+        setWalletBalance(Number(balance));
+        console.log("Wallet balance refreshed:", Number(balance));
+      } else {
+        throw new Error("Cannot connect to wallet or contract");
+      }
+    } catch (err) {
+      console.error("Error refreshing wallet balance:", err);
+      setWalletBalance("Error");
+      setTimeout(() => {
+        // Fallback to DB value after error
+        if (profileData && profileData.stats) {
+          setWalletBalance(profileData.stats.minted_carbon_credits || 0);
+        }
+      }, 2000);
+    }
+  };
+
   // Effect for fetching profile data - runs only once on component mount
   useEffect(() => {
     async function fetchProfileData() {
@@ -51,89 +79,13 @@ export default function NGOProfile() {
     };
   }, []); // Empty dependency array - runs only once
 
-  // Separate effect for blockchain wallet data
+  // Effect to set initial wallet balance from database
   useEffect(() => {
-    let isMounted = true; // Flag to prevent state updates after unmount
-    let connectionTimeout;
-
-    async function fetchBlockchainData() {
-      try {
-        // Set a timeout to provide fallback data if connection takes too long
-        connectionTimeout = setTimeout(() => {
-          if (walletBalance === null && isMounted) {
-            console.log("Using fallback wallet data due to timeout");
-            // Use mock data from profileData if available
-            if (profileData && profileData.stats) {
-              setWalletBalance(profileData.stats.minted_carbon_credits || 0);
-            } else {
-              setWalletBalance(0);
-            }
-          }
-        }, 5000); // 5 second timeout
-
-        // Fetch blockchain wallet data
-        await connectWallet();
-
-        if (!isMounted) return; // Don't proceed if component unmounted
-
-        if (contract && account) {
-          // Fetch wallet balance
-          try {
-            const balance = await contract.getWalletBalance(account);
-            if (isMounted) {
-              clearTimeout(connectionTimeout);
-              setWalletBalance(Number(balance));
-            }
-          } catch (err) {
-            console.error("Wallet balance error:", err);
-            if (isMounted) {
-              clearTimeout(connectionTimeout);
-              // Use mock data from profileData if available after error
-              if (profileData && profileData.stats) {
-                setWalletBalance(profileData.stats.minted_carbon_credits || 0);
-              } else {
-                setWalletBalance(0);
-              }
-            }
-          }
-
-          // Fetch all transactions
-          if (isMounted) setTxLoading(true);
-          if (isMounted) setTxError("");
-
-          try {
-            const allTx = await contract.getAllTransactions();
-            // Filter only those where from or to is the current account
-            if (isMounted) {
-              const filtered = allTx.filter(
-                (tx) =>
-                  (tx.from &&
-                    tx.from.toLowerCase() === account.toLowerCase()) ||
-                  (tx.to && tx.to.toLowerCase() === account.toLowerCase())
-              );
-              setTransactions(filtered);
-            }
-          } catch (err) {
-            if (isMounted) setTxError("Could not fetch transactions");
-          }
-
-          if (isMounted) setTxLoading(false);
-        }
-      } catch (err) {
-        console.error("Error fetching blockchain data:", err);
-      }
+    // Use database values initially instead of auto-connecting to wallet
+    if (profileData && profileData.stats && walletBalance === null) {
+      setWalletBalance(profileData.stats.minted_carbon_credits || 0);
     }
-
-    fetchBlockchainData();
-
-    // Cleanup function
-    return () => {
-      isMounted = false;
-      if (connectionTimeout) {
-        clearTimeout(connectionTimeout);
-      }
-    };
-  }, [account, contract, profileData]);
+  }, [profileData, walletBalance]); // Run when profileData or walletBalance changes
   return (
     <div className="min-h-screen flex flex-col bg-[#fcedd3]">
       {/* ✅ Same taskbar as Dashboard */}
@@ -251,11 +203,27 @@ export default function NGOProfile() {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-xl font-semibold">Wallet</h2>
-                {walletBalance !== null && walletBalance !== "Error" && (
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                    Using {profileData ? "blockchain" : "estimated"} data
-                  </span>
-                )}
+                <button
+                  onClick={() => refreshWalletBalance()}
+                  className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded flex items-center"
+                  disabled={!account}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  Refresh
+                </button>
               </div>
               <p className="text-gray-700 text-lg">
                 <strong>Balance:</strong>{" "}
