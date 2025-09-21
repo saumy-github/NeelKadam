@@ -76,7 +76,7 @@ export default function Landing() {
     {
       q: "What is Blue Carbon?",
       a: "Blue carbon refers to carbon stored within coastal and marine ecosystems. Mangroves, seagrass meadows, and salt marshes capture carbon extremely fast. Unlike terrestrial forests, they securely lock carbon for millennia ahead. These ecosystems provide protection from erosion, storms, and rising coastal threats. They also sustain fisheries, biodiversity, and support important coastal livelihoods. Global strategies now integrate blue carbon into nature-based climate solutions.",
-      img: "/Bluecarbon.jpg",
+      img: "/BCC2.jpg",
       fullScreen: false,
       padding: "py-12",
       xOffset: 0,
@@ -84,7 +84,7 @@ export default function Landing() {
     },
     {
       q: "Why does Blue Carbon matter?",
-      a: "These ecosystems not only store carbon but also protect coastlines, sustain fisheries, and support coastal communities.",
+      a: "These ecosystems not only store carbon, but also safeguard coastlines from erosion and storms. They sustain vital fisheries, preserve biodiversity, and support the livelihoods of coastal communities.",
       img: "/BC5.jpg",
       fullScreen: true,
       xOffset: -15,
@@ -92,7 +92,7 @@ export default function Landing() {
     },
     {
       q: "How is Blue Carbon unique?",
-      a: "Unlike land forests, blue carbon ecosystems lock away carbon for centuries to millennia while providing biodiversity benefits.",
+      a: "Unlike land forests blue carbon ecosystems lock away carbon not just for years, but for centuries to millennia.They act as long-term climate buffers, while also nurturing rich biodiversity that sustains marine and coastal life.",
       img: "/BC2.jpg",
       fullScreen: false,
       padding: "py-2",
@@ -101,7 +101,7 @@ export default function Landing() {
     },
     {
       q: "The Future of Blue Carbon",
-      a: "Scaling restoration and protection of blue carbon ecosystems is key to achieving global climate goals.",
+      a: "Scaling the restoration and protection of blue carbon ecosystems is essential for meeting global climate goals. By expanding these efforts, we not only enhance carbon storage but also strengthen biodiversity, protect coastlines, and support sustainable livelihoods",
       img: "/BC4.jpg",
       fullScreen: true,
       xOffset: 0,
@@ -109,7 +109,7 @@ export default function Landing() {
     },
     {
       q: "What role does it play in climate?",
-      a: "Blue carbon is now being integrated into nature-based solutions for climate change mitigation and adaptation.",
+      a: "Blue carbon is now being integrated into nature-based solutions for both climate change mitigation and adaptation. Coastal and marine ecosystems such as mangroves, seagrass meadows, and salt marshes are recognized as powerful carbon sinks that can store vast amounts of carbon for centuries. Beyond their climate benefits, these ecosystems provide natural protection against storms and rising sea levels, safeguard biodiversity, and sustain the livelihoods of millions of people living in coastal regions.",
       img: "/BC3.jpg",
       fullScreen: false,
       xOffset: 15,
