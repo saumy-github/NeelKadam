@@ -58,12 +58,12 @@ export default function Hero() {
             Learn More
           </Link>
 
-          <a
+          {/* <a
             href="#projects"
             className="px-6 py-3 border border-white hover:bg-white hover:text-black text-lg font-semibold rounded-xl transition"
           >
             Explore Projects
-          </a>
+          </a> */}
         </div>
       </div>
     </section>
