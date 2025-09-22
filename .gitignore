@@ -34,6 +34,9 @@ frontend/.env
 # Summary file for Gemini
 backend/refactoring_summary.md
 
+# Test documentation
+backend/test_cc_generation.md
+
 # Project reports
 reports/
 reports/*.md
