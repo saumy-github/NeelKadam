@@ -1,4 +1,4 @@
-PS-25038: Blockchain-Based Blue Carbon Registry and MRV System
+# PS-25038: Blockchain-Based Blue Carbon Registry and MRV System
 This README provides an overview of the project, including team details, relevant links, tasks completed, tech stack, key features, and steps to run the project locally.
 
 Team Details
