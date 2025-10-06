@@ -1,3 +1,5 @@
+import apiClient from '../api/config.js';
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -49,30 +51,21 @@ export default function BuyerSignup() {
   };
 
   const handleFinish = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("http://localhost:3000/api/auth/buyer/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+  setLoading(true);
+  try {
+    // Use the apiClient with the correct path
+    const response = await apiClient.post("/auth/buyer/register", formData);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log("✅ Registration successful:", data);
-        navigate("/login/buyer");
-      } else {
-        console.error("❌ Registration failed:", data.error || data.message);
-        alert(data.error || data.message || "Registration failed");
-      }
-    } catch (error) {
-      console.error("❌ Error during registration:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    console.log("✅ Registration successful:", response.data);
+    navigate("/login/buyer");
+  } catch (error) {
+    const errorMessage = error.response?.data?.error || "Something went wrong. Please try again.";
+    console.error("❌ Error during registration:", errorMessage);
+    alert(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex flex-col min-h-screen bg-[#fcedd3]">

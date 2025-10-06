@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken"); // Add JWT
+const jwt = require("jsonwebtoken"); 
 
 // ================= REGISTER =================
 router.post("/register", async (req, res) => {
@@ -14,7 +14,7 @@ router.post("/register", async (req, res) => {
     account_holder_name,
     account_number,
     ifsc_code,
-    wallet_address, // ✅ now included
+    wallet_address,
   } = req.body;
 
   try {

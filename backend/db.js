@@ -1,32 +1,28 @@
-// d:/SIH_2025/backend/db.js
+// d:/NeelKadam/backend/db.js
 const { Pool } = require("pg");
-require("dotenv").config();
-
-// Database connection parameters
-const dbConfig = {
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-};
-
-// Log database connection info (without password)
-console.log("📊 Database connection parameters:", {
-  user: dbConfig.user,
-  host: dbConfig.host,
-  database: dbConfig.database,
-  port: dbConfig.port,
-});
 
 // Create connection pool
-const pool = new Pool(dbConfig);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // Required for Render PostgreSQL
+  },
+  // // Sets the default schema for all connections in this pool
+  options: "--search_path=neelkadam_schema",
+});
+
+// Log database connection info (without sensitive data)
+console.log(
+  "📊 Database connection configured for:",
+  process.env.DATABASE_URL ? "Render PostgreSQL" : "Local PostgreSQL"
+);
 
 // Add event listeners for better debugging
 pool.on("connect", () => {
-  console.log("✅ Connected to PostgreSQL database:", dbConfig.database);
+  console.log("✅ Connected to PostgreSQL database:");
 });
 
+// Add event listener for general pool errors
 pool.on("error", (err) => {
   console.error("❌ PostgreSQL pool error:", err.message);
   console.error("Error stack:", err.stack);

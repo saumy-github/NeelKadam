@@ -1,18 +1,18 @@
 // Main entry point for the backend server.
+require("dotenv").config();
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors"); // Import cors
+const morgan = require("morgan"); //Import morgan
 const pool = require("./db"); // Import the shared pool
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON bodies and handle CORS
-app.use(express.json());
-app.use(cors()); // Enable CORS for all routes
+// Apply Middleware
+app.use(cors());          // Allows requests from all origins
+app.use(express.json());  // Parses incoming JSON requests
+app.use(morgan("dev"));   // Logs incoming requests
 
 // Import auth routes for different user types
 const ngoAuthRoutes = require("./routes/auth/ngo");

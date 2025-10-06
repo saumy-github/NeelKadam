@@ -1,3 +1,5 @@
+import apiClient from "../api/config.js";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,25 +11,25 @@ export default function SignUp() {
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
-  email: "",
-  password: "",
-  confirm_password: "",
-  email_otp: "",
-  ngo_name: "",
-  license_no: "",
-  spokesperson_name: "",
-  spokesperson_mobile: "",
-  pan_no: "",
-  account_holder_name: "",
-  account_number: "",
-  ifsc_code: "",
-  wallet_address: "",
-  zila_id_ward_no: "",
-  address: "",
-  contact_email: "",
-  community_name: "",
-  community_spokesperson_name: "",
-  community_spokesperson_mobile: "",
+    email: "",
+    password: "",
+    confirm_password: "",
+    email_otp: "",
+    ngo_name: "",
+    license_no: "",
+    spokesperson_name: "",
+    spokesperson_mobile: "",
+    pan_no: "",
+    account_holder_name: "",
+    account_number: "",
+    ifsc_code: "",
+    wallet_address: "",
+    zila_id_ward_no: "",
+    address: "",
+    contact_email: "",
+    community_name: "",
+    community_spokesperson_name: "",
+    community_spokesperson_mobile: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -69,7 +71,12 @@ export default function SignUp() {
     setError("");
 
     // ✅ validate Step 4 fields before sending to backend
-    if (!formData.account_holder_name || !formData.account_number || !formData.ifsc_code || !formData.wallet_address) {
+    if (
+      !formData.account_holder_name ||
+      !formData.account_number ||
+      !formData.ifsc_code ||
+      !formData.wallet_address
+    ) {
       setError("All bank details and wallet address are required.");
       return;
     }
@@ -92,7 +99,7 @@ export default function SignUp() {
           ifsc_code: formData.ifsc_code,
           wallet_address: formData.wallet_address,
         };
-        apiEndpoint = "http://localhost:3000/api/auth/ngo/register";
+        apiEndpoint = "/auth/ngo/register";
       } else if (userType === "panchayat") {
         apiData = {
           zila_id_ward_no: formData.zila_id_ward_no,
@@ -105,7 +112,7 @@ export default function SignUp() {
           ifsc_code: formData.ifsc_code,
           wallet_address: formData.wallet_address,
         };
-        apiEndpoint = "http://localhost:3000/api/auth/panchayat/register";
+        apiEndpoint = "/auth/panchayat/register";
       } else if (userType === "community") {
         apiData = {
           community_name: formData.community_name,
@@ -119,23 +126,18 @@ export default function SignUp() {
           ifsc_code: formData.ifsc_code,
           wallet_address: formData.wallet_address,
         };
-        apiEndpoint = "http://localhost:3000/api/auth/community/register";
+        apiEndpoint = "/auth/community/register";
       }
 
-      const response = await fetch(apiEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(apiData),
-      });
+      // Use the apiClient to make the request
+      await apiClient.post(apiEndpoint, apiData); // <-- New apiClient call
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Registration failed");
-
-      // ✅ Smooth redirect after success
       navigate(`/login/${userType}`, { state: { success: true } });
     } catch (err) {
-      console.error("❌ Error:", err);
-      setError(err.message);
+      // <-- New error handling
+      const errorMessage = err.response?.data?.error || "Registration failed";
+      console.error("❌ Error:", errorMessage);
+      setError(errorMessage);
     }
   };
 
@@ -167,12 +169,16 @@ export default function SignUp() {
           </div>
 
           {/* Error message */}
-          {error && <p className="mb-4 text-red-600 text-sm font-medium">{error}</p>}
+          {error && (
+            <p className="mb-4 text-red-600 text-sm font-medium">{error}</p>
+          )}
 
           {/* Step 1 */}
           {step === 1 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 1: Account Setup</h2>
+              <h2 className="text-2xl font-bold text-green-700 mb-6">
+                Step 1: Account Setup
+              </h2>
               <input
                 type="email"
                 name="email"
@@ -181,7 +187,6 @@ export default function SignUp() {
                 onChange={handleChange}
                 className="w-full p-3 mb-4 border rounded-lg"
               />
-
 
               {/* Password */}
               <div className="relative mb-4">
@@ -225,20 +230,23 @@ export default function SignUp() {
 
           {/* Step 2 */}
           {step === 2 && (
-  <div>
-    <h2 className="text-2xl font-bold text-green-700 mb-6">Step 2: OTP Verification</h2>
-    <p className="font-medium text-gray-700 mb-2">Enter the OTP sent to your Email:</p>
-    <input
-      type="text"
-      name="email_otp"
-      placeholder="Enter Email OTP"
-      value={formData.email_otp}
-      onChange={handleChange}
-      className="w-full p-3 mb-4 border rounded-lg"
-    />
-  </div>
-)}
-
+            <div>
+              <h2 className="text-2xl font-bold text-green-700 mb-6">
+                Step 2: OTP Verification
+              </h2>
+              <p className="font-medium text-gray-700 mb-2">
+                Enter the OTP sent to your Email:
+              </p>
+              <input
+                type="text"
+                name="email_otp"
+                placeholder="Enter Email OTP"
+                value={formData.email_otp}
+                onChange={handleChange}
+                className="w-full p-3 mb-4 border rounded-lg"
+              />
+            </div>
+          )}
 
           {/* Step 3 */}
           {step === 3 && (
@@ -365,7 +373,9 @@ export default function SignUp() {
           {/* Step 4 */}
           {step === 4 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 4: Bank Details</h2>
+              <h2 className="text-2xl font-bold text-green-700 mb-6">
+                Step 4: Bank Details
+              </h2>
               <input
                 name="account_holder_name"
                 placeholder="Account Holder Name"
