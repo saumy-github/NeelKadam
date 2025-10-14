@@ -10,9 +10,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Apply Middleware
+app.use(morgan("dev"));   // Logs incoming requests
 app.use(cors());          // Allows requests from all origins
 app.use(express.json());  // Parses incoming JSON requests
-app.use(morgan("dev"));   // Logs incoming requests
 
 // Import auth routes for different user types
 const ngoAuthRoutes = require("./routes/auth/ngo");
