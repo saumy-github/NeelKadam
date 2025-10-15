@@ -1,4 +1,4 @@
-import apiClient from '../api/config.js';
+import apiClient from "../api/config.js";
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -40,7 +40,8 @@ export default function BuyerSignup() {
 
   const handleNext = () => {
     if (step === 1) {
-      if (!formData.email || !formData.password || !formData.confirm_password) return;
+      if (!formData.email || !formData.password || !formData.confirm_password)
+        return;
       if (formData.password !== formData.confirm_password) return;
     }
     if (step === 2 && !formData.email_otp) return;
@@ -51,21 +52,26 @@ export default function BuyerSignup() {
   };
 
   const handleFinish = async () => {
-  setLoading(true);
-  try {
-    // Use the apiClient with the correct path
-    const response = await apiClient.post("/auth/buyer/register", formData);
+    setLoading(true);
+    try {
+      // Use the apiClient with the correct path
+      const response = await apiClient.post(
+        "/api/auth/buyer/register",
+        formData
+      );
 
-    console.log("✅ Registration successful:", response.data);
-    navigate("/login/buyer");
-  } catch (error) {
-    const errorMessage = error.response?.data?.error || "Something went wrong. Please try again.";
-    console.error("❌ Error during registration:", errorMessage);
-    alert(errorMessage);
-  } finally {
-    setLoading(false);
-  }
-};
+      console.log("✅ Registration successful:", response.data);
+      navigate("/login/buyer");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.error ||
+        "Something went wrong. Please try again.";
+      console.error("❌ Error during registration:", errorMessage);
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#fcedd3]">

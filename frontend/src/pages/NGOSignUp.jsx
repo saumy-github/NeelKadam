@@ -99,7 +99,7 @@ export default function SignUp() {
           ifsc_code: formData.ifsc_code,
           wallet_address: formData.wallet_address,
         };
-        apiEndpoint = "/auth/ngo/register";
+        apiEndpoint = "/api/auth/ngo/register";
       } else if (userType === "panchayat") {
         apiData = {
           zila_id_ward_no: formData.zila_id_ward_no,
@@ -112,7 +112,7 @@ export default function SignUp() {
           ifsc_code: formData.ifsc_code,
           wallet_address: formData.wallet_address,
         };
-        apiEndpoint = "/auth/panchayat/register";
+        apiEndpoint = "/api/auth/panchayat/register";
       } else if (userType === "community") {
         apiData = {
           community_name: formData.community_name,
@@ -126,7 +126,7 @@ export default function SignUp() {
           ifsc_code: formData.ifsc_code,
           wallet_address: formData.wallet_address,
         };
-        apiEndpoint = "/auth/community/register";
+        apiEndpoint = "/api/auth/community/register";
       }
 
       // Use the apiClient to make the request

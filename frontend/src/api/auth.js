@@ -5,7 +5,7 @@ export const ngoAuth = {
   // Register new NGO
   register: async (ngoData) => {
     try {
-      const response = await apiClient.post("/auth/ngo/register", ngoData);
+      const response = await apiClient.post("/api/auth/ngo/register", ngoData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -15,7 +15,7 @@ export const ngoAuth = {
   // NGO Login
   login: async (credentials) => {
     try {
-      const response = await apiClient.post("/auth/ngo/login", credentials);
+      const response = await apiClient.post("/api/auth/ngo/login", credentials);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -25,7 +25,7 @@ export const ngoAuth = {
   // Get NGO profile
   getProfile: async () => {
     try {
-      const response = await apiClient.get("/auth/ngo/profile");
+      const response = await apiClient.get("/api/auth/ngo/profile");
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -35,7 +35,10 @@ export const ngoAuth = {
   // Update NGO profile
   updateProfile: async (profileData) => {
     try {
-      const response = await apiClient.put("/auth/ngo/profile", profileData);
+      const response = await apiClient.put(
+        "/api/auth/ngo/profile",
+        profileData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -48,7 +51,10 @@ export const buyerAuth = {
   // Register new Buyer
   register: async (buyerData) => {
     try {
-      const response = await apiClient.post("/auth/buyer/register", buyerData);
+      const response = await apiClient.post(
+        "/api/auth/buyer/register",
+        buyerData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -58,7 +64,10 @@ export const buyerAuth = {
   // Buyer Login
   login: async (credentials) => {
     try {
-      const response = await apiClient.post("/auth/buyer/login", credentials);
+      const response = await apiClient.post(
+        "/api/auth/buyer/login",
+        credentials
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -68,7 +77,7 @@ export const buyerAuth = {
   // Get Buyer profile
   getProfile: async () => {
     try {
-      const response = await apiClient.get("/auth/buyer/profile");
+      const response = await apiClient.get("/api/auth/buyer/profile");
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -78,7 +87,10 @@ export const buyerAuth = {
   // Update Buyer profile
   updateProfile: async (profileData) => {
     try {
-      const response = await apiClient.put("/auth/buyer/profile", profileData);
+      const response = await apiClient.put(
+        "/api/auth/buyer/profile",
+        profileData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -92,7 +104,7 @@ export const panchayatAuth = {
   register: async (panchayatData) => {
     try {
       const response = await apiClient.post(
-        "/auth/panchayat/register",
+        "/api/auth/panchayat/register",
         panchayatData
       );
       return response.data;
@@ -105,7 +117,7 @@ export const panchayatAuth = {
   login: async (credentials) => {
     try {
       const response = await apiClient.post(
-        "/auth/panchayat/login",
+        "/api/auth/panchayat/login",
         credentials
       );
       return response.data;
@@ -117,7 +129,7 @@ export const panchayatAuth = {
   // Get Panchayat profile
   getProfile: async () => {
     try {
-      const response = await apiClient.get("/auth/panchayat/profile");
+      const response = await apiClient.get("/api/auth/panchayat/profile");
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -128,7 +140,7 @@ export const panchayatAuth = {
   updateProfile: async (profileData) => {
     try {
       const response = await apiClient.put(
-        "/auth/panchayat/profile",
+        "/api/auth/panchayat/profile",
         profileData
       );
       return response.data;
@@ -144,7 +156,7 @@ export const communityAuth = {
   register: async (communityData) => {
     try {
       const response = await apiClient.post(
-        "/auth/community/register",
+        "/api/auth/community/register",
         communityData
       );
       return response.data;
@@ -157,7 +169,7 @@ export const communityAuth = {
   login: async (credentials) => {
     try {
       const response = await apiClient.post(
-        "/auth/community/login",
+        "/api/auth/community/login",
         credentials
       );
       return response.data;
@@ -169,7 +181,7 @@ export const communityAuth = {
   // Get Community profile
   getProfile: async () => {
     try {
-      const response = await apiClient.get("/auth/community/profile");
+      const response = await apiClient.get("/api/auth/community/profile");
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -180,7 +192,7 @@ export const communityAuth = {
   updateProfile: async (profileData) => {
     try {
       const response = await apiClient.put(
-        "/auth/community/profile",
+        "/api/auth/community/profile",
         profileData
       );
       return response.data;

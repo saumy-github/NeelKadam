@@ -9,7 +9,7 @@ const cache = {
   get(key) {
     const now = Date.now();
     if (this.data[key] && now - this.timestamp[key] < this.maxAge) {
-      console.log(`✅ Using cached data for ${key}`);
+      console.log("✅ Using cached data for ${key}");
       return this.data[key];
     }
     return null;
@@ -45,7 +45,7 @@ export const dashboardApi = {
 
     try {
       console.log("🔄 Fetching fresh NGO dashboard data");
-      const response = await apiClient.get("/dashboard/ngo");
+      const response = await apiClient.get("/api/dashboard/ngo");
 
       // Cache the successful response
       if (response.data && response.data.success) {
