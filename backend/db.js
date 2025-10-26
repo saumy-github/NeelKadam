@@ -1,5 +1,5 @@
 // d:/NeelKadam/backend/db.js
-const { Pool } = require("pg");
+import { Pool } from "pg";
 
 // Create connection pool
 // This is now much simpler. The connectionString from Supabase handles everything, including SSL.
@@ -10,7 +10,9 @@ const pool = new Pool({
 // Log database connection info
 console.log(
   "📊 Database connection configured for:",
-  process.env.DATABASE_URL.includes("supabase") ? "Supabase PostgreSQL" : "Remote PostgreSQL"
+  process.env.DATABASE_URL.includes("supabase")
+    ? "Supabase PostgreSQL"
+    : "Remote PostgreSQL"
 );
 
 // Add event listeners for better debugging
@@ -58,4 +60,4 @@ pool
     console.error("❌ Database connection test failed:", err.message)
   );
 
-module.exports = pool;
+export default pool;

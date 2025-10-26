@@ -1,8 +1,9 @@
 // Admin management routes
-const express = require("express");
+import express from "express";
+import pool from "../db.js";
+import bcrypt from "bcryptjs";
+
 const router = express.Router();
-const pool = require("../db");
-const bcrypt = require("bcryptjs");
 
 // POST /api/admin/login - Admin Login (placeholder - you'll need to create admin table)
 router.post("/login", async (req, res) => {
@@ -430,7 +431,7 @@ router.patch("/projects/:id/approve", async (req, res) => {
       );
 
       // 4. Import blockchain utility
-      const { mintCarbonCredits } = require("../utils/blockchain");
+      const { mintCarbonCredits } = await import("../utils/blockchain.js");
 
       // Update project to approved status first
       await client.query(
@@ -653,4 +654,4 @@ router.get("/reports/:type", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

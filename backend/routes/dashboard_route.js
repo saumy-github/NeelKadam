@@ -10,10 +10,11 @@
  * All routes are protected by JWT authentication.
  */
 
-const express = require("express");
+import express from "express";
+import pool from "../db.js";
+import authMiddleware from "../middleware/auth_middleware.js";
+
 const router = express.Router();
-const pool = require("../db");
-const authMiddleware = require("../middleware/auth_middleware");
 
 // GET /api/dashboard/ngo - Get NGO dashboard data
 router.get("/ngo", authMiddleware, async (req, res) => {
@@ -97,4 +98,4 @@ router.get("/ngo", authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

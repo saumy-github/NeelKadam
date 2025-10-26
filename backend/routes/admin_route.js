@@ -1,8 +1,9 @@
 // Admin protected routes
-const express = require("express");
+import express from "express";
+import pool from "../db.js";
+import authMiddleware from "../middleware/auth_middleware.js";
+
 const router = express.Router();
-const pool = require("../db");
-const authMiddleware = require("../middleware/auth_middleware");
 
 // GET /projects - Get all projects for verification with seller name
 // Protected route - requires authentication
@@ -42,4 +43,4 @@ router.get("/projects", authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

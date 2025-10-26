@@ -1,5 +1,8 @@
 // Blockchain utility for interacting with the smart contract
-const { ethers } = require("ethers");
+import { ethers } from "ethers";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
 const contractABI = require("../../blockchain/abi.json");
 
 // Contract configuration
@@ -70,6 +73,4 @@ async function mintCarbonCredits(ngoWalletAddress, amount) {
   }
 }
 
-module.exports = {
-  mintCarbonCredits,
-};
+export { mintCarbonCredits };

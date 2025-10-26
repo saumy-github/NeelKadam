@@ -1,10 +1,11 @@
 // This file contains all NGO authentication-related API endpoints.
 
-const express = require("express");
+import express from "express";
+import pool from "../../db.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
 const router = express.Router();
-const pool = require("../../db"); // Assuming db.js is in the parent directory
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken"); // Add JWT
 
 // POST /api/auth/ngo/register - NGO Registration
 router.post("/register", async (req, res) => {
@@ -181,4 +182,4 @@ router.post("/login", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

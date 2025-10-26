@@ -1,31 +1,31 @@
 // Main entry point for the backend server.
-require("dotenv").config();
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors"); // Import cors
-const morgan = require("morgan"); //Import morgan
-const pool = require("./db"); // Import the shared pool
+import "dotenv/config";
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors"; // Import cors
+import morgan from "morgan"; //Import morgan
+import pool from "./db.js"; // Import the shared pool
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Apply Middleware
-app.use(morgan("dev"));   // Logs incoming requests
-app.use(cors());          // Allows requests from all origins
-app.use(express.json());  // Parses incoming JSON requests
+app.use(morgan("dev")); // Logs incoming requests
+app.use(cors()); // Allows requests from all origins
+app.use(express.json()); // Parses incoming JSON requests
 
 // Import auth routes for different user types
-const ngoAuthRoutes = require("./routes/auth/ngo");
-const panchayatAuthRoutes = require("./routes/auth/panchayat");
-const communityAuthRoutes = require("./routes/auth/community");
-const buyerAuthRoutes = require("./routes/auth/buyer");
+import ngoAuthRoutes from "./routes/auth/ngo.js";
+import panchayatAuthRoutes from "./routes/auth/panchayat.js";
+import communityAuthRoutes from "./routes/auth/community.js";
+import buyerAuthRoutes from "./routes/auth/buyer.js";
 
 // Import other routes
-const projectRoutes = require("./routes/projects");
-const adminRoutes = require("./routes/admin");
-const adminProtectedRoutes = require("./routes/admin_route");
-const dashboardRoutes = require("./routes/dashboard_route");
-const buyerRoutes = require("./routes/buyer_route");
+import projectRoutes from "./routes/projects.js";
+import adminRoutes from "./routes/admin.js";
+import adminProtectedRoutes from "./routes/admin_route.js";
+import dashboardRoutes from "./routes/dashboard_route.js";
+import buyerRoutes from "./routes/buyer_route.js";
 
 // Use auth routes with specific prefixes
 app.use("/api/auth/ngo", ngoAuthRoutes);

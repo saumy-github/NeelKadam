@@ -1,13 +1,12 @@
-const { ethers } = require("ethers");
-require("dotenv").config({ path: __dirname + "/../.env" });
-const contractABI = require("../../blockchain/abi.json");
+import { ethers } from "ethers";
+import {
+  CONTRACT_ADDRESS,
+  PROVIDER_URL,
+  contractABI,
+  validateProviderUrl,
+} from "./config.js";
 
-const CONTRACT_ADDRESS = "0xacea7fa9e319ca2f1cadce88dd023887d017f741";
-const PROVIDER_URL = process.env.PROVIDER_URL;
-if (!PROVIDER_URL) {
-  console.error("Set PROVIDER_URL in backend/.env before running this script");
-  process.exit(1);
-}
+validateProviderUrl();
 
 async function main() {
   const target = process.argv[2];

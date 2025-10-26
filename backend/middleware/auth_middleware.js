@@ -1,5 +1,5 @@
 // Authentication middleware for JWT token verification
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 /**
  * Middleware to authenticate requests using JWT token
@@ -35,4 +35,4 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = authMiddleware;
+export default authMiddleware;

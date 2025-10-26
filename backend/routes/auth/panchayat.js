@@ -1,9 +1,10 @@
 // Coastal Panchayat authentication routes
-const express = require("express");
+import express from "express";
+import pool from "../../db.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
 const router = express.Router();
-const pool = require("../../db");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken"); // Add JWT
 
 // POST /api/auth/panchayat/register - Panchayat Registration
 router.post("/register", async (req, res) => {
@@ -249,4 +250,4 @@ router.put("/profile", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

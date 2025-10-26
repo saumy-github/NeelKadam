@@ -1,8 +1,9 @@
 // Project management routes
-const express = require("express");
+import express from "express";
+import pool from "../db.js";
+import jwt from "jsonwebtoken";
+
 const router = express.Router();
-const pool = require("../db");
-const jwt = require("jsonwebtoken");
 
 // Authentication middleware
 const authMiddleware = (req, res, next) => {
@@ -372,4 +373,4 @@ router.post("/:id/photos", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

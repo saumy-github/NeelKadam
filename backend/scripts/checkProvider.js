@@ -1,5 +1,5 @@
-const { ethers } = require("ethers");
-require("dotenv").config({ path: __dirname + "/../.env" });
+import { ethers } from "ethers";
+import { PROVIDER_URL, CONTRACT_ADDRESS } from "./config.js";
 
 async function main() {
   // Use either env var or command line arg

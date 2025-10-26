@@ -10,10 +10,12 @@
  * All routes are protected by JWT authentication.
  */
 
-const express = require("express");
-const router = express.Router();
-const pool = require("../db");
-const authMiddleware = require("../middleware/auth_middleware"); // GET /api/buyer/dashboard - Get buyer dashboard data
+import express from "express";
+import pool from "../db.js";
+import authMiddleware from "../middleware/auth_middleware.js";
+
+const router = express.Router(); 
+// GET /api/buyer/dashboard - Get buyer dashboard data
 router.get("/dashboard", authMiddleware, async (req, res) => {
   try {
     // Get buyer ID from authenticated user's JWT token
@@ -136,4 +138,4 @@ router.patch("/update-wallet", authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

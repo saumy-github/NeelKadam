@@ -1,14 +1,14 @@
-const { ethers } = require("ethers");
-require("dotenv").config({ path: __dirname + "/../.env" });
-const contractABI = require("../../blockchain/abi.json");
+import { ethers } from "ethers";
+import {
+  CONTRACT_ADDRESS,
+  PROVIDER_URL,
+  ADMIN_PRIVATE_KEY,
+  contractABI,
+} from "./config.js";
 
-const CONTRACT_ADDRESS = "0xacea7fa9e319ca2f1cadce88dd023887d017f741";
-const PROVIDER_URL = process.env.PROVIDER_URL;
-const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
-
-if (!PROVIDER_URL || !DEPLOYER_PRIVATE_KEY) {
+if (!PROVIDER_URL || !ADMIN_PRIVATE_KEY) {
   console.error(
-    "Set PROVIDER_URL and DEPLOYER_PRIVATE_KEY in backend/.env before running this script"
+    "Set PROVIDER_URL and ADMIN_PRIVATE_KEY in backend/.env before running this script"
   );
   process.exit(1);
 }
@@ -21,7 +21,7 @@ async function main() {
   }
 
   const provider = new ethers.JsonRpcProvider(PROVIDER_URL);
-  const adminWallet = new ethers.Wallet(DEPLOYER_PRIVATE_KEY, provider);
+  const adminWallet = new ethers.Wallet(ADMIN_PRIVATE_KEY, provider);
   const contract = new ethers.Contract(
     CONTRACT_ADDRESS,
     contractABI,
