@@ -11,8 +11,8 @@
  */
 
 import express from "express";
-import authMiddleware from "../src/middleware/auth.middleware.js";
-import { getNgoDashboard } from "../src/controllers/dashboard.controller.js";
+import { authMiddleware } from "../middleware/index.js";
+import { getNgoDashboard } from "../controllers/dashboard.controller.js";
 
 const router = express.Router();
 

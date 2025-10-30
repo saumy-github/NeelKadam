@@ -1,9 +1,6 @@
 // NGO authentication routes
 import express from "express";
-import {
-  ngoRegister,
-  ngoLogin,
-} from "../../src/controllers/auth.controller.js";
+import { ngoRegister, ngoLogin } from "../../controllers/auth.controller.js";
 
 const router = express.Router();
 

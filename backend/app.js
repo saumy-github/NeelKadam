@@ -1,44 +1,33 @@
-// Main entry point for the backend server.
-import "dotenv/config";
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors"; // Import cors
-import morgan from "morgan"; //Import morgan
-import pool from "./db.js"; // Import the shared pool
+// Express application configuration
+// This file sets up the Express app with all middleware and routes
+// Server startup logic is in server.js
 
+import express from "express";
+import cors from "cors";
+import morgan from "morgan";
+import pool from "./src/config/database.config.js";
+
+// Import routes from new organized structure
+import apiRoutes from "./src/routes/index.js";
+
+// Import admin routes (kept in old location, will be moved in Phase 3)
+import adminRoutes from "./routes/admin.js";
+import adminProtectedRoutes from "./routes/admin_route.js";
+
+// Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Apply Middleware
 app.use(morgan("dev")); // Logs incoming requests
 app.use(cors()); // Allows requests from all origins
 app.use(express.json()); // Parses incoming JSON requests
 
-// Import auth routes for different user types
-import ngoAuthRoutes from "./routes/auth/ngo.js";
-import panchayatAuthRoutes from "./routes/auth/panchayat.js";
-import communityAuthRoutes from "./routes/auth/community.js";
-import buyerAuthRoutes from "./routes/auth/buyer.js";
+// Mount all API routes (auth, projects, buyer, dashboard)
+app.use("/api", apiRoutes);
 
-// Import other routes
-import projectRoutes from "./routes/projects.js";
-import adminRoutes from "./routes/admin.js";
-import adminProtectedRoutes from "./routes/admin_route.js";
-import dashboardRoutes from "./routes/dashboard_route.js";
-import buyerRoutes from "./routes/buyer_route.js";
-
-// Use auth routes with specific prefixes
-app.use("/api/auth/ngo", ngoAuthRoutes);
-app.use("/api/auth/panchayat", panchayatAuthRoutes);
-app.use("/api/auth/community", communityAuthRoutes);
-app.use("/api/auth/buyer", buyerAuthRoutes);
-
-// Use other routes
-app.use("/api/projects", projectRoutes);
+// Mount admin routes (will be refactored in Phase 3)
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin", adminProtectedRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/buyer", buyerRoutes);
 
 // Root route - welcome message
 app.get("/", (req, res) => {
@@ -83,7 +72,5 @@ app.get("/api/test_connection", async (req, res) => {
   }
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Export the configured Express app
+export default app;

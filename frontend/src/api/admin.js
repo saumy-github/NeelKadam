@@ -15,7 +15,9 @@ export const adminApi = {
   // Get all NGOs
   getAllNGOs: async (filters = {}) => {
     try {
-      const response = await apiClient.get("/api/admin/ngos", { params: filters });
+      const response = await apiClient.get("/api/admin/ngos", {
+        params: filters,
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -95,9 +97,12 @@ export const adminApi = {
   // Verify NGO
   verifyNGO: async (ngoId, verified) => {
     try {
-      const response = await apiClient.patch("/api/admin/ngos/${ngoId}/verify", {
-        verified,
-      });
+      const response = await apiClient.patch(
+        `/api/admin/ngos/${ngoId}/verify`,
+        {
+          verified,
+        }
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -108,7 +113,7 @@ export const adminApi = {
   verifyBuyer: async (buyerId, verified) => {
     try {
       const response = await apiClient.patch(
-        "/api/admin/buyers/${buyerId}/verify",
+        `/api/admin/buyers/${buyerId}/verify`,
         { verified }
       );
       return response.data;
@@ -121,7 +126,7 @@ export const adminApi = {
   verifyPanchayat: async (panchayatId, verified) => {
     try {
       const response = await apiClient.patch(
-        "/api/admin/panchayats/${panchayatId}/verify",
+        `/api/admin/panchayats/${panchayatId}/verify`,
         { verified }
       );
       return response.data;
@@ -134,7 +139,7 @@ export const adminApi = {
   verifyCommunity: async (communityId, verified) => {
     try {
       const response = await apiClient.patch(
-        "/api/admin/communities/${communityId}/verify",
+        `/api/admin/communities/${communityId}/verify`,
         { verified }
       );
       return response.data;
@@ -147,7 +152,7 @@ export const adminApi = {
   approveProject: async (projectId, approved) => {
     try {
       const response = await apiClient.patch(
-        "/api/admin/projects/${projectId}/approve",
+        `/api/admin/projects/${projectId}/approve`,
         { approved }
       );
       return response.data;
@@ -169,7 +174,7 @@ export const adminApi = {
   // Get Reports
   getReports: async (reportType, filters = {}) => {
     try {
-      const response = await apiClient.get("/api/admin/reports/${reportType}", {
+      const response = await apiClient.get(`/api/admin/reports/${reportType}`, {
         params: filters,
       });
       return response.data;

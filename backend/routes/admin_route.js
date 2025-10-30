@@ -1,7 +1,7 @@
 // Admin protected routes
 import express from "express";
-import pool from "../db.js";
-import authMiddleware from "../middleware/auth_middleware.js";
+import pool from "../src/config/database.config.js";
+import authMiddleware from "../src/middleware/auth.middleware.js";
 
 const router = express.Router();
 

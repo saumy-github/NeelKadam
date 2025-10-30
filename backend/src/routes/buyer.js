@@ -11,11 +11,11 @@
  */
 
 import express from "express";
-import authMiddleware from "../src/middleware/auth.middleware.js";
+import { authMiddleware } from "../middleware/index.js";
 import {
   getBuyerDashboard,
   updateBuyerWallet,
-} from "../src/controllers/buyer.controller.js";
+} from "../controllers/buyer.controller.js";
 
 const router = express.Router();
 

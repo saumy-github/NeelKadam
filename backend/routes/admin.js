@@ -1,6 +1,6 @@
 // Admin management routes
 import express from "express";
-import pool from "../db.js";
+import pool from "../src/config/database.config.js";
 import bcrypt from "bcryptjs";
 
 const router = express.Router();

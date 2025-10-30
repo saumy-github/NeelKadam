@@ -1,6 +1,18 @@
-// Project management routes
+/**
+ * Project Management Routes
+ *
+ * This file contains all project-related endpoints, including:
+ * - Creating and submitting projects
+ * - Retrieving project data (all, by ID, by seller)
+ * - Updating and deleting projects
+ * - Managing project status
+ * - Uploading project photos
+ *
+ * Protected routes require JWT authentication.
+ */
+
 import express from "express";
-import jwt from "jsonwebtoken";
+import { authMiddleware } from "../middleware/index.js";
 import {
   createProject,
   submitProject,
@@ -11,34 +23,9 @@ import {
   getProjectsBySeller,
   updateProjectStatus,
   uploadProjectPhotos,
-} from "../src/controllers/project.controller.js";
+} from "../controllers/project.controller.js";
 
 const router = express.Router();
-
-// Authentication middleware
-const authMiddleware = (req, res, next) => {
-  // Get token from the Authorization header
-  const authHeader = req.header("Authorization");
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Access denied. No token provided." });
-  }
-
-  const token = authHeader.replace("Bearer ", "");
-
-  try {
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Add user info to request
-    req.user = decoded;
-
-    next();
-  } catch (error) {
-    console.error("Token verification failed:", error.message);
-    res.status(401).json({ error: "Invalid token." });
-  }
-};
 
 // POST /api/projects - Create new project with authentication
 router.post("/", authMiddleware, createProject);

@@ -27,7 +27,7 @@ export const projectApi = {
   // Get project by ID
   getProjectById: async (projectId) => {
     try {
-      const response = await apiClient.get("/api/projects/${projectId}");
+      const response = await apiClient.get(`/api/projects/${projectId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -38,7 +38,7 @@ export const projectApi = {
   updateProject: async (projectId, projectData) => {
     try {
       const response = await apiClient.put(
-        "/api/projects/${projectId}",
+        `/api/projects/${projectId}`,
         projectData
       );
       return response.data;
@@ -50,7 +50,7 @@ export const projectApi = {
   // Delete project
   deleteProject: async (projectId) => {
     try {
-      const response = await apiClient.delete("/api/projects/${projectId}");
+      const response = await apiClient.delete(`/api/projects/${projectId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -60,7 +60,7 @@ export const projectApi = {
   // Get projects by seller (NGO/Panchayat/Community)
   getProjectsBySeller: async (sellerId, sellerType) => {
     try {
-      const response = await apiClient.get("/api/projects/seller/${sellerId}", {
+      const response = await apiClient.get(`/api/projects/seller/${sellerId}`, {
         params: { seller_type: sellerType },
       });
       return response.data;
@@ -73,7 +73,7 @@ export const projectApi = {
   updateProjectStatus: async (projectId, status) => {
     try {
       const response = await apiClient.patch(
-        "/api/projects/${projectId}/status",
+        `/api/projects/${projectId}/status`,
         {
           status,
         }
@@ -93,7 +93,7 @@ export const projectApi = {
       });
 
       const response = await apiClient.post(
-        "/api/projects/${projectId}/photos",
+        `/api/projects/${projectId}/photos`,
         formData,
         {
           headers: {
