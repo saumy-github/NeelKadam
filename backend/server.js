@@ -4,8 +4,19 @@
 
 import "dotenv/config";
 import app from "./app.js";
+import axios from "axios";
 
 const PORT = process.env.PORT || 3000;
+
+// Check blockchain microservice connectivity
+(async () => {
+  try {
+    const { data } = await axios.get(`${process.env.BLOCKCHAIN_SERVICE_URL || 'http://localhost:3001'}/health`);
+    console.log('✅ Blockchain microservice reachable:', data);
+  } catch (err) {
+    console.error('❌ Cannot reach blockchain microservice:', err.message);
+  }
+})();
 
 // Start the server
 const server = app.listen(PORT, () => {
