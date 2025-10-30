@@ -26,28 +26,38 @@ export default function NGODashboard() {
     setSellModalOpen(true);
   };
 
-  // Fetch dashboard data
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        // Force refresh on dashboard page to always get latest data
-        const response = await dashboardApi.getNgoDashboard(true);
-        if (response.success) {
-          setDashboardData(response.dashboard);
-        } else {
-          setError("Failed to fetch dashboard data");
-        }
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-        setError(
-          err.message || "An error occurred while fetching dashboard data"
-        );
-      } finally {
-        setLoading(false);
+  // Fetch dashboard data function
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      // Force refresh on dashboard page to always get latest data
+      const response = await dashboardApi.getNgoDashboard(true);
+      if (response.success) {
+        setDashboardData(response.dashboard);
+      } else {
+        setError("Failed to fetch dashboard data");
       }
-    };
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+      setError(
+        err.message || "An error occurred while fetching dashboard data"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Refresh dashboard after successful transfer
+  const handleTransferSuccess = () => {
+    console.log("🔄 Refreshing dashboard after transfer...");
+    // Clear cache to force fresh data
+    dashboardApi.clearCache();
+    // Fetch fresh data
+    fetchDashboardData();
+  };
+
+  // Fetch dashboard data on mount
+  useEffect(() => {
     fetchDashboardData();
 
     // Clear cache when navigating away from dashboard
@@ -131,7 +141,7 @@ export default function NGODashboard() {
                     Verified CC Earned
                   </h3>
                   <p className="text-3xl font-bold mt-2 text-blue-600">
-                    {dashboardData.stats?.minted_carbon_credits || 0}
+                    {dashboardData.stats?.total_carbon_credits || 0}
                   </p>
                 </div>
               </div>
@@ -177,6 +187,7 @@ export default function NGODashboard() {
             open={sellModalOpen}
             onClose={() => setSellModalOpen(false)}
             account={account}
+            onSuccess={handleTransferSuccess}
           />
         </div>
 

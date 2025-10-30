@@ -19,10 +19,8 @@ export const getBuyerDashboard = async (req, res) => {
 
     const result = await getBuyerDashboardService(buyerId, sellerType);
 
-    res.json({
-      success: true,
-      dashboard: result,
-    });
+    // Service already returns the full response object
+    res.json(result);
   } catch (error) {
     console.error("Buyer dashboard data fetch error:", error.message);
 
@@ -66,11 +64,8 @@ export const updateBuyerWallet = async (req, res) => {
       wallet_address
     );
 
-    res.json({
-      success: true,
-      message: "Wallet address updated successfully",
-      data: result,
-    });
+    // Service already returns the full response object
+    res.json(result);
   } catch (error) {
     console.error("Error updating wallet address:", error.message);
 

@@ -40,9 +40,9 @@ export const getNgoDashboardService = async (ngoId) => {
   // Calculate summary statistics
   const totalProjects = projects.length;
   const pendingProjects = projects.filter((p) => p.status === "pending").length;
-  const mintedCarbonCredits = projects
-    .filter((p) => p.status === "minted")
-    .reduce((sum, p) => sum + (parseFloat(p.actual_cc) || 0), 0);
+
+  // Use total_cc from NGO profile (includes transfers and minting)
+  const totalCarbonCredits = ngoProfile.total_cc || 0;
 
   // Get 5 most recent projects for activity feed
   const recentProjects = projects.slice(0, 5).map((p) => ({
@@ -61,7 +61,7 @@ export const getNgoDashboardService = async (ngoId) => {
       stats: {
         total_projects: totalProjects,
         pending_projects: pendingProjects,
-        minted_carbon_credits: mintedCarbonCredits,
+        total_carbon_credits: totalCarbonCredits, // Changed from minted_carbon_credits
       },
       recent_activity: recentProjects,
     },

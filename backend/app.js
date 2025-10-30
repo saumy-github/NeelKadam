@@ -41,6 +41,7 @@ app.get("/", (req, res) => {
       admin: "/api/admin",
       dashboard: "/api/dashboard",
       buyer: "/api/buyer",
+      transfer: "/api/transfer/cc",
       test: "/api/test_connection",
     },
   });

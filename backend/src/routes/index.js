@@ -11,6 +11,7 @@ import buyerAuthRoutes from "./auth/buyer.js";
 import projectRoutes from "./projects.js";
 import buyerRoutes from "./buyer.js";
 import dashboardRoutes from "./dashboard.js";
+import transferRoutes from "./transfer.js";
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.use("/auth/buyer", buyerAuthRoutes);
 router.use("/projects", projectRoutes);
 router.use("/buyer", buyerRoutes);
 router.use("/dashboard", dashboardRoutes);
+router.use("/transfer", transferRoutes);
 
 export default router;

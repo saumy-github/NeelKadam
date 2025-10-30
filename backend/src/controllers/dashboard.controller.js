@@ -27,10 +27,8 @@ export const getNgoDashboard = async (req, res) => {
 
     const result = await getNgoDashboardService(ngoId);
 
-    res.json({
-      success: true,
-      dashboard: result,
-    });
+    // Service already returns the full response object
+    res.json(result);
   } catch (error) {
     console.error("Dashboard data fetch error:", error.message);
 
