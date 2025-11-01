@@ -430,8 +430,10 @@ router.patch("/projects/:id/approve", async (req, res) => {
         [actualCC, id]
       );
 
-      // 4. Import blockchain utility
-      const { mintCarbonCredits } = await import("../utils/blockchain.js");
+      // 4. Import blockchain client service
+      const { generateCredits } = await import(
+        "../src/services/blockchainClient.service.js"
+      );
 
       // Update project to approved status first
       await client.query(
@@ -444,7 +446,7 @@ router.patch("/projects/:id/approve", async (req, res) => {
 
       // 5. Start minting carbon credits on the blockchain (non-blocking)
       // This runs in the background and doesn't block the API response
-      mintCarbonCredits(walletAddress, actualCC)
+      generateCredits(walletAddress, actualCC)
         .then(async (mintResult) => {
           // Get a new client for follow-up DB updates
           const followUpClient = await pool.connect();
@@ -455,13 +457,14 @@ router.patch("/projects/:id/approve", async (req, res) => {
                 "UPDATE project SET status = 'minted', updated_at = CURRENT_TIMESTAMP WHERE project_id = $1",
                 [id]
               );
-              // Transaction hash: ${mintResult.txHash} - could add this to the database if a column exists
+              // txHash is nested in data object from blockchain service
+              const txHash = mintResult.data?.txHash || 'unknown';
               console.log(
-                `Project ${id} successfully minted with tx: ${mintResult.txHash}`
+                `✅ Project ${id} successfully minted with tx: ${txHash}`
               );
             } else {
               console.error(
-                `Minting failed for project ${id}: ${mintResult.error}`
+                `❌ Minting failed for project ${id}: ${mintResult.error || mintResult.message}`
               );
               // Optionally update status to indicate failed minting
               await followUpClient.query(
@@ -470,13 +473,19 @@ router.patch("/projects/:id/approve", async (req, res) => {
               );
             }
           } catch (err) {
-            console.error("Error in post-minting update:", err);
+            console.error("❌ Error in post-minting update:", err);
           } finally {
             followUpClient.release();
           }
         })
-        .catch((err) => {
-          console.error("Unhandled error in background minting:", err);
+        .catch(async (err) => {
+          console.error("⚠️ Background minting error:", err.message);
+          
+          // If it's a timeout error, the transaction might still succeed
+          // Keep status as "approved" - admin can check blockchain later
+          if (err.message && err.message.includes('timeout')) {
+            console.log(`⏳ Timeout on project ${id} - transaction may still be mining on blockchain`);
+          }
         });
 
       // 7. Update seller's total_cc
