@@ -10,9 +10,8 @@ import pool from "./src/config/database.config.js";
 // Import routes from new organized structure
 import apiRoutes from "./src/routes/index.js";
 
-// Import admin routes (kept in old location, will be moved in Phase 3)
-import adminRoutes from "./routes/admin.js";
-import adminProtectedRoutes from "./routes/admin_route.js";
+// Import admin proxy routes (forwards to admin microservice)
+import adminRoutes from "./src/routes/admin.js";
 
 // Initialize Express app
 const app = express();
@@ -25,9 +24,8 @@ app.use(express.json()); // Parses incoming JSON requests
 // Mount all API routes (auth, projects, buyer, dashboard)
 app.use("/api", apiRoutes);
 
-// Mount admin routes (will be refactored in Phase 3)
+// Mount admin proxy routes (forwards to admin microservice)
 app.use("/api/admin", adminRoutes);
-app.use("/api/admin", adminProtectedRoutes);
 
 // Root route - welcome message
 app.get("/", (req, res) => {

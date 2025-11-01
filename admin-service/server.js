@@ -1,45 +1,20 @@
-// Server startup and initialization
+// Server startup and initialization for Admin Microservice
 // This file imports the configured Express app and starts the server
 // App configuration is in app.js
 
 import "dotenv/config";
 import app from "./app.js";
-import axios from "axios";
-import { blockchainServiceConfig } from "./src/config/blockchainMS.config.js";
-import { adminServiceConfig } from "./src/config/adminMS.config.js";
 
-const PORT = process.env.PORT || 3000;
-
-// Check blockchain microservice connectivity
-(async () => {
-  try {
-    const { data } = await axios.get(
-      `${blockchainServiceConfig.serviceUrl}/health`
-    );
-    console.log("✅ Blockchain microservice reachable:", data);
-  } catch (err) {
-    console.error("❌ Cannot reach blockchain microservice:", err.message);
-  }
-})();
-
-// Check admin microservice connectivity
-(async () => {
-  try {
-    const { data } = await axios.get(`${adminServiceConfig.serviceUrl}/health`);
-    console.log("✅ Admin microservice reachable:", data);
-  } catch (err) {
-    console.error("❌ Cannot reach admin microservice:", err.message);
-  }
-})();
+const PORT = process.env.ADMIN_PORT || 3001;
 
 // Start the server
 const server = app.listen(PORT, () => {
   console.log("=".repeat(50));
-  console.log("🌊 Blue Carbon Registry API Server");
+  console.log("🔐 Admin Microservice");
   console.log("=".repeat(50));
   console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`📚 API Documentation: http://localhost:${PORT}/`);
-  console.log(`🔍 Database Test: http://localhost:${PORT}/api/test_connection`);
+  console.log(`🏥 Health Check: http://localhost:${PORT}/health`);
+  console.log(`📚 API Info: http://localhost:${PORT}/`);
   console.log("=".repeat(50));
 });
 
