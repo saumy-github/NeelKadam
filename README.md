@@ -2,8 +2,8 @@
 
 ## Project Links
 
-- **HackVision Presentation:** https://github.com/saumy-github/NeelKadam/blob/main/file/HackVision_PPT-2.pdf
-- **Video Demonstration:** https://youtu.be/kpIlNnXLj7k
-- **Live Deployment:** https://neel-kadam.vercel.app
-- **Source Code:** https://github.com/saumy-github/NeelKadam
+- **HackVision Presentation:** <https://github.com/saumy-github/NeelKadam/blob/main/file/HackVision_PPT-2.pdf>
+- **Video Demonstration:** <https://youtu.be/kpIlNnXLj7k>
+- **Live Deployment:** <https://neel-kadam.vercel.app>
+- **Source Code:** <https://github.com/saumy-github/NeelKadam>
 - **Additional Resources:** NA
