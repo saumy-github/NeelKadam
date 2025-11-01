@@ -28,8 +28,11 @@ Editor directories and files
 .env.development.local
 .env.test.local
 .env.production.local
+.env.docker
 backend/.env
 frontend/.env
+admin-service/.env
+blockchain/.env
 
 # Summary file for Gemini
 backend/refactoring_summary.md

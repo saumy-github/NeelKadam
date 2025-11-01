@@ -1,0 +1,83 @@
+services:
+  # Blockchain Microservice (Development)
+  blockchain-service:
+    build:
+      context: ./blockchain
+      dockerfile: Dockerfile
+    container_name: neelkadam-blockchain-dev
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - BLOCKCHAIN_PORT=3001
+      - PROVIDER_URL=${BLOCKCHAIN_PROVIDER_URL:-http://localhost:8545}
+      - CONTRACT_ADDRESS=${BLOCKCHAIN_CONTRACT_ADDRESS}
+      - ADMIN_PRIVATE_KEY=${BLOCKCHAIN_ADMIN_PRIVATE_KEY}
+    volumes:
+      - ./blockchain:/app
+      - blockchain-node-modules:/app/node_modules
+    networks:
+      - neelkadam-network
+    command: npm run dev
+    restart: unless-stopped
+
+  # Admin Microservice (Development)
+  admin-service:
+    build:
+      context: ./admin-service
+      dockerfile: Dockerfile
+    container_name: neelkadam-admin-dev
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - ADMIN_PORT=3002
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET:-blue_carbon_registry_secret_key_2025}
+      - BLOCKCHAIN_SERVICE_URL=http://blockchain-service:3001
+      - MAIN_BACKEND_URL=http://main-backend:3000
+    volumes:
+      - ./admin-service:/app
+      - admin-node-modules:/app/node_modules
+    networks:
+      - neelkadam-network
+    depends_on:
+      - blockchain-service
+    command: npm run dev
+    restart: unless-stopped
+
+  # Main Backend (API Gateway) (Development)
+  main-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: neelkadam-backend-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET:-blue_carbon_registry_secret_key_2025}
+      - BLOCKCHAIN_SERVICE_URL=http://blockchain-service:3001
+      - ADMIN_SERVICE_URL=http://admin-service:3002
+    volumes:
+      - ./backend:/app
+      - backend-node-modules:/app/node_modules
+    networks:
+      - neelkadam-network
+    depends_on:
+      - blockchain-service
+      - admin-service
+    command: npm run dev
+    restart: unless-stopped
+
+networks:
+  neelkadam-network:
+    driver: bridge
+    name: neelkadam-network-dev
+
+volumes:
+  backend-node-modules:
+  admin-node-modules:
+  blockchain-node-modules:
