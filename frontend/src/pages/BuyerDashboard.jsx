@@ -14,27 +14,34 @@ export default function BuyerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch dashboard data from API
-  useEffect(() => {
-    async function fetchDashboardData() {
-      try {
-        setLoading(true);
-        const response = await buyerApi.getBuyerDashboard();
-        if (response.success) {
-          setDashboardData(response.dashboard);
-        } else {
-          setError("Failed to fetch dashboard data");
-        }
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-        setError(
-          err.message || "An error occurred while fetching dashboard data"
-        );
-      } finally {
-        setLoading(false);
+  // Fetch dashboard data function
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const response = await buyerApi.getBuyerDashboard();
+      if (response.success) {
+        setDashboardData(response.dashboard);
+      } else {
+        setError("Failed to fetch dashboard data");
       }
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+      setError(
+        err.message || "An error occurred while fetching dashboard data"
+      );
+    } finally {
+      setLoading(false);
     }
+  };
 
+  // Refresh dashboard after successful transfer
+  const handleTransferSuccess = () => {
+    console.log("🔄 Refreshing buyer dashboard after transfer...");
+    fetchDashboardData();
+  };
+
+  // Fetch dashboard data on mount
+  useEffect(() => {
     fetchDashboardData();
   }, []); // Empty dependency array - runs only once on mount
 
@@ -164,6 +171,7 @@ export default function BuyerDashboard() {
               open={sellModalOpen}
               onClose={() => setSellModalOpen(false)}
               account={account}
+              onSuccess={handleTransferSuccess}
             />
 
             {/* Transaction History */}

@@ -9,7 +9,7 @@ const cache = {
   get(key) {
     const now = Date.now();
     if (this.data[key] && now - this.timestamp[key] < this.maxAge) {
-      console.log("✅ Using cached data for ${key}");
+      console.log(`✅ Using cached data for ${key}`);
       return this.data[key];
     }
     return null;

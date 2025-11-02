@@ -1,0 +1,119 @@
+services:
+  # Blockchain Microservice
+  blockchain-service:
+    build:
+      context: ./blockchain
+      dockerfile: Dockerfile
+    container_name: neelkadam-blockchain
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - BLOCKCHAIN_PORT=3001
+      - PROVIDER_URL=${BLOCKCHAIN_PROVIDER_URL}
+      - CONTRACT_ADDRESS=${BLOCKCHAIN_CONTRACT_ADDRESS}
+      - ADMIN_PRIVATE_KEY=${BLOCKCHAIN_ADMIN_PRIVATE_KEY}
+    volumes:
+      - ./blockchain:/app
+      - /app/node_modules
+    networks:
+      - neelkadam-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Admin Microservice
+  admin-service:
+    build:
+      context: ./admin-service
+      dockerfile: Dockerfile
+    container_name: neelkadam-admin
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - ADMIN_PORT=3002
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - BLOCKCHAIN_SERVICE_URL=http://blockchain-service:3001
+      - MAIN_BACKEND_URL=http://main-backend:3000
+    volumes:
+      - ./admin-service:/app
+      - /app/node_modules
+    networks:
+      - neelkadam-network
+    depends_on:
+      blockchain-service:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3002/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Main Backend (API Gateway)
+  main-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: neelkadam-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - BLOCKCHAIN_SERVICE_URL=http://blockchain-service:3001
+      - ADMIN_SERVICE_URL=http://admin-service:3002
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - neelkadam-network
+    depends_on:
+      blockchain-service:
+        condition: service_healthy
+      admin-service:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  neelkadam-network:
+    driver: bridge
+    name: neelkadam-network
+
+volumes:
+  backend-node-modules:
+  admin-node-modules:
+  blockchain-node-modules:
