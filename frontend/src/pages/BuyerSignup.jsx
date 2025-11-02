@@ -1,6 +1,7 @@
 import apiClient from "../api/config.js";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { connectMetaMask, isMetaMaskInstalled } from "../utils/metamask";
 
 export default function BuyerSignup() {
   const navigate = useNavigate();
@@ -22,10 +23,38 @@ export default function BuyerSignup() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
+  const [error, setError] = useState("");
 
   // Password toggles
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Connect MetaMask and populate wallet address
+  const handleConnectWallet = async () => {
+    setError("");
+    setIsConnectingWallet(true);
+    
+    try {
+      if (!isMetaMaskInstalled()) {
+        throw new Error("Please install MetaMask extension first.");
+      }
+
+      const walletAddress = await connectMetaMask();
+      
+      // Auto-populate the wallet address field
+      setFormData((prev) => ({ 
+        ...prev, 
+        wallet_address: walletAddress 
+      }));
+      
+      alert(`MetaMask connected successfully!\nWallet Address: ${walletAddress}`);
+    } catch (err) {
+      setError(err.message || "Failed to connect MetaMask");
+    } finally {
+      setIsConnectingWallet(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -70,9 +99,10 @@ export default function BuyerSignup() {
             Buyer Sign Up
           </h1>
 
-          <div className="mb-6 p-4 bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 rounded-lg shadow-sm text-center font-semibold">
-            Please create a MetaMask wallet/account before signing up.
-          </div>
+          {/* Error display */}
+          {error && (
+            <p className="mb-6 text-red-600 text-center font-semibold">{error}</p>
+          )}
 
           {/* Progress Bar */}
           <div className="mb-10">
@@ -204,13 +234,38 @@ export default function BuyerSignup() {
                 onChange={handleChange}
                 className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 uppercase text-lg"
               />
-              <input
-                name="wallet_address"
-                placeholder="Wallet Address"
-                value={formData.wallet_address}
-                onChange={handleChange}
-                className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
-              />
+              
+              {/* MetaMask Connection Section */}
+              <div className="mb-4 p-4 bg-gray-50 border border-gray-300 rounded-lg">
+                <label className="block text-gray-700 font-semibold mb-2">
+                  MetaMask Wallet Address *
+                </label>
+                <p className="text-sm text-gray-600 mb-3">
+                  Connect your MetaMask wallet to auto-fill your wallet address. 
+                  This address will be used for all blockchain transactions.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleConnectWallet}
+                  disabled={isConnectingWallet}
+                  className="w-full mb-3 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                >
+                  {isConnectingWallet ? "Connecting..." : formData.wallet_address ? "🦊 Reconnect MetaMask" : "🦊 Connect MetaMask"}
+                </button>
+                <input
+                  name="wallet_address"
+                  placeholder="Wallet Address (auto-filled after connecting MetaMask)"
+                  value={formData.wallet_address}
+                  onChange={handleChange}
+                  readOnly
+                  className="w-full p-3 border rounded-lg bg-gray-100 text-gray-700"
+                />
+                {formData.wallet_address && (
+                  <p className="text-xs text-green-600 mt-2">
+                    ✓ Wallet connected successfully
+                  </p>
+                )}
+              </div>
             </div>
           )}
 

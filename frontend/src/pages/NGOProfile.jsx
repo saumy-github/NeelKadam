@@ -24,22 +24,25 @@ export default function NGOProfile() {
   const refreshWalletBalance = async () => {
     try {
       setWalletBalance(null); // Set to loading state
-      if (!contract || !account) {
-        await connectWallet();
-      }
-      if (contract && account) {
-        const balance = await contract.getWalletBalance(account);
-        setWalletBalance(Number(balance));
-        console.log("Wallet balance refreshed:", Number(balance));
+      
+      // Fetch fresh data from database
+      const response = await dashboardApi.getNgoDashboard(true); // Force refresh
+      
+      if (response.success && response.dashboard.stats) {
+        const balance = response.dashboard.stats.total_carbon_credits || 0;
+        setWalletBalance(balance);
+        // Also update profile data
+        setProfileData(response.dashboard);
+        console.log("Wallet balance refreshed from database:", balance);
       } else {
-        throw new Error("Cannot connect to wallet or contract");
+        throw new Error("Failed to fetch wallet balance");
       }
     } catch (err) {
       console.error("Error refreshing wallet balance:", err);
       setWalletBalance("Error");
       setTimeout(() => {
         if (profileData && profileData.stats) {
-          setWalletBalance(profileData.stats.minted_carbon_credits || 0);
+          setWalletBalance(profileData.stats.total_carbon_credits || 0);
         }
       }, 2000);
     }
@@ -70,7 +73,7 @@ export default function NGOProfile() {
 
   useEffect(() => {
     if (profileData && profileData.stats && walletBalance === null) {
-      setWalletBalance(profileData.stats.minted_carbon_credits || 0);
+      setWalletBalance(profileData.stats.total_carbon_credits || 0);
     }
   }, [profileData, walletBalance]);
 
@@ -247,9 +250,8 @@ export default function NGOProfile() {
 
           <button
             onClick={refreshWalletBalance}
-            disabled={!account}
-            className="p-2 rounded-full bg-blue-200 hover:bg-blue-300 disabled:bg-gray-300 text-blue-700 disabled:text-gray-500 transition-colors shadow"
-            title="Refresh wallet balance"
+            className="p-2 rounded-full bg-blue-200 hover:bg-blue-300 text-blue-700 transition-colors shadow hover:shadow-lg"
+            title="Refresh wallet balance from database"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

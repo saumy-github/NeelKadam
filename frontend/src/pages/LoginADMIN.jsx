@@ -25,15 +25,19 @@ export default function AdminLogin() {
       if (!formData.email_or_phone || !formData.password) {
         throw new Error("Both fields are required!");
       }
-      const isEmail = /\S+@\S+\.\S+/.test(formData.email_or_phone);
-      const isPhone = /^\d{10}$/.test(formData.email_or_phone);
-      if (!isEmail && !isPhone) {
-        throw new Error("Enter a valid email or 10-digit phone number!");
+      
+      // Hardcoded admin credentials
+      const ADMIN_EMAIL = "blockchainlost404@gmail.com";
+      const ADMIN_PASSWORD = "12345678";
+      
+      if (formData.email_or_phone !== ADMIN_EMAIL) {
+        throw new Error("Invalid admin credentials!");
       }
-      if (formData.password.length < 8) {
-        throw new Error("Password must be at least 8 characters!");
+      if (formData.password !== ADMIN_PASSWORD) {
+        throw new Error("Invalid admin credentials!");
       }
-      // TODO: Add real admin login verification logic
+      
+      // Admin login successful
       navigate("/admin/dashboard");
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");

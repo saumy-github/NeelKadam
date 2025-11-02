@@ -35,7 +35,7 @@ export default function AdminMetaMaskVerificationModal({
       // Verify if the connected address matches the admin wallet
       if (!isAdminWallet(address)) {
         throw new Error(
-          `Unauthorized wallet address. Please connect with the official admin wallet:\n${ADMIN_WALLET_ADDRESS}`
+          "Unauthorized wallet address. Please connect with the official admin wallet."
         );
       }
 
@@ -77,15 +77,6 @@ export default function AdminMetaMaskVerificationModal({
             </p>
             <p className="text-sm text-yellow-700 mt-2">
               To {action}, you must verify your identity by connecting your official admin MetaMask wallet.
-            </p>
-          </div>
-
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-            <p className="text-xs font-semibold text-gray-700 mb-1">
-              Expected Admin Wallet:
-            </p>
-            <p className="text-xs text-gray-600 font-mono break-all">
-              {ADMIN_WALLET_ADDRESS}
             </p>
           </div>
 
