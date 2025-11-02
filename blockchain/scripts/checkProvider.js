@@ -50,7 +50,7 @@ async function main() {
     }
 
     // Try to connect to the contract if CONTRACT_ADDRESS is available
-    const contractAddress = "0xacea7fa9e319ca2f1cadce88dd023887d017f741";
+    const contractAddress = "0x365738edE45674DEAB1B2C665E66B82c80Ebe4E6";
     if (contractAddress) {
       try {
         // Check if contract exists at address (get code)

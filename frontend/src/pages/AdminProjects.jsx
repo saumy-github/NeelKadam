@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { adminApi } from "../api/admin";
+import AdminMetaMaskVerificationModal from "../components/AdminMetaMaskVerificationModal";
 
 /**
  * AdminProjects.jsx
@@ -14,6 +15,10 @@ export default function AdminProjects() {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [notification, setNotification] = useState(null);
+  
+  // MetaMask verification modal state
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null); // { projectId, status }
 
   useEffect(() => {
     async function fetchProjects() {
@@ -32,18 +37,30 @@ export default function AdminProjects() {
     fetchProjects();
   }, []);
 
-  const updateStatus = async (id, status) => {
+  // Handle approval/rejection button click - show verification modal
+  const handleStatusUpdate = (id, status) => {
+    setPendingAction({ projectId: id, status });
+    setShowVerificationModal(true);
+  };
+
+  // Execute the actual status update after MetaMask verification
+  const updateStatus = async (verifiedAddress) => {
+    if (!pendingAction) return;
+
+    const { projectId, status } = pendingAction;
+
     try {
       setActionLoading(true);
+      setShowVerificationModal(false);
 
       // Call the backend to approve/reject the project
       const approved = status === "approved";
-      const result = await adminApi.approveProject(id, approved);
+      const result = await adminApi.approveProject(projectId, approved);
 
       // Update local state with the response
       setProjects((prev) =>
         prev.map((p) =>
-          p.project_id === id
+          p.project_id === projectId
             ? {
                 ...p,
                 status: result.project.status,
@@ -53,10 +70,10 @@ export default function AdminProjects() {
         )
       );
 
-      // Show success notification
+      // Show success notification with admin wallet info
       setNotification({
         type: "success",
-        message: result.message,
+        message: `${result.message} (Verified by: ${verifiedAddress.substring(0, 10)}...${verifiedAddress.substring(verifiedAddress.length - 8)})`,
       });
     } catch (err) {
       console.error("Error updating project status:", err);
@@ -67,12 +84,19 @@ export default function AdminProjects() {
       });
     } finally {
       setActionLoading(false);
+      setPendingAction(null);
 
       // Clear notification after 5 seconds
       setTimeout(() => {
         setNotification(null);
       }, 5000);
     }
+  };
+
+  // Handle modal close
+  const handleCloseModal = () => {
+    setShowVerificationModal(false);
+    setPendingAction(null);
   };
 
   return (
@@ -143,14 +167,14 @@ export default function AdminProjects() {
                   {p.status === "pending" && !actionLoading && (
                     <>
                       <button
-                        onClick={() => updateStatus(p.project_id, "approved")}
+                        onClick={() => handleStatusUpdate(p.project_id, "approved")}
                         className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                         disabled={actionLoading}
                       >
                         Approve
                       </button>
                       <button
-                        onClick={() => updateStatus(p.project_id, "rejected")}
+                        onClick={() => handleStatusUpdate(p.project_id, "rejected")}
                         className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                         disabled={actionLoading}
                       >
@@ -171,6 +195,14 @@ export default function AdminProjects() {
           ))}
         </div>
       )}
+
+      {/* MetaMask Verification Modal */}
+      <AdminMetaMaskVerificationModal
+        isOpen={showVerificationModal}
+        onClose={handleCloseModal}
+        onVerified={updateStatus}
+        action={pendingAction?.status === "approved" ? "approve this project" : "reject this project"}
+      />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ethers } from "ethers";
 import abi from "../abi.json";
 
-const CONTRACT_ADDRESS = "0xacea7fa9e319ca2f1cadce88dd023887d017f741"; // Replace with your contract address
+const CONTRACT_ADDRESS = "0x365738edE45674DEAB1B2C665E66B82c80Ebe4E6"; // Replace with your contract address
 
 const BlockchainConnector = React.forwardRef((props, ref) => {
   const [account, setAccount] = useState(null);

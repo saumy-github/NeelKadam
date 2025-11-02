@@ -18,7 +18,7 @@ dotenv.config({ path: join(__dirname, "../.env") });
 export const requireJSON = createRequire(import.meta.url);
 
 // Contract configuration
-export const CONTRACT_ADDRESS = "0xacea7fa9e319ca2f1cadce88dd023887d017f741";
+export const CONTRACT_ADDRESS = "0x365738edE45674DEAB1B2C665E66B82c80Ebe4E6";
 export const PROVIDER_URL = process.env.PROVIDER_URL;
 export const ADMIN_PRIVATE_KEY = process.env.ADMIN_PRIVATE_KEY;
 

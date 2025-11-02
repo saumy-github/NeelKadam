@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url);
 const contractABI = require("../../blockchain/abi.json");
 
 // Contract configuration
-const CONTRACT_ADDRESS = "0xacea7fa9e319ca2f1cadce88dd023887d017f741"; // Same as frontend
+const CONTRACT_ADDRESS = "0x365738edE45674DEAB1B2C665E66B82c80Ebe4E6"; // Same as frontend
 const PROVIDER_URL =
   process.env.PROVIDER_URL ||
   "https://sepolia.infura.io/v3/your-infura-project-id"; // Replace with your Infura project ID

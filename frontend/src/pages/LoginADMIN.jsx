@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import React from "react";
-import useWalletConnect from "../hooks/useWalletConnect";
 
 // Form field names follow snake_case convention to align with the backend API contract.
 // This ensures consistent data format between frontend and database schema.
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const { connectWallet } = useWalletConnect();
   const [formData, setFormData] = useState({
     email_or_phone: "",
     password: "",
@@ -25,10 +23,6 @@ export default function AdminLogin() {
     setLoading(true);
     setError("");
     try {
-      // Check for MetaMask
-      if (!window.ethereum) {
-        throw new Error("Please install MetaMask first and create a wallet.");
-      }
       if (!formData.email_or_phone || !formData.password) {
         throw new Error("Both fields are required!");
       }
@@ -43,9 +37,7 @@ export default function AdminLogin() {
         throw new Error("Password must be at least 8 characters!");
       }
       // TODO: Add real admin login verification logic
-      // Connect MetaMask after successful login
-      await connectWallet();
-      // Navigate to dashboard
+      // Navigate to dashboard (no MetaMask connection needed at login)
       navigate("/admin/dashboard");
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
