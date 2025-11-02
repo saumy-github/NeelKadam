@@ -164,7 +164,7 @@ useEffect(() => {
                         Verified CC Earned
                       </h3>
                       <p className="text-5xl font-bold text-blue-600 mt-3">
-                        {dashboardData.stats?.minted_carbon_credits || 0}
+                        {dashboardData.stats?.total_carbon_credits || 0}
                       </p>
                     </div>
                     <div className="text-4xl text-blue-100 group-hover:scale-125 transition-transform">✨</div>

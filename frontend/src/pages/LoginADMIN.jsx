@@ -22,9 +22,6 @@ export default function AdminLogin() {
     setLoading(true);
     setError("");
     try {
-      if (!window.ethereum) {
-        throw new Error("Please install MetaMask first and create a wallet.");
-      }
       if (!formData.email_or_phone || !formData.password) {
         throw new Error("Both fields are required!");
       }
@@ -37,7 +34,6 @@ export default function AdminLogin() {
         throw new Error("Password must be at least 8 characters!");
       }
       // TODO: Add real admin login verification logic
-      await connectWallet();
       navigate("/admin/dashboard");
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");

@@ -28,9 +28,6 @@ export default function NGOLogin() {
     setError("");
 
     try {
-      if (!window.ethereum) {
-        throw new Error("Please install MetaMask first and create a wallet.");
-      }
       if (!formData.email || !formData.password) {
         throw new Error("Both email and password are required!");
       }
@@ -45,7 +42,6 @@ export default function NGOLogin() {
         password: formData.password,
       });
       login(response.token, response.ngo);
-      await connectWallet();
       navigate("/ngo/dashboard");
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
