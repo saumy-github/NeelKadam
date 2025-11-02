@@ -161,7 +161,7 @@ useEffect(() => {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Verified CC Earned
+                        CC Wallet
                       </h3>
                       <p className="text-5xl font-bold text-blue-600 mt-3">
                         {dashboardData.stats?.total_carbon_credits || 0}

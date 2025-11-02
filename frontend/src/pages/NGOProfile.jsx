@@ -188,103 +188,96 @@ export default function NGOProfile() {
         </section>
 
         {/* Wallet/Stats */}
-        <section className="bg-white rounded-2xl shadow-lg p-10 mb-8 grid md:grid-cols-2 gap-10 border-l-4 border-blue-500 animate-fade-in">
-          {/* Wallet */}
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-xl font-bold text-gray-800">Wallet</h2>
-              <button
-                onClick={refreshWalletBalance}
-                className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded shadow flex items-center"
-                disabled={!account}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-                Refresh
-              </button>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl font-bold text-green-700">
-                {walletBalance === null ? (
-                  <span className="inline-flex items-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-5 w-5 text-green-600"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Loading...
-                  </span>
-                ) : walletBalance === "Error" ? (
-                  <span className="text-yellow-600">Unavailable</span>
-                ) : (
-                  <>{walletBalance} <span className="text-base text-gray-600 font-normal">CC</span></>
-                )}
-              </span>
-            </div>
-          </div>
+  <section className="bg-white rounded-2xl shadow-lg p-10 mb-8 flex flex-col items-center gap-10 border-l-4 border-blue-500 animate-fade-in">
+          {/* Wallet column removed - stats boxes will be centered below */}
           
           {/* Project Statistics */}
-          <div>
-            <h2 className="text-xl font-bold text-gray-800 mb-3">Project Statistics</h2>
-            {loading ? (
-              <div className="text-gray-600">Loading stats...</div>
-            ) : error ? (
-              <div className="text-red-600">{error}</div>
-            ) : profileData && profileData.stats ? (
-              <div className="flex flex-col gap-2">
-                <div className="bg-gradient-to-r from-green-100 to-white rounded-xl p-4 flex items-center shadow">
-                  <span className="text-lg font-semibold text-emerald-800 flex-grow">Total Projects</span>
-                  <span className="text-2xl font-bold text-emerald-700">
-                    {profileData.stats.total_projects}
-                  </span>
-                </div>
-                <div className="bg-gradient-to-r from-yellow-100 to-white rounded-xl p-4 flex items-center shadow">
-                  <span className="text-lg font-semibold text-yellow-800 flex-grow">Pending Projects</span>
-                  <span className="text-2xl font-bold text-yellow-600">
-                    {profileData.stats.pending_projects}
-                  </span>
-                </div>
-                <div className="bg-gradient-to-r from-blue-100 to-white rounded-xl p-4 flex items-center shadow">
-                  <span className="text-lg font-semibold text-blue-800 flex-grow">Minted Carbon Credits</span>
-                  <span className="text-2xl font-bold text-blue-600">
-                    {profileData.stats.minted_carbon_credits}
-                  </span>
-                </div>
+<div>
+  <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center w-full">Project Statistics</h2>
+  {loading ? (
+    <div className="text-center text-gray-600 py-12">Loading stats...</div>
+  ) : error ? (
+    <div className="text-center text-red-600 py-12 bg-red-50 rounded-lg">{error}</div>
+  ) : profileData && profileData.stats ? (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+      {/* Total Projects Card */}
+      <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-8 flex flex-col items-center text-center shadow-lg hover:shadow-xl transition-shadow">
+        <span className="text-sm font-semibold text-emerald-700 uppercase tracking-wide mb-3">Total Projects</span>
+        <span className="text-5xl font-extrabold text-emerald-600">{profileData.stats.total_projects}</span>
+        <div className="mt-3 w-12 h-1 bg-emerald-500 rounded-full" />
+      </div>
+
+      {/* Pending Projects Card */}
+      <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-8 flex flex-col items-center text-center shadow-lg hover:shadow-xl transition-shadow">
+        <span className="text-sm font-semibold text-amber-700 uppercase tracking-wide mb-3">Pending Projects</span>
+        <span className="text-5xl font-extrabold text-amber-600">{profileData.stats.pending_projects}</span>
+        <div className="mt-3 w-12 h-1 bg-amber-500 rounded-full" />
+      </div>
+
+      {/* Wallet Balance Card */}
+      <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 flex flex-col items-center text-center shadow-lg hover:shadow-xl transition-shadow">
+        <span className="text-sm font-semibold text-blue-700 uppercase tracking-wide mb-3">Wallet Balance</span>
+        <div className="flex items-center justify-center gap-4 w-full">
+          <div className="text-5xl font-extrabold text-blue-600">
+            {walletBalance === null ? (
+              <div className="flex items-center justify-center gap-2">
+                <svg
+                  className="animate-spin h-6 w-6 text-blue-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
               </div>
+            ) : walletBalance === "Error" ? (
+              <span className="text-lg text-amber-600">Unavailable</span>
             ) : (
-              <div className="text-gray-600">No stats available</div>
+              <div className="flex items-center justify-center gap-2">
+                <span>{walletBalance}</span>
+                <span className="text-lg text-gray-600 font-normal">CC</span>
+              </div>
             )}
           </div>
-        </section>
 
-        {/* Recent Projects Activity */}
+          <button
+            onClick={refreshWalletBalance}
+            disabled={!account}
+            className="p-2 rounded-full bg-blue-200 hover:bg-blue-300 disabled:bg-gray-300 text-blue-700 disabled:text-gray-500 transition-colors shadow"
+            title="Refresh wallet balance"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582M20 20v-5h-.581M20.418 9A8.001 8.001 0 004.582 15"
+              />
+            </svg>
+          </button>
+        </div>
+        <div className="mt-3 w-12 h-1 bg-blue-500 rounded-full" />
+      </div>
+    </div>
+  ) : (
+    <div className="text-center text-gray-600 py-12 bg-gray-50 rounded-lg">No stats available</div>
+  )}
+</div>
+
+  </section>
+
+  {/* Recent Projects Activity */}
         <section className="bg-white rounded-2xl shadow-lg p-10 mb-8 border-l-4 border-yellow-500 animate-fade-in">
           <h2 className="text-2xl font-bold text-yellow-700 mb-6">
             Recent Project Activity
