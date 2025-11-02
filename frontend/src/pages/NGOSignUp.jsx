@@ -251,23 +251,13 @@ export default function SignUp() {
           {/* Step 3 */}
           {step === 3 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 3: Organization / Community Details</h2>
-              <select
-                name="userType"
-                value={userType}
-                onChange={(e) => setUserType(e.target.value)}
-                className="w-full p-4 mb-6 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
-              >
-                <option value="ngo">NGO</option>
-                <option value="panchayat">Coastal Panchayat</option>
-                <option value="community">Community</option>
-              </select>
+              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 3: Seller Details</h2>
 
               {userType === "ngo" && (
                 <>
                   <input
                     name="ngo_name"
-                    placeholder="NGO Name"
+                    placeholder="Seller Name"
                     value={formData.ngo_name}
                     onChange={handleChange}
                     className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"

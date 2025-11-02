@@ -46,9 +46,9 @@ export default function ProjectUpload() {
         return;
       }
 
-      const { photos, ...projectData } = formData;
-      projectData.tree_no = +projectData.tree_no;
-      projectData.estimated_cc = +projectData.estimated_cc;
+  // Exclude estimated_cc from the payload sent to backend per request
+  const { photos, estimated_cc, ...projectData } = formData;
+  projectData.tree_no = +projectData.tree_no;
 
       const response = await projectApi.createProject(projectData);
 
@@ -196,20 +196,7 @@ export default function ProjectUpload() {
             )}
           </div>
 
-          {/* Estimated CC */}
-          <div className="mb-8">
-            <label className="block text-gray-600 font-semibold mb-2">
-              Quote an Estimate for Carbon Credits
-            </label>
-            <input
-              type="number"
-              name="estimated_cc"
-              value={formData.estimated_cc}
-              onChange={handleChange}
-              placeholder="e.g., 1200"
-              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-lg bg-gradient-to-r from-amber-50 to-white transition"
-            />
-          </div>
+          {/* Estimated CC field removed as requested */}
 
           {/* Submit Button */}
           <button
