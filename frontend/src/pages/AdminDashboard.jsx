@@ -18,7 +18,7 @@ export default function AdminDashboard() {
           <li><Link to="/about" className="hover:underline hover:text-red-300 transition">About</Link></li>
           <li><Link to="/admin/profile" className="hover:underline hover:text-red-300 transition">Profile</Link></li>
           <li><Link to="/blog" className="hover:underline hover:text-red-300 transition">Blog</Link></li>
-          <li><Link to="/admin/ngos" className="hover:underline hover:text-red-300 transition">NGOs</Link></li>
+          <li><Link to="/admin/ngos" className="hover:underline hover:text-red-300 transition">Sellers</Link></li>
           <li><Link to="/admin/buyers" className="hover:underline hover:text-red-300 transition">Buyers</Link></li>
           <li><Link to="/admin/projects" className="hover:underline hover:text-red-300 transition">Projects</Link></li>
         </ul>
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
         {/* Quick Stats */}
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            { label: "Total NGOs", value: 54, color: "emerald" },
+            { label: "Total Sellers", value: 54, color: "emerald" },
             { label: "Total Buyers", value: 78, color: "blue" },
             { label: "Total Projects", value: 132, color: "amber" }
           ].map((stat) => (
@@ -49,8 +49,8 @@ export default function AdminDashboard() {
         <div className="grid md:grid-cols-3 gap-8">
           {[
             {
-              title: "NGO Management",
-              description: "View, verify, and manage registered NGOs.",
+              title: "Seller Management",
+              description: "View, verify, and manage registered sellers.",
               link: "/admin/ngos",
             },
             {
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
             },
             {
               title: "Project Verification",
-              description: "Check NGO project status and approvals.",
+              description: "Check seller project status and approvals.",
               link: "/admin/projects",
             },
           ].map((panel) => (

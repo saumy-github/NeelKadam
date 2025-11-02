@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import SellCCModal from "../components/SellCCModal";
-import useWalletConnect from "../hooks/useWalletConnect";
 import buyerApi from "../api/buyer";
 
 export default function BuyerDashboard() {
-  const { account, contract, connectWallet } = useWalletConnect();
-  const [walletBalance, setWalletBalance] = useState(null);
-  const [sellModalOpen, setSellModalOpen] = useState(false);
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,31 +28,11 @@ export default function BuyerDashboard() {
     }
   };
 
-  // Refresh dashboard after successful transfer
-  const handleTransferSuccess = () => {
-    console.log("🔄 Refreshing buyer dashboard after transfer...");
-    fetchDashboardData();
-  };
-
   // Fetch dashboard data on mount
   useEffect(() => {
     fetchDashboardData();
   }, []);
 
-  useEffect(() => {
-    async function fetchBalance() {
-      await connectWallet();
-      if (contract && account) {
-        try {
-          const balance = await contract.getWalletBalance(account);
-          setWalletBalance(Number(balance));
-        } catch (err) {
-          setWalletBalance("Error");
-        }
-      }
-    }
-    fetchBalance();
-  }, [account, contract]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
@@ -105,75 +80,42 @@ export default function BuyerDashboard() {
               Welcome back, <span className="text-green-600">{dashboardData?.profile?.company_name || "Buyer"}</span>
             </h2>
 
-            {/* Wallet & Transaction Stats */}
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white p-8 rounded-2xl shadow-md border-l-4 border-l-blue-500 hover:shadow-lg transition transform hover:-translate-y-1">
-                <h3 className="text-xl font-semibold text-blue-600 mb-4">Wallet Balance</h3>
-                <p className="text-5xl font-extrabold">
-                  {walletBalance === null
-                    ? "Loading..."
-                    : walletBalance === "Error"
-                    ? "Error"
-                    : `${walletBalance} CC`}
-                </p>
-              </div>
+            {/* Wallet + Quick Actions in single responsive row */}
+            <section>
+              <h3 className="text-2xl font-bold mb-6 text-gray-800 drop-shadow">Overview</h3>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div className="bg-white p-8 rounded-2xl shadow-md border-l-4 border-l-emerald-500 hover:shadow-lg transition transform hover:-translate-y-1">
+                  <h3 className="text-xl font-semibold text-emerald-700 mb-4">Wallet</h3>
+                  <p className="text-5xl font-extrabold">{dashboardData?.stats?.total_credits_owned || 0}</p>
+                </div>
 
-              <div className="bg-white p-8 rounded-2xl shadow-md border-l-4 border-l-emerald-500 hover:shadow-lg transition transform hover:-translate-y-1">
-                <h3 className="text-xl font-semibold text-emerald-700 mb-4">Carbon Credits</h3>
-                <p className="text-5xl font-extrabold">
-                  {dashboardData?.stats?.total_credits_owned || 0}
-                </p>
-              </div>
+                <div
+                  role="button"
+                  aria-disabled="true"
+                  className="bg-white p-8 rounded-2xl shadow-md border-l-4 border-l-blue-500 hover:shadow-lg transition transform hover:-translate-y-1"
+                >
+                  <h4 className="text-xl font-semibold mb-3">💳 Buy CC</h4>
+                  <p className="text-gray-600 text-lg leading-relaxed">
+                    Purchase carbon credits securely from verified projects.
+                  </p>
+                </div>
 
-              <div className="bg-white p-8 rounded-2xl shadow-md border-l-4 border-l-amber-500 hover:shadow-lg transition transform hover:-translate-y-1">
-                <h3 className="text-xl font-semibold text-amber-600 mb-4">Verified Purchases</h3>
-                <p className="text-5xl font-extrabold text-amber-600">
-                  {dashboardData?.transactions?.length || 0}
-                </p>
+                <div
+                  role="button"
+                  aria-disabled="true"
+                  className="bg-white p-8 rounded-2xl shadow-md border-l-4 border-l-amber-500 hover:shadow-lg transition transform hover:-translate-y-1"
+                >
+                  <h4 className="text-xl font-semibold mb-3">📜 Transactions</h4>
+                  <p className="text-gray-600 text-lg leading-relaxed">
+                    View your complete transaction history here.
+                  </p>
+                </div>
               </div>
-            </div>
+            </section>
           </>
         )}
 
-        {/* Quick Actions */}
-        <section>
-          <h3 className="text-2xl font-bold mb-8 text-gray-800 drop-shadow">Quick Actions</h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Link
-              to="/buyer/buy-cc"
-              className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 block"
-            >
-              <h4 className="text-xl font-semibold mb-3">💳 Buy CC</h4>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                Purchase carbon credits securely from verified projects.
-              </p>
-            </Link>
-
-            <button
-              className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 block text-left w-full"
-              onClick={() => setSellModalOpen(true)}
-            >
-              <h4 className="text-xl font-semibold mb-3">💰 Sell CC</h4>
-              <p className="text-gray-600 text-lg leading-relaxed">List and sell your carbon credits in the market.</p>
-            </button>
-            <SellCCModal
-              open={sellModalOpen}
-              onClose={() => setSellModalOpen(false)}
-              account={account}
-              onSuccess={handleTransferSuccess}
-            />
-
-            <Link
-              to="/buyer/transactions"
-              className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 block"
-            >
-              <h4 className="text-xl font-semibold mb-3">📜 Transactions</h4>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                View your complete transaction history here.
-              </p>
-            </Link>
-          </div>
-        </section>
+        
 
         {/* Recent Activity (Buyer specific) */}
         <section>
@@ -222,15 +164,7 @@ export default function BuyerDashboard() {
           </div>
         </section>
 
-        {/* Wallet Connection Status */}
-        <section className="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800">Wallet Connection</h3>
-          {account ? (
-            <p className="text-green-700 font-medium truncate">Connected wallet: {account}</p>
-          ) : (
-            <p className="text-red-600 font-medium">Connecting to MetaMask...</p>
-          )}
-        </section>
+        {/* Wallet Connection removed per simplification */}
       </main>
     </div>
   );

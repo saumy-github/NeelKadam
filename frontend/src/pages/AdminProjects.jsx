@@ -126,16 +126,11 @@ export default function AdminProjects() {
             >
               <div className="flex justify-between items-start flex-wrap md:flex-nowrap gap-4">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-2xl font-semibold text-gray-900 truncate">{p.plantation_area || "Unnamed Project"}</h3>
-                  <p className="mt-1 text-gray-600 text-sm sm:text-base">
-                    Seller: <span className="font-medium">{p.seller_name}</span> • Type: <span>{p.seller_type}</span> • Estimated CC: <span>{p.estimated_cc || 0}</span>
-                    {p.actual_cc && (
-                      <>
-                        {" "}• Actual CC: <span>{p.actual_cc}</span>
-                      </>
-                    )}
+                  <h3 className="text-3xl font-bold text-gray-900 truncate">{p.plantation_area || "Unnamed Project"}</h3>
+                  <p className="mt-2 text-gray-700 text-base sm:text-lg">
+                    Seller: <span className="font-medium">{p.seller_name}</span> • Type: <span>{p.seller_type}</span>
                   </p>
-                  <p className="mt-1 text-gray-600 text-sm sm:text-base">
+                  <p className="mt-2 text-gray-700 text-base sm:text-lg">
                     Location: <span>{p.location || "Not specified"}</span> • Trees: <span>{p.tree_no || 0}</span> • Type: <span>{p.tree_type || "Not specified"}</span>
                   </p>
                 </div>
@@ -180,7 +175,7 @@ export default function AdminProjects() {
                 </div>
               </div>
 
-              <div className="mt-4 text-gray-700 text-sm sm:text-base">
+              <div className="mt-4 text-gray-700 text-base sm:text-lg">
                 Created: {new Date(p.created_at).toLocaleDateString()}
               </div>
             </div>

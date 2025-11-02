@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useWalletConnect from "../hooks/useWalletConnect";
 import buyerApi from "../api/buyer";
 
 export default function BuyerProfile() {
   const navigate = useNavigate();
-  const { account, contract, connectWallet } = useWalletConnect();
-  const [walletBalance, setWalletBalance] = useState(null);
   const [transactions, setTransactions] = useState([]);
-  const [txLoading, setTxLoading] = useState(false);
-  const [txError, setTxError] = useState("");
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,6 +25,7 @@ export default function BuyerProfile() {
         const response = await buyerApi.getBuyerDashboard();
         if (response.success) {
           setProfileData(response.dashboard);
+          setTransactions(response.dashboard.transactions || []);
         } else {
           setError("Failed to fetch profile data");
         }
@@ -45,92 +41,7 @@ export default function BuyerProfile() {
     fetchProfileData();
   }, []);
 
-  useEffect(() => {
-    let isMounted = true;
-    let connectionTimeout;
-
-    async function fetchBlockchainData() {
-      try {
-        connectionTimeout = setTimeout(() => {
-          if (isMounted && txLoading) {
-            setTxLoading(false);
-            setTxError(
-              "Connection timed out. Please make sure MetaMask is installed and connected."
-            );
-            if (profileData && profileData.transactions) {
-              setTransactions(profileData.transactions);
-            }
-          }
-        }, 10000);
-
-        await connectWallet();
-
-        if (!isMounted) return;
-
-        if (contract && account) {
-          try {
-            const balance = await contract.getWalletBalance(account);
-            if (isMounted) setWalletBalance(Number(balance));
-          } catch {
-            if (isMounted) setWalletBalance("Error");
-          }
-
-          if (isMounted) {
-            setTxLoading(true);
-            setTxError("");
-          }
-          try {
-            const allTx = await contract.getAllTransactions();
-            if (isMounted) {
-              clearTimeout(connectionTimeout);
-              const filtered = allTx.filter(
-                (tx) =>
-                  (tx.from &&
-                    tx.from.toLowerCase() === account.toLowerCase()) ||
-                  (tx.to && tx.to.toLowerCase() === account.toLowerCase())
-              );
-              setTransactions(filtered);
-              setTxLoading(false);
-            }
-          } catch {
-            if (isMounted) {
-              clearTimeout(connectionTimeout);
-              setTxError("Could not fetch blockchain transactions");
-              setTxLoading(false);
-              if (profileData && profileData.transactions) {
-                setTransactions(profileData.transactions);
-              }
-            }
-          }
-        } else {
-          if (isMounted) {
-            clearTimeout(connectionTimeout);
-            setTxLoading(false);
-            setTxError("Blockchain wallet not connected");
-            if (profileData && profileData.transactions) {
-              setTransactions(profileData.transactions);
-            }
-          }
-        }
-      } catch {
-        if (isMounted) {
-          clearTimeout(connectionTimeout);
-          setTxLoading(false);
-          setTxError("Error connecting to blockchain");
-          if (profileData && profileData.transactions) {
-            setTransactions(profileData.transactions);
-          }
-        }
-      }
-    }
-
-    fetchBlockchainData();
-
-    return () => {
-      isMounted = false;
-      if (connectionTimeout) clearTimeout(connectionTimeout);
-    };
-  }, [account, contract, profileData]);
+  // Transactions are sourced from profileData.transactions — no blockchain wallet integration here
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
@@ -236,46 +147,12 @@ export default function BuyerProfile() {
               <li>
                 <span className="font-semibold">IFSC Code:</span> {profileData.profile.ifsc_code}
               </li>
-              <li className="flex items-center justify-between">
-                <div>
-                  <span className="font-semibold">Wallet Address:</span>{" "}
-                  {profileData.profile.wallet_address ? (
-                    <span className="font-mono text-sm">{profileData.profile.wallet_address}</span>
-                  ) : account ? (
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-sm bg-yellow-50 px-2 rounded">{account}</span>
-                      <span className="text-xs text-yellow-600">(from MetaMask, not saved)</span>
-                    </div>
-                  ) : (
-                    <span className="text-red-500 font-semibold">Not connected</span>
-                  )}
-                </div>
-                {!profileData.profile.wallet_address && account && (
-                  <button
-                    type="button"
-                    className="text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded-lg shadow"
-                    onClick={async () => {
-                      try {
-                        const response = await buyerApi.updateWalletAddress(account);
-                        if (response.success) {
-                          setProfileData({
-                            ...profileData,
-                            profile: {
-                              ...profileData.profile,
-                              wallet_address: account,
-                            },
-                          });
-                          alert("Wallet address saved successfully!");
-                        } else {
-                          alert("Failed to save wallet address: " + (response.error || "Unknown error"));
-                        }
-                      } catch (err) {
-                        alert("Error saving wallet address: " + (err.message || "Unknown error"));
-                      }
-                    }}
-                  >
-                    Save to Profile
-                  </button>
+              <li>
+                <span className="font-semibold">Wallet Address:</span>{" "}
+                {profileData.profile.wallet_address ? (
+                  <span className="font-mono text-sm">{profileData.profile.wallet_address}</span>
+                ) : (
+                  <span className="text-red-500 font-semibold">Not provided</span>
                 )}
               </li>
               <li>
@@ -288,50 +165,37 @@ export default function BuyerProfile() {
           )}
         </section>
 
-        {/* Wallet Info */}
+        {/* Blockchain Wallet UI removed — profile shows saved wallet address and transactions only */}
+
+        {/* Wallet (restored) */}
         <section className="bg-white rounded-2xl shadow-lg p-10 mb-10 max-w-[60rem] mx-auto border-l-8 border-blue-600 animate-fade-in">
-          <div className="grid md:grid-cols-2 gap-10">
-            <div>
-              <h2 className="text-3xl font-bold mb-6 text-gray-900 drop-shadow">Blockchain Wallet</h2>
+          <div>
+            <h2 className="text-3xl font-bold mb-6 text-gray-900 drop-shadow">Wallet</h2>
+            {loading ? (
+              <div className="text-gray-600 text-lg">Loading...</div>
+            ) : error ? (
+              <div className="text-red-600 font-semibold text-lg">Error loading data</div>
+            ) : profileData ? (
               <p className="text-lg text-gray-800">
-                <span className="font-semibold">Balance:</span>{" "}
-                {walletBalance === null ? (
-                  "Loading..."
-                ) : walletBalance === "Error" ? (
-                  <span className="text-red-600 font-semibold">Error</span>
-                ) : (
-                  <span className="font-bold text-green-700">{walletBalance} CC</span>
-                )}
+                <span className="font-semibold">Wallet Balance:</span>{" "}
+                {profileData.stats?.total_credits_owned || 0} CC
               </p>
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold mb-6 text-gray-900 drop-shadow">Carbon Credits</h2>
-              {loading ? (
-                <div className="text-gray-600 text-lg">Loading...</div>
-              ) : error ? (
-                <div className="text-red-600 font-semibold text-lg">Error loading data</div>
-              ) : profileData ? (
-                <p className="text-lg text-gray-800">
-                  <span className="font-semibold">Total Credits:</span>{" "}
-                  {profileData.stats.total_credits_owned || 0} CC
-                </p>
-              ) : (
-                <p className="text-gray-600 text-lg">No data available</p>
-              )}
-            </div>
+            ) : (
+              <p className="text-gray-600 text-lg">No data available</p>
+            )}
           </div>
         </section>
 
         {/* Transactions */}
         <section className="bg-white rounded-2xl shadow-lg p-12 mb-10 max-w-[60rem] mx-auto border-l-8 border-amber-500 animate-fade-in">
           <h2 className="text-4xl font-bold mb-8 text-gray-900 drop-shadow">Transaction History</h2>
-          {txLoading ? (
+          {loading ? (
             <div className="flex items-center gap-6 text-gray-600">
               <div className="animate-spin rounded-full h-7 w-7 border-t-4 border-b-4 border-green-700"></div>
               Loading transactions...
             </div>
-          ) : txError ? (
-            <div className="text-red-600 font-semibold text-lg">{txError}</div>
+          ) : error ? (
+            <div className="text-red-600 font-semibold text-lg">{error}</div>
           ) : transactions.length === 0 ? (
             <div className="text-gray-600 text-lg">No transaction found</div>
           ) : (
