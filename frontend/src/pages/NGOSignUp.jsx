@@ -9,6 +9,7 @@ export default function SignUp() {
   const totalSteps = 4;
   const [userType, setUserType] = useState("ngo");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -90,6 +91,8 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
+    
     if (
       !formData.account_holder_name ||
       !formData.account_number ||
@@ -97,6 +100,7 @@ export default function SignUp() {
       !formData.wallet_address
     ) {
       setError("All bank details and wallet address are required.");
+      setLoading(false);
       return;
     }
     try {
@@ -150,6 +154,8 @@ export default function SignUp() {
     } catch (err) {
       const errorMessage = err.response?.data?.error || "Registration failed";
       setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
