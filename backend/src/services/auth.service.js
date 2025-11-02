@@ -114,6 +114,7 @@ export const ngoLoginService = async ({ email, password }) => {
       ngo_id: ngo.ngo_id,
       ngo_name: ngo.ngo_name,
       email: ngo.email,
+      wallet_address: ngo.wallet_address,
     },
   };
 };

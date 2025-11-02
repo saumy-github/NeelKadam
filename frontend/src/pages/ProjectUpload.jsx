@@ -5,7 +5,7 @@ import { projectApi } from "../api/projects";
 // Form field names follow snake_case convention to align with the backend API contract.
 // This ensures consistent data format between frontend and database schema.
 export default function ProjectUpload() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [formData, setFormData] = useState({
     plantation_area: "",
     location: "",
