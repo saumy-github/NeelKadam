@@ -15,6 +15,7 @@ import { authMiddleware } from "../middleware/index.js";
 import {
   getBuyerDashboard,
   updateBuyerWallet,
+  lookupBuyerByCompanyName,
 } from "../controllers/buyer.controller.js";
 
 const router = express.Router();
@@ -24,5 +25,8 @@ router.get("/dashboard", authMiddleware, getBuyerDashboard);
 
 // PATCH /api/buyer/update-wallet - Update buyer wallet address
 router.patch("/update-wallet", authMiddleware, updateBuyerWallet);
+
+// GET /api/buyer/lookup/:companyName - Lookup buyer by company name
+router.get("/lookup/:companyName", authMiddleware, lookupBuyerByCompanyName);
 
 export default router;

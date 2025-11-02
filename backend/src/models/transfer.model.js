@@ -2,72 +2,47 @@
 
 import pool from "../config/database.config.js";
 
-// Get seller by ID and type (ngo, panchayat, community)
+// Get seller by ID and type (ngo only)
 export const getSellerByIdAndType = async (sellerId, sellerType) => {
-  let table, idColumn, nameColumn;
-
-  if (sellerType === "ngo") {
-    table = "ngo";
-    idColumn = "ngo_id";
-    nameColumn = "ngo_name";
-  } else if (sellerType === "panchayat") {
-    table = "coastal_panchayat";
-    idColumn = "cp_id";
-    nameColumn = "zila_id_ward_no";
-  } else if (sellerType === "community") {
-    table = "community";
-    idColumn = "comm_id";
-    nameColumn = "community_name";
-  } else {
-    throw new Error(`Invalid seller type: ${sellerType}`);
+  if (sellerType !== "ngo") {
+    throw new Error("Invalid seller type. Only 'ngo' is supported");
   }
 
   const result = await pool.query(
-    `SELECT ${idColumn} as id, ${nameColumn} as name, total_cc, wallet_address 
-     FROM ${table} 
-     WHERE ${idColumn} = $1`,
+    `SELECT ngo_id as id, ngo_name as name, total_cc, wallet_address 
+     FROM ngo 
+     WHERE ngo_id = $1`,
     [sellerId]
   );
 
   return result.rows[0] || null;
 };
 
-// Get buyer by wallet address
-export const getBuyerByWalletAddress = async (walletAddress) => {
+// Get buyer by company name
+export const getBuyerByCompanyName = async (companyName) => {
   const result = await pool.query(
-    "SELECT buyer_id, company_name, total_cc, wallet_address FROM buyer WHERE LOWER(wallet_address) = LOWER($1)",
-    [walletAddress]
+    "SELECT buyer_id, company_name, total_cc, wallet_address FROM buyer WHERE company_name = $1",
+    [companyName]
   );
 
   return result.rows[0] || null;
 };
 
-// Update seller balance (reduce)
+// Update seller balance (reduce, ngo only)
 export const updateSellerBalance = async (
   sellerId,
   sellerType,
   amount,
   client
 ) => {
-  let table, idColumn;
-
-  if (sellerType === "ngo") {
-    table = "ngo";
-    idColumn = "ngo_id";
-  } else if (sellerType === "panchayat") {
-    table = "coastal_panchayat";
-    idColumn = "cp_id";
-  } else if (sellerType === "community") {
-    table = "community";
-    idColumn = "comm_id";
-  } else {
-    throw new Error(`Invalid seller type: ${sellerType}`);
+  if (sellerType !== "ngo") {
+    throw new Error("Invalid seller type. Only 'ngo' is supported");
   }
 
   const result = await client.query(
-    `UPDATE ${table} 
+    `UPDATE ngo 
      SET total_cc = total_cc - $1, updated_at = NOW() 
-     WHERE ${idColumn} = $2 
+     WHERE ngo_id = $2 
      RETURNING total_cc`,
     [amount, sellerId]
   );

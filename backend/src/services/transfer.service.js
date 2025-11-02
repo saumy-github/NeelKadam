@@ -5,21 +5,19 @@ import pool from "../config/database.config.js";
 import * as TransferModel from "../models/transfer.model.js";
 
 // Transfer carbon credits from seller to buyer
-// Supports all seller types: ngo, panchayat, community
+// Supports NGO sellers only
 export const transferCarbonCreditsService = async (
   sellerId,
   sellerType,
-  buyerWalletAddress,
+  buyerCompanyName,
   amount,
   txHash
 ) => {
   console.log("🔍 Starting carbon credit transfer service...");
 
   // Validate seller type
-  if (!["ngo", "panchayat", "community"].includes(sellerType)) {
-    throw new Error(
-      `Invalid seller type: ${sellerType}. Must be 'ngo', 'panchayat', or 'community'.`
-    );
+  if (!["ngo"].includes(sellerType)) {
+    throw new Error(`Invalid seller type: ${sellerType}. Must be 'ngo'.`);
   }
 
   const client = await pool.connect();
@@ -49,16 +47,12 @@ export const transferCarbonCreditsService = async (
       );
     }
 
-    // Find buyer by wallet address using model
-    console.log(
-      `🔍 Finding buyer with wallet address: ${buyerWalletAddress}...`
-    );
-    const buyer = await TransferModel.getBuyerByWalletAddress(
-      buyerWalletAddress
-    );
+    // Find buyer by company name using model
+    console.log(`🔍 Finding buyer with company name: ${buyerCompanyName}...`);
+    const buyer = await TransferModel.getBuyerByCompanyName(buyerCompanyName);
 
     if (!buyer) {
-      throw new Error("Buyer not found with the provided wallet address");
+      throw new Error("Buyer not found with the provided company name");
     }
 
     console.log(`📊 Buyer current balance: ${buyer.total_cc} CC`);

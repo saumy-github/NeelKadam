@@ -5,25 +5,25 @@ import { transferCarbonCreditsService } from "../services/transfer.service.js";
 
 // Transfer carbon credits from seller to buyer
 // POST /api/transfer/cc
-// Body: { buyer_wallet_address, amount, tx_hash }
+// Body: { buyer_company_name, amount, tx_hash }
 export const transferCarbonCredits = async (req, res) => {
   console.log("🔵 Carbon Credit transfer route hit!");
 
   try {
-    const { buyer_wallet_address, amount, tx_hash } = req.body;
+    const { buyer_company_name, amount, tx_hash } = req.body;
     const sellerId = req.user.seller_id;
     const sellerType = req.user.seller_type;
 
     // Validate request body
-    if (!buyer_wallet_address || !amount || !tx_hash) {
+    if (!buyer_company_name || !amount || !tx_hash) {
       console.log("❌ Missing required fields:", {
-        buyer_wallet_address,
+        buyer_company_name,
         amount,
         tx_hash,
       });
       return res.status(400).json({
         success: false,
-        error: "buyer_wallet_address, amount, and tx_hash are required",
+        error: "buyer_company_name, amount, and tx_hash are required",
       });
     }
 
@@ -39,7 +39,7 @@ export const transferCarbonCredits = async (req, res) => {
     console.log("📝 Transfer request details:", {
       sellerId,
       sellerType,
-      buyer_wallet_address,
+      buyer_company_name,
       amount,
       tx_hash,
     });
@@ -47,7 +47,7 @@ export const transferCarbonCredits = async (req, res) => {
     const result = await transferCarbonCreditsService(
       sellerId,
       sellerType,
-      buyer_wallet_address,
+      buyer_company_name,
       amount,
       tx_hash
     );

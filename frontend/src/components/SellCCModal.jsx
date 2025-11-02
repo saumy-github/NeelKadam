@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import abi from "../abi.json";
 import { transferCarbonCredits } from "../api/transfer";
-import { connectMetaMask, verifyMetaMaskAddress, isMetaMaskInstalled } from "../utils/metamask";
+import apiClient from "../api/config";
+import {
+  connectMetaMask,
+  verifyMetaMaskAddress,
+  isMetaMaskInstalled,
+} from "../utils/metamask";
 import { useAuth } from "../contexts/AuthContext";
 
 const CONTRACT_ADDRESS = "0x365738edE45674DEAB1B2C665E66B82c80Ebe4E6"; // Replace with your deployed contract address
@@ -40,7 +45,7 @@ export default function SellCCModal({ open, onClose, account, onSuccess }) {
 
     // Check if MetaMask is already connected and matches
     const verification = await verifyMetaMaskAddress(user.wallet_address);
-    
+
     if (verification.isValid) {
       setWalletConnected(true);
       setConnectedAddress(verification.currentAddress);
@@ -69,7 +74,7 @@ export default function SellCCModal({ open, onClose, account, onSuccess }) {
 
       // Verify the connected address matches the registered one
       const verification = await verifyMetaMaskAddress(user.wallet_address);
-      
+
       if (verification.isValid) {
         setWalletConnected(true);
         setConnectedAddress(address);
@@ -101,8 +106,8 @@ export default function SellCCModal({ open, onClose, account, onSuccess }) {
 
       // Step 2: Validate inputs
 
-      if (!recipient || !ethers.isAddress(recipient)) {
-        throw new Error("Please enter a valid recipient address.");
+      if (!recipient || recipient.trim() === "") {
+        throw new Error("Please enter a valid company name.");
       }
       if (!amount || isNaN(amount) || Number(amount) <= 0) {
         throw new Error("Please enter a valid amount.");
@@ -118,12 +123,39 @@ export default function SellCCModal({ open, onClose, account, onSuccess }) {
       console.log("🔵 Step 1: Starting blockchain transaction...");
 
       // Step 3: Execute blockchain transaction
+      // Note: Backend will lookup buyer wallet address from company name
+      // For now, we'll do backend call first to validate and get wallet, then blockchain
+      let buyerWalletAddress;
+
+      console.log("🔵 Validating buyer company name with backend...");
+      try {
+        // Make a preliminary call to validate buyer exists and get wallet address
+        const tempResponse = await apiClient.get(
+          `/api/buyer/lookup/${encodeURIComponent(recipient)}`
+        );
+        buyerWalletAddress = tempResponse.data?.wallet_address;
+
+        if (!buyerWalletAddress || !ethers.isAddress(buyerWalletAddress)) {
+          throw new Error("Invalid buyer wallet address returned from server");
+        }
+        console.log(
+          "✅ Buyer validated, proceeding with blockchain transaction"
+        );
+      } catch (lookupError) {
+        console.error("❌ Buyer lookup failed:", lookupError);
+        throw new Error(
+          lookupError.response?.data?.error ||
+            lookupError.message ||
+            "Failed to validate buyer company name"
+        );
+      }
+
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, signer);
 
-      // Call transferCredits(recipient, amount)
-      const tx = await contract.transferCredits(recipient, amount);
+      // Call transferCredits(buyerWalletAddress, amount)
+      const tx = await contract.transferCredits(buyerWalletAddress, amount);
       console.log("⏳ Waiting for blockchain confirmation...");
       await tx.wait();
       setTxHash(tx.hash);
@@ -188,33 +220,47 @@ export default function SellCCModal({ open, onClose, account, onSuccess }) {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-bold mb-4">Sell Carbon Credits</h2>
-        
+
         {/* Wallet Connection Section */}
-        <div className={`mb-4 p-4 rounded-lg border ${
-          walletConnected 
-            ? "bg-green-50 border-green-300" 
-            : "bg-orange-50 border-orange-300"
-        }`}>
+        <div
+          className={`mb-4 p-4 rounded-lg border ${
+            walletConnected
+              ? "bg-green-50 border-green-300"
+              : "bg-orange-50 border-orange-300"
+          }`}
+        >
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-sm">Wallet Status</span>
             {walletConnected ? (
-              <span className="text-green-600 font-bold text-sm">✓ Connected</span>
+              <span className="text-green-600 font-bold text-sm">
+                ✓ Connected
+              </span>
             ) : (
-              <span className="text-orange-600 font-bold text-sm">⚠ Not Connected</span>
+              <span className="text-orange-600 font-bold text-sm">
+                ⚠ Not Connected
+              </span>
             )}
           </div>
-          
+
           {user?.wallet_address && (
             <p className="text-xs text-gray-600 mb-2">
-              <strong>Your Wallet:</strong><br />
-              <span className="font-mono">{user.wallet_address.substring(0, 10)}...{user.wallet_address.substring(user.wallet_address.length - 8)}</span>
+              <strong>Your Wallet:</strong>
+              <br />
+              <span className="font-mono">
+                {user.wallet_address.substring(0, 10)}...
+                {user.wallet_address.substring(user.wallet_address.length - 8)}
+              </span>
             </p>
           )}
 
           {connectedAddress && walletConnected && (
             <p className="text-xs text-green-700 mb-2">
-              <strong>Connected:</strong><br />
-              <span className="font-mono">{connectedAddress.substring(0, 10)}...{connectedAddress.substring(connectedAddress.length - 8)}</span>
+              <strong>Connected:</strong>
+              <br />
+              <span className="font-mono">
+                {connectedAddress.substring(0, 10)}...
+                {connectedAddress.substring(connectedAddress.length - 8)}
+              </span>
             </p>
           )}
 
@@ -229,10 +275,10 @@ export default function SellCCModal({ open, onClose, account, onSuccess }) {
           )}
         </div>
 
-        <label className="block mb-2 font-semibold">Recipient Address</label>
+        <label className="block mb-2 font-semibold">Buyer Company Name</label>
         <input
           type="text"
-          placeholder="0x..."
+          placeholder="Enter exact company name"
           value={recipient}
           onChange={(e) => setRecipient(e.target.value)}
           className="w-full p-2 border rounded mb-4"
@@ -268,8 +314,8 @@ export default function SellCCModal({ open, onClose, account, onSuccess }) {
           </div>
         )}
         <div className="flex justify-end gap-2 mt-4">
-          <button 
-            onClick={handleClose} 
+          <button
+            onClick={handleClose}
             className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition"
             disabled={loading}
           >

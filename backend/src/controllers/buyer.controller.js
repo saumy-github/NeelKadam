@@ -7,6 +7,7 @@ import {
   getBuyerDashboardService,
   updateBuyerWalletService,
 } from "../services/buyer.service.js";
+import { getBuyerByCompanyName } from "../models/transfer.model.js";
 
 /**
  * Get buyer dashboard data
@@ -82,6 +83,50 @@ export const updateBuyerWallet = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Server error while updating wallet address",
+    });
+  }
+};
+
+/**
+ * Lookup buyer by company name
+ * GET /api/buyer/lookup/:companyName
+ */
+export const lookupBuyerByCompanyName = async (req, res) => {
+  try {
+    const companyName = decodeURIComponent(req.params.companyName);
+
+    // Validate input
+    if (!companyName || companyName.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        error: "Company name is required",
+      });
+    }
+
+    console.log("🔍 Looking up buyer by company name:", companyName);
+
+    // Query buyer by company name
+    const buyer = await getBuyerByCompanyName(companyName);
+
+    if (!buyer) {
+      return res.status(404).json({
+        success: false,
+        error: "Buyer not found with the provided company name",
+      });
+    }
+
+    // Return only necessary fields for security (simplified response)
+    res.json({
+      success: true,
+      company_name: buyer.company_name,
+      wallet_address: buyer.wallet_address,
+    });
+  } catch (error) {
+    console.error("Buyer lookup error:", error.message);
+
+    res.status(500).json({
+      success: false,
+      error: "Server error while looking up buyer",
     });
   }
 };
