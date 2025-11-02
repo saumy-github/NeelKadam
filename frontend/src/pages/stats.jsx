@@ -25,7 +25,7 @@ export default function Stats() {
   ];
 
   return (
-    <section className="bg-[#fcedd3] py-24 px-6">
+    <section className="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 py-24 px-6">
       <div className="max-w-6xl mx-auto text-center">
         {/* Heading */}
         <h2 className="text-5xl md:text-7xl font-extrabold text-gray-800 mb-6">

@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-/**
- * AdminBuyers.jsx
- * - Show buyer registrations
- * - Block/unblock buyer
- * - View quick stats and last transactions preview
- * - Using snake_case for data properties to match backend API contract
- */
 export default function AdminBuyers() {
   const [buyers, setBuyers] = useState([
     {
@@ -38,40 +31,43 @@ export default function AdminBuyers() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between mb-6">
-        <h2 className="text-2xl font-bold">Registered Buyers</h2>
-        <Link to="/admin/dashboard" className="text-sm underline">
-          Back to Admin
+    <div className="max-w-6xl mx-auto p-8 space-y-8 bg-slate-50 min-h-screen">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-extrabold text-gray-900">Registered Buyers</h2>
+        <Link to="/admin/dashboard" className="text-indigo-600 hover:underline font-semibold text-lg">
+          ← Back to Admin
         </Link>
       </div>
 
-      <div className="grid gap-4">
+      <div className="space-y-6">
         {buyers.map((b) => (
           <div
             key={b.id}
-            className="bg-white p-4 rounded-lg shadow flex justify-between items-center"
+            className="bg-white p-6 rounded-2xl shadow-lg flex justify-between items-center border-l-8 border-indigo-500 hover:shadow-xl transition"
           >
             <div>
-              <h3 className="font-semibold">{b.name}</h3>
+              <h3 className="text-xl font-semibold text-gray-800">{b.name}</h3>
               <p className="text-sm text-gray-600">
-                {b.email} • Credits: {b.total_credits}
+                <span className="underline">{b.email}</span> • Credits:{" "}
+                <span className="font-semibold">{b.total_credits}</span>
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex items-center gap-4">
               <span
-                className={`px-2 py-1 rounded text-sm ${
+                className={`px-3 py-1 rounded-full text-sm font-semibold ${
                   b.status === "active"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
                 }`}
               >
-                {b.status}
+                {b.status.charAt(0).toUpperCase() + b.status.slice(1)}
               </span>
               <button
                 onClick={() => toggleBlock(b.id)}
-                className="px-3 py-1 bg-red-600 text-white rounded"
+                className={`px-4 py-2 rounded-full shadow-md text-white transition hover:brightness-90 ${
+                  b.status === "active" ? "bg-red-600" : "bg-green-600"
+                }`}
               >
                 {b.status === "active" ? "Block" : "Unblock"}
               </button>

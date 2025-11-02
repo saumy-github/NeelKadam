@@ -32,7 +32,6 @@ export default function ProjectUpload() {
       ...prev,
       photos: files,
     }));
-
     // Show previews
     const previews = files.map((file) => URL.createObjectURL(file));
     setPreviewImages(previews);
@@ -42,23 +41,17 @@ export default function ProjectUpload() {
     e.preventDefault();
 
     try {
-      // If not authenticated, show error and return
       if (!isAuthenticated) {
         alert("You must be logged in to upload a project.");
         return;
       }
 
-      // Create a copy of the form data without photos for the initial project creation
       const { photos, ...projectData } = formData;
-
-      // Convert string values to numbers for numeric fields
       projectData.tree_no = +projectData.tree_no;
       projectData.estimated_cc = +projectData.estimated_cc;
 
-      // Submit the project data to the API
       const response = await projectApi.createProject(projectData);
 
-      // If there are photos and project was created successfully, upload them
       if (photos.length > 0 && response.id) {
         try {
           await projectApi.uploadPhotos(response.id, photos);
@@ -71,7 +64,6 @@ export default function ProjectUpload() {
         }
       }
 
-      // Clear the form on success
       setFormData({
         plantation_area: "",
         location: "",
@@ -82,12 +74,9 @@ export default function ProjectUpload() {
         photos: [],
       });
       setPreviewImages([]);
-
-      // Show success message
       alert("Project uploaded successfully!");
       console.log("Project created:", response);
     } catch (error) {
-      // Show error message
       alert(
         `Error uploading project: ${error.message || "Unknown error occurred"}`
       );
@@ -96,122 +85,136 @@ export default function ProjectUpload() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fcedd3]">
-      <main className="flex-grow flex justify-center items-start pt-10">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
+      <main className="flex-grow flex justify-center items-start pt-16">
         <form
           onSubmit={handle_submit}
-          className="bg-white shadow-xl rounded-xl p-10 w-full max-w-3xl border border-gray-200"
+          className="bg-white shadow-2xl rounded-2xl p-12 w-full max-w-3xl border border-gray-200 animate-fade-in"
         >
-          <h1 className="text-3xl font-bold text-center mb-8 text-green-700">
+          <h1 className="text-4xl font-bold text-center mb-10 text-green-700">
             Upload New Project
           </h1>
 
           {/* Plantation Area */}
-          <label className="block text-gray-700 font-semibold mb-2">
-            Plantation Area (in hectares)
-          </label>
-          <input
-            type="text"
-            name="plantation_area"
-            value={formData.plantation_area}
-            onChange={handleChange}
-            placeholder="e.g., 25 hectares"
-            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+          <div className="mb-6">
+            <label className="block text-gray-600 font-semibold mb-2">
+              Plantation Area (in hectares)
+            </label>
+            <input
+              type="text"
+              name="plantation_area"
+              value={formData.plantation_area}
+              onChange={handleChange}
+              placeholder="e.g., 25 hectares"
+              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg bg-gradient-to-r from-emerald-50 to-white transition"
+            />
+          </div>
 
           {/* Location */}
-          <label className="block text-gray-700 font-semibold mb-2">
-            Location
-          </label>
-          <input
-            type="text"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            placeholder="e.g., Coastal Andhra Pradesh"
-            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+          <div className="mb-6">
+            <label className="block text-gray-600 font-semibold mb-2">
+              Location
+            </label>
+            <input
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="e.g., Coastal Andhra Pradesh"
+              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg bg-gradient-to-r from-blue-50 to-white transition"
+            />
+          </div>
 
           {/* Tree Type */}
-          <label className="block text-gray-700 font-semibold mb-2">
-            Type of Trees
-          </label>
-          <input
-            type="text"
-            name="tree_type"
-            value={formData.tree_type}
-            onChange={handleChange}
-            placeholder="e.g., Mangroves, Coconut"
-            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+          <div className="mb-6">
+            <label className="block text-gray-600 font-semibold mb-2">
+              Type of Trees
+            </label>
+            <input
+              type="text"
+              name="tree_type"
+              value={formData.tree_type}
+              onChange={handleChange}
+              placeholder="e.g., Mangroves, Coconut"
+              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 text-lg bg-gradient-to-r from-green-50 to-white transition"
+            />
+          </div>
 
           {/* Plantation Period */}
-          <label className="block text-gray-700 font-semibold mb-2">
-            Plantation Period
-          </label>
-          <input
-            type="text"
-            name="plantation_period"
-            value={formData.plantation_period}
-            onChange={handleChange}
-            placeholder="e.g., June 2023 – Dec 2023"
-            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+          <div className="mb-6">
+            <label className="block text-gray-600 font-semibold mb-2">
+              Plantation Period
+            </label>
+            <input
+              type="text"
+              name="plantation_period"
+              value={formData.plantation_period}
+              onChange={handleChange}
+              placeholder="e.g., June 2023 – Dec 2023"
+              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 text-lg bg-gradient-to-r from-emerald-50 to-white transition"
+            />
+          </div>
 
           {/* Number of Trees */}
-          <label className="block text-gray-700 font-semibold mb-2">
-            Number of Trees
-          </label>
-          <input
-            type="number"
-            name="tree_no"
-            value={formData.tree_no}
-            onChange={handleChange}
-            placeholder="e.g., 5000"
-            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+          <div className="mb-6">
+            <label className="block text-gray-600 font-semibold mb-2">
+              Number of Trees
+            </label>
+            <input
+              type="number"
+              name="tree_no"
+              value={formData.tree_no}
+              onChange={handleChange}
+              placeholder="e.g., 5000"
+              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 text-lg bg-gradient-to-r from-blue-50 to-white transition"
+            />
+          </div>
 
           {/* Photos Upload */}
-          <label className="block text-gray-700 font-semibold mb-2">
-            Upload Photos (Geo-tagged)
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleFileChange}
-            className="w-full p-3 mb-4 border rounded-lg bg-gray-50"
-          />
-          {previewImages.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {previewImages.map((src, index) => (
-                <img
-                  key={index}
-                  src={src}
-                  alt="Preview"
-                  className="h-24 w-full object-cover rounded-lg border"
-                />
-              ))}
-            </div>
-          )}
+          <div className="mb-8">
+            <label className="block text-gray-600 font-semibold mb-2">
+              Upload Photos (Geo-tagged)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileChange}
+              className="w-full p-4 border rounded-xl bg-gray-50 focus:outline-none"
+            />
+            {previewImages.length > 0 && (
+              <div className="grid grid-cols-3 gap-4 mt-4">
+                {previewImages.map((src, index) => (
+                  <img
+                    key={index}
+                    src={src}
+                    alt="Preview"
+                    className="h-24 w-full object-cover rounded-xl border shadow-lg"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Estimated CC */}
-          <label className="block text-gray-700 font-semibold mb-2">
-            Quote an Estimate for Carbon Credits
-          </label>
-          <input
-            type="number"
-            name="estimated_cc"
-            value={formData.estimated_cc}
-            onChange={handleChange}
-            placeholder="e.g., 1200"
-            className="w-full p-3 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+          <div className="mb-8">
+            <label className="block text-gray-600 font-semibold mb-2">
+              Quote an Estimate for Carbon Credits
+            </label>
+            <input
+              type="number"
+              name="estimated_cc"
+              value={formData.estimated_cc}
+              onChange={handleChange}
+              placeholder="e.g., 1200"
+              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-lg bg-gradient-to-r from-amber-50 to-white transition"
+            />
+          </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 transition"
+            className="w-full py-4 rounded-xl font-semibold text-lg bg-gradient-to-r from-emerald-500 via-green-600 to-emerald-400 text-white hover:bg-green-800 shadow-xl transition-all"
           >
             Upload Project
           </button>

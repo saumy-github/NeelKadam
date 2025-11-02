@@ -1,12 +1,12 @@
-// src/pages/Landing.jsx
-
 import Hero from "../components/Hero";
+import PremiumBackground from "../components/PremiumBackground";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 
 export default function Landing() {
   const location = useLocation();
+  const { scrollYProgress } = useScroll();
 
   useEffect(() => {
     if (location.state?.scrollTo === "blogs") {
@@ -20,7 +20,7 @@ export default function Landing() {
       id: 1,
       title: "Mangrove Restoration Boosts Blue Carbon Credits",
       description:
-        "Community-driven mangrove planting along India’s coastline is generating measurable carbon credits and protecting biodiversity.",
+        "Community-driven mangrove planting along India's coastline is generating measurable carbon credits and protecting biodiversity.",
       image:
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
       date: "Sept 10, 2025",
@@ -78,7 +78,7 @@ export default function Landing() {
       a: "Blue carbon refers to carbon stored within coastal and marine ecosystems. Mangroves, seagrass meadows, and salt marshes capture carbon extremely fast. Unlike terrestrial forests, they securely lock carbon for millennia ahead. These ecosystems provide protection from erosion, storms, and rising coastal threats. They also sustain fisheries, biodiversity, and support important coastal livelihoods. Global strategies now integrate blue carbon into nature-based climate solutions.",
       img: "/BCC2.jpg",
       fullScreen: false,
-      padding: "py-12",
+      padding: "py-16",
       xOffset: 0,
       yOffset: 0,
     },
@@ -92,16 +92,16 @@ export default function Landing() {
     },
     {
       q: "How is Blue Carbon unique?",
-      a: "Unlike land forests blue carbon ecosystems lock away carbon not just for years, but for centuries to millennia.They act as long-term climate buffers, while also nurturing rich biodiversity that sustains marine and coastal life.",
+      a: "Unlike land forests, blue carbon ecosystems lock away carbon not just for years, but for centuries to millennia. They act as long-term climate buffers, while also nurturing rich biodiversity that sustains marine and coastal life.",
       img: "/BC2.jpg",
       fullScreen: false,
-      padding: "py-2",
+      padding: "py-16",
       xOffset: -15,
       yOffset: 2,
     },
     {
       q: "The Future of Blue Carbon",
-      a: "Scaling the restoration and protection of blue carbon ecosystems is essential for meeting global climate goals. By expanding these efforts, we not only enhance carbon storage but also strengthen biodiversity, protect coastlines, and support sustainable livelihoods",
+      a: "Scaling the restoration and protection of blue carbon ecosystems is essential for meeting global climate goals. By expanding these efforts, we not only enhance carbon storage but also strengthen biodiversity, protect coastlines, and support sustainable livelihoods.",
       img: "/BC4.jpg",
       fullScreen: true,
       xOffset: 0,
@@ -118,41 +118,48 @@ export default function Landing() {
   ];
 
   return (
-    <div className="scroll-smooth">
+    <div className="scroll-smooth bg-white relative">
+      {/* Premium 3D Interactive Background */}
+      <PremiumBackground />
+
+      {/* Hero Section */}
       <Hero />
 
       {/* Q&A Section */}
-      <section id="why-blue-carbon" className="bg-[#fcedd3]">
+      <section id="why-blue-carbon" className="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 py-4 relative z-10">
         {questions.map((item, index) => {
           const ref = useRef(null);
-          const { scrollYProgress } = useScroll({
+          const { scrollYProgress: itemProgress } = useScroll({
             target: ref,
             offset: ["start end", "end start"],
           });
-          const y = useTransform(scrollYProgress, [0, 1], ["20%", "-30%"]);
-          const scale = useTransform(scrollYProgress, [0, 1], [1.2, 1]);
+          const y = useTransform(itemProgress, [0, 1], ["20%", "-30%"]);
+          const scale = useTransform(itemProgress, [0, 1], [1.2, 1]);
 
           if (item.fullScreen) {
             return (
               <section
                 key={index}
                 ref={ref}
-                className="relative h-screen w-full flex items-center m-0 p-0"
+                className="relative w-full h-screen flex items-center justify-start overflow-hidden"
               >
-                <motion.div className="absolute inset-6" style={{ y, scale }}>
+                <motion.div 
+                  className="absolute inset-0 w-full h-full" 
+                  style={{ y, scale }}
+                >
                   <img
                     src={item.img}
                     alt={item.q}
-                    className="w-full h-full object-cover m-0 p-0"
+                    className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/50"></div>
                 </motion.div>
 
-                <div className="relative z-10 max-w-3xl px-8 text-left text-white">
-                  <h2 className="text-5xl md:text-7xl font-bold leading-tight">
+                <div className="relative z-10 max-w-2xl px-8 md:px-16 text-left text-white">
+                  <h2 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight">
                     {item.q}
                   </h2>
-                  <p className="mt-6 text-2xl font-light leading-relaxed">
+                  <p className="mt-6 text-xl md:text-2xl font-light leading-relaxed max-w-lg">
                     {item.a}
                   </p>
                 </div>
@@ -164,33 +171,31 @@ export default function Landing() {
             <div
               key={index}
               ref={ref}
-              className={`flex flex-col md:flex-row items-center gap-3 px-8 ${
-                item.padding || "py-20"
-              } bg-[#fcedd3] m-0 ${
+              className={`flex flex-col md:flex-row items-center gap-12 px-6 md:px-12 lg:px-20 ${item.padding} w-full ${
                 index % 2 === 0 ? "" : "md:flex-row-reverse"
               }`}
             >
               <div className="flex-1 space-y-6">
-                <h2 className="text-5xl md:text-6xl font-bold text-gray-700 leading-tight">
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
                   {item.q}
                 </h2>
-                <p className="text-2xl font-light text-gray-800 leading-relaxed max-w-prose">
+                <p className="text-lg md:text-xl lg:text-2xl font-light text-gray-800 leading-relaxed">
                   {item.a}
                 </p>
               </div>
 
               <motion.div
-                className="flex-1"
+                className="flex-1 w-full overflow-hidden rounded-3xl"
                 style={{
-                  y: item.yOffset || 0,
-                  x: item.xOffset || 0,
+                  y: useTransform(itemProgress, [0, 1], [item.yOffset ? item.yOffset * 2 : 0, item.yOffset || 0]),
+                  x: useTransform(itemProgress, [0, 1], [item.xOffset ? item.xOffset * 2 : 0, item.xOffset || 0]),
                 }}
               >
                 <img
                   src={item.img}
                   alt={item.q}
                   loading="lazy"
-                  className="rounded-3xl shadow-lg w-full max-w-full object-cover h-[450px] m-0"
+                  className="rounded-3xl shadow-2xl w-full h-auto max-h-96 object-cover"
                 />
               </motion.div>
             </div>
@@ -199,32 +204,27 @@ export default function Landing() {
       </section>
 
       {/* Stats Section */}
-      <section id="stats" className="relative h-screen w-full overflow-hidden">
-        {/* Background with Parallax */}
+      <section id="stats" className="relative w-full min-h-screen flex items-center overflow-hidden z-10">
         <motion.div
-  className="absolute inset-0"
-  style={{
-    y: useTransform(useScroll().scrollYProgress, [0, 1], ["0%", "-20%"]),
-  }}
->
-  <div className="relative w-Screen h-Screen">
-    <img
-      src="/image.png"
-      alt="Screen"
-      className="w-Screen h-Screen object-cover"
-    />
-    <div className="absolute inset-0 bg-black/60"></div>
-  </div>
-</motion.div>
+          className="absolute inset-0 w-full h-full"
+          style={{
+            y: useTransform(scrollYProgress, [0, 1], ["0%", "-20%"]),
+          }}
+        >
+          <img
+            src="/image.png"
+            alt="Background"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/60"></div>
+        </motion.div>
 
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center text-white">
-          <h2 className="text-5xl md:text-7xl font-extrabold mb-12">
+        <div className="relative z-10 w-full flex flex-col items-center justify-center px-6 md:px-12 py-20 text-center text-white">
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-16">
             Critical Storage
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16 w-full max-w-6xl">
             <StatItem value={83} suffix="%" title="Global Carbon">
               83% of the global carbon cycle is circulated through the ocean.
             </StatItem>
@@ -239,7 +239,7 @@ export default function Landing() {
             </StatItem>
           </div>
 
-          <p className="mt-12 max-w-3xl text-xl md:text-2xl font-light leading-relaxed">
+          <p className="mt-16 max-w-3xl text-lg md:text-xl lg:text-2xl font-light leading-relaxed">
             Blue carbon ecosystems store up to 5x more carbon per hectare than
             tropical forests. Their destruction contributes ~10% of global
             emissions from deforestation, even though they cover less than 2% of
@@ -248,8 +248,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Blogs Section */}
-      <section id="blogs" className="py-16 px-0 overflow-hidden bg-transparent">
+      {/* Blogs Section - UNCHANGED */}
+      <section id="blogs" className="py-16 px-0 overflow-hidden bg-transparent relative z-10">
         <div className="text-center mb-12">
           {/* Badge */}
           <div className="mb-4">
@@ -273,7 +273,7 @@ export default function Landing() {
 
           {/* Subtitle */}
           <p className="mt-4 text-lg text-gray-500">
-            Fresh updates, inspiring stories, and research you can’t miss.
+            Fresh updates, inspiring stories, and research you can't miss.
           </p>
         </div>
 
@@ -335,7 +335,7 @@ function StatItem({ value, suffix, title, children }) {
 
     let start = 0;
     const end = value;
-    const duration = 2000; // 2 seconds
+    const duration = 2000;
     const increment = end / (duration / 16);
 
     const counter = setInterval(() => {
@@ -351,7 +351,7 @@ function StatItem({ value, suffix, title, children }) {
   }, [isInView, value]);
 
   return (
-    <div ref={ref}>
+    <div ref={ref} className="space-y-4">
       <p className="text-6xl font-extrabold">
         {count}
         {suffix}

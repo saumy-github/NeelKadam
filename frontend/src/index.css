@@ -1,5 +1,5 @@
 body {
-  background-color: #fcedd3;
+  background: linear-gradient(to bottom right, #f8fafc 0%, #e0e7ff 100%);
 }
 
 
@@ -44,4 +44,18 @@ body {
 html, body {
   overflow-x: hidden; /* 🚫 disables horizontal scrolling */
 }
+
+body {
+  background: linear-gradient(to bottom right, #f8fafc 0%, #e0e7ff 100%);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom right, #f8fafc 0%, #e0e7ff 100%);
+}
+
 

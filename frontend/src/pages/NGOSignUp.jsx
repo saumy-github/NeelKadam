@@ -1,5 +1,4 @@
 import apiClient from "../api/config.js";
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { connectMetaMask, isMetaMaskInstalled } from "../utils/metamask";
@@ -37,11 +36,10 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Removed OTP method selection, only email OTP is used
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (error) setError("");
   };
 
   // Connect MetaMask and populate wallet address
@@ -71,8 +69,7 @@ export default function SignUp() {
   };
 
   const handleNext = () => {
-    setError(""); // clear error
-
+    setError("");
     if (step === 1) {
       if (!formData.email) {
         setError("Email is required.");
@@ -83,22 +80,16 @@ export default function SignUp() {
         return;
       }
     }
-
-    if (step === 2) {
-      if (!formData.email_otp) {
-        setError("Please enter the OTP sent to your email.");
-        return;
-      }
+    if (step === 2 && !formData.email_otp) {
+      setError("Please enter the OTP sent to your email.");
+      return;
     }
-
     setStep((prev) => Math.min(prev + 1, totalSteps));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    // ✅ validate Step 4 fields before sending to backend
     if (
       !formData.account_holder_name ||
       !formData.account_number ||
@@ -108,11 +99,9 @@ export default function SignUp() {
       setError("All bank details and wallet address are required.");
       return;
     }
-
     try {
       let apiData = {};
       let apiEndpoint = "";
-
       if (userType === "ngo") {
         apiData = {
           license_no: formData.license_no,
@@ -141,7 +130,7 @@ export default function SignUp() {
           wallet_address: formData.wallet_address,
         };
         apiEndpoint = "/api/auth/panchayat/register";
-      } else if (userType === "community") {
+      } else {
         apiData = {
           community_name: formData.community_name,
           spokesperson_name: formData.community_spokesperson_name,
@@ -156,99 +145,87 @@ export default function SignUp() {
         };
         apiEndpoint = "/api/auth/community/register";
       }
-
-      // Use the apiClient to make the request
-      await apiClient.post(apiEndpoint, apiData); // <-- New apiClient call
-
+      await apiClient.post(apiEndpoint, apiData);
       navigate(`/login/${userType}`, { state: { success: true } });
     } catch (err) {
-      // <-- New error handling
       const errorMessage = err.response?.data?.error || "Registration failed";
-      console.error("❌ Error:", errorMessage);
       setError(errorMessage);
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fcedd3]">
-      <main className="flex-grow flex justify-center items-start pt-20">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
+      <main className="flex-grow flex justify-center items-start pt-16 px-6 sm:px-12">
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-xl rounded-xl p-10 w-full max-w-2xl border border-gray-200"
+          className="bg-white shadow-2xl rounded-3xl p-12 w-full max-w-3xl border border-gray-200 animate-fade-in"
         >
-          <h1 className="text-3xl font-bold text-center mb-6 text-green-700">
+          <h1 className="text-4xl font-bold text-center mb-10 text-green-700 drop-shadow">
             Seller Sign Up
           </h1>
 
           {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex justify-between text-sm font-medium text-gray-600 mb-2">
+          <div className="mb-10">
+            <div className="flex justify-between text-base text-gray-700 mb-3">
               <span>
                 Step {step} of {totalSteps}
               </span>
               <span>{Math.round((step / totalSteps) * 100)}%</span>
             </div>
-            <div className="w-full bg-gray-200 h-2 rounded-full">
+            <div className="w-full bg-gray-200 h-4 rounded-full overflow-hidden shadow-sm">
               <div
-                className="bg-green-600 h-2 rounded-full transition-all duration-500"
+                className="bg-green-600 h-4 rounded-full transition-all duration-500 shadow-md"
                 style={{ width: `${(step / totalSteps) * 100}%` }}
               />
             </div>
           </div>
 
-          {/* Error message */}
+          {/* Error */}
           {error && (
-            <p className="mb-4 text-red-600 text-sm font-medium">{error}</p>
+            <p className="mb-6 text-red-600 text-center font-semibold">{error}</p>
           )}
 
           {/* Step 1 */}
           {step === 1 && (
-            <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">
-                Step 1: Account Setup
-              </h2>
+            <div className="space-y-6">
               <input
                 type="email"
                 name="email"
                 placeholder="Email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
+                className="w-full p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
               />
-
-              {/* Password */}
-              <div className="relative mb-4">
+              <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3 top-3 text-sm text-gray-600"
+                  className="absolute top-4 right-4 text-green-600 font-medium hover:text-green-700"
                 >
                   {showPassword ? "Hide" : "View"}
                 </button>
               </div>
-
-              {/* Confirm Password */}
-              <div className="relative mb-4">
+              <div className="relative">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirm_password"
                   placeholder="Confirm Password"
                   value={formData.confirm_password}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((s) => !s)}
-                  className="absolute right-3 top-3 text-sm text-gray-600"
+                  className="absolute top-4 right-4 text-green-600 font-medium hover:text-green-700"
                 >
                   {showConfirmPassword ? "Hide" : "View"}
                 </button>
@@ -259,19 +236,14 @@ export default function SignUp() {
           {/* Step 2 */}
           {step === 2 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">
-                Step 2: OTP Verification
-              </h2>
-              <p className="font-medium text-gray-700 mb-2">
-                Enter the OTP sent to your Email:
-              </p>
+              <p className="font-medium text-gray-800 mb-4">Enter the OTP sent to your Email:</p>
               <input
                 type="text"
                 name="email_otp"
                 placeholder="Enter Email OTP"
                 value={formData.email_otp}
                 onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
+                className="w-full p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
               />
             </div>
           )}
@@ -279,14 +251,12 @@ export default function SignUp() {
           {/* Step 3 */}
           {step === 3 && (
             <div>
-              <h2 className="text-2xl font-bold text-green-700 mb-6">
-                Step 3: Organization / Community Details
-              </h2>
+              <h2 className="text-2xl font-bold text-green-700 mb-6">Step 3: Organization / Community Details</h2>
               <select
                 name="userType"
                 value={userType}
                 onChange={(e) => setUserType(e.target.value)}
-                className="w-full p-3 mb-6 border rounded-lg"
+                className="w-full p-4 mb-6 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
               >
                 <option value="ngo">NGO</option>
                 <option value="panchayat">Coastal Panchayat</option>
@@ -300,21 +270,21 @@ export default function SignUp() {
                     placeholder="NGO Name"
                     value={formData.ngo_name}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                   <input
                     name="license_no"
                     placeholder="License No."
                     value={formData.license_no}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                   <input
                     name="spokesperson_name"
                     placeholder="Spokesperson Name"
                     value={formData.spokesperson_name}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                   <input
                     type="tel"
@@ -322,14 +292,14 @@ export default function SignUp() {
                     placeholder="Spokesperson Mobile"
                     value={formData.spokesperson_mobile}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                   <input
                     name="pan_no"
                     placeholder="PAN No."
                     value={formData.pan_no}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                 </>
               )}
@@ -341,14 +311,14 @@ export default function SignUp() {
                     placeholder="Zila ID / Ward No."
                     value={formData.zila_id_ward_no}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                   <input
                     name="address"
                     placeholder="Address"
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                   <input
                     type="email"
@@ -356,7 +326,7 @@ export default function SignUp() {
                     placeholder="Contact Email"
                     value={formData.contact_email}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                   <input
                     type="tel"
@@ -364,7 +334,7 @@ export default function SignUp() {
                     placeholder="Contact Phone"
                     value={formData.contact_phone}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                 </>
               )}
@@ -376,14 +346,14 @@ export default function SignUp() {
                     placeholder="Community Name"
                     value={formData.community_name}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                   <input
                     name="community_spokesperson_name"
                     placeholder="Spokesperson Name"
                     value={formData.community_spokesperson_name}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                   <input
                     type="tel"
@@ -391,7 +361,7 @@ export default function SignUp() {
                     placeholder="Spokesperson Mobile"
                     value={formData.community_spokesperson_mobile}
                     onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded-lg"
+                    className="w-full p-4 mb-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
                   />
                 </>
               )}
@@ -409,21 +379,21 @@ export default function SignUp() {
                 placeholder="Account Holder Name"
                 value={formData.account_holder_name}
                 onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
+                className="w-full p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
               />
               <input
                 name="account_number"
                 placeholder="Account Number"
                 value={formData.account_number}
                 onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg"
+                className="w-full p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
               />
               <input
                 name="ifsc_code"
                 placeholder="IFSC Code"
                 value={formData.ifsc_code}
                 onChange={handleChange}
-                className="w-full p-3 mb-4 border rounded-lg uppercase"
+                className="w-full p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 uppercase text-lg"
               />
               
               {/* MetaMask Connection Section */}
@@ -461,12 +431,12 @@ export default function SignUp() {
           )}
 
           {/* Buttons */}
-          <div className="flex justify-between mt-6">
+          <div className="flex justify-between mt-8">
             {step > 1 && (
               <button
                 type="button"
-                onClick={() => setStep((prev) => prev - 1)}
-                className="px-6 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition"
+                onClick={() => setStep((prev) => Math.max(prev - 1, 1))}
+                className="px-8 py-3 bg-gray-300 rounded-xl hover:bg-gray-400 transition font-semibold text-lg"
               >
                 Back
               </button>
@@ -475,16 +445,17 @@ export default function SignUp() {
               <button
                 type="button"
                 onClick={handleNext}
-                className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition ml-auto"
+                className="ml-auto px-8 py-3 bg-green-700 text-white rounded-xl hover:bg-green-800 transition font-semibold text-lg disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 Next
               </button>
             ) : (
               <button
                 type="submit"
-                className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition ml-auto"
+                disabled={loading}
+                className="ml-auto px-8 py-3 bg-green-700 text-white rounded-xl hover:bg-green-800 transition font-semibold text-lg disabled:opacity-70"
               >
-                Submit
+                {loading ? "Submitting..." : "Finish"}
               </button>
             )}
           </div>

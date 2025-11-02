@@ -21,15 +21,12 @@ export default function NGOProfile() {
     navigate("/login/ngo");
   };
 
-  // Function to refresh wallet balance
   const refreshWalletBalance = async () => {
     try {
       setWalletBalance(null); // Set to loading state
-
       if (!contract || !account) {
         await connectWallet();
       }
-
       if (contract && account) {
         const balance = await contract.getWalletBalance(account);
         setWalletBalance(Number(balance));
@@ -41,7 +38,6 @@ export default function NGOProfile() {
       console.error("Error refreshing wallet balance:", err);
       setWalletBalance("Error");
       setTimeout(() => {
-        // Fallback to DB value after error
         if (profileData && profileData.stats) {
           setWalletBalance(profileData.stats.minted_carbon_credits || 0);
         }
@@ -49,12 +45,10 @@ export default function NGOProfile() {
     }
   };
 
-  // Effect for fetching profile data - runs only once on component mount
   useEffect(() => {
     async function fetchProfileData() {
       try {
         setLoading(true);
-        // Use cached data if available (forceRefresh=false)
         const response = await dashboardApi.getNgoDashboard(false);
         if (response.success) {
           setProfileData(response.dashboard);
@@ -70,25 +64,19 @@ export default function NGOProfile() {
         setLoading(false);
       }
     }
-
     fetchProfileData();
+    return () => {};
+  }, []);
 
-    // Cleanup function to prevent memory leaks
-    return () => {
-      // No cleanup needed for API calls with our cache implementation
-    };
-  }, []); // Empty dependency array - runs only once
-
-  // Effect to set initial wallet balance from database
   useEffect(() => {
-    // Use database values initially instead of auto-connecting to wallet
     if (profileData && profileData.stats && walletBalance === null) {
       setWalletBalance(profileData.stats.minted_carbon_credits || 0);
     }
-  }, [profileData, walletBalance]); // Run when profileData or walletBalance changes
+  }, [profileData, walletBalance]);
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#fcedd3]">
-      {/* ✅ Same taskbar as Dashboard */}
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
+      {/* Taskbar */}
       <nav className="bg-green-700 text-white p-4 flex justify-between items-center shadow">
         <h1 className="text-xl font-bold">NGO Dashboard</h1>
         <ul className="flex gap-6 text-sm font-medium">
@@ -115,21 +103,20 @@ export default function NGOProfile() {
         </ul>
       </nav>
 
-      {/* ✅ Main content area */}
-      <main className="flex-grow p-8 space-y-8">
-        <h1 className="text-3xl font-bold text-green-700 mb-6">
+      {/* Main Content */}
+      <main className="flex-grow px-8 py-12 space-y-10 max-w-5xl w-full mx-auto">
+        <h1 className="text-4xl font-bold text-green-700 mb-8 drop-shadow">
           Seller Profile
         </h1>
 
-        {/* ✅ NGO Details */}
-        <section className="bg-white p-6 rounded-xl shadow mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Seller Details</h2>
+        {/* Seller Details */}
+        <section className="bg-white rounded-2xl shadow-lg p-10 mb-8 border-l-4 border-emerald-500 animate-fade-in">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900">Seller Details</h2>
             <button
               onClick={async () => {
                 try {
                   setLoading(true);
-                  // Force refresh data
                   const response = await dashboardApi.getNgoDashboard(true);
                   if (response.success) {
                     setProfileData(response.dashboard);
@@ -144,11 +131,11 @@ export default function NGOProfile() {
                   setLoading(false);
                 }
               }}
-              className="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition flex items-center"
+              className="text-sm bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition flex items-center shadow"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
+                className="h-5 w-5 mr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -169,25 +156,29 @@ export default function NGOProfile() {
           ) : error ? (
             <div className="text-red-600">{error}</div>
           ) : profileData && profileData.profile ? (
-            <ul className="space-y-2 text-gray-700">
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 text-gray-700">
               <li>
-                <strong>Name:</strong> {profileData.profile.ngo_name}
+                <span className="font-semibold text-gray-800">Name:</span>{" "}
+                {profileData.profile.ngo_name}
               </li>
               <li>
-                <strong>License No:</strong> {profileData.profile.license_no}
+                <span className="font-semibold text-gray-800">License No:</span>{" "}
+                {profileData.profile.license_no}
               </li>
               <li>
-                <strong>Email:</strong> {profileData.profile.email}
+                <span className="font-semibold text-gray-800">Email:</span>{" "}
+                {profileData.profile.email}
               </li>
               <li>
-                <strong>PAN No:</strong> {profileData.profile.pan_no}
+                <span className="font-semibold text-gray-800">PAN No:</span>{" "}
+                {profileData.profile.pan_no}
               </li>
               <li>
-                <strong>Spokesperson:</strong>{" "}
+                <span className="font-semibold text-gray-800">Spokesperson:</span>{" "}
                 {profileData.profile.spokesperson_name}
               </li>
               <li>
-                <strong>Member Since:</strong>{" "}
+                <span className="font-semibold text-gray-800">Member Since:</span>{" "}
                 {new Date(profileData.profile.created_at).toLocaleDateString()}
               </li>
             </ul>
@@ -196,41 +187,40 @@ export default function NGOProfile() {
           )}
         </section>
 
-        {/* ✅ Wallet Info and Project Stats */}
-        <section className="bg-white p-6 rounded-xl shadow mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Wallet Information */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="text-xl font-semibold">Wallet</h2>
-                <button
-                  onClick={() => refreshWalletBalance()}
-                  className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded flex items-center"
-                  disabled={!account}
+        {/* Wallet/Stats */}
+        <section className="bg-white rounded-2xl shadow-lg p-10 mb-8 grid md:grid-cols-2 gap-10 border-l-4 border-blue-500 animate-fade-in">
+          {/* Wallet */}
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-xl font-bold text-gray-800">Wallet</h2>
+              <button
+                onClick={refreshWalletBalance}
+                className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded shadow flex items-center"
+                disabled={!account}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3 mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
-                  Refresh
-                </button>
-              </div>
-              <p className="text-gray-700 text-lg">
-                <strong>Balance:</strong>{" "}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Refresh
+              </button>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl font-bold text-green-700">
                 {walletBalance === null ? (
                   <span className="inline-flex items-center">
                     <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-green-600"
+                      className="animate-spin -ml-1 mr-2 h-5 w-5 text-green-600"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -249,50 +239,54 @@ export default function NGOProfile() {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    Loading wallet...
+                    Loading...
                   </span>
                 ) : walletBalance === "Error" ? (
                   <span className="text-yellow-600">Unavailable</span>
                 ) : (
-                  <span className="font-bold text-green-700">
-                    {walletBalance} CC
-                  </span>
+                  <>{walletBalance} <span className="text-base text-gray-600 font-normal">CC</span></>
                 )}
-              </p>
+              </span>
             </div>
-
-            {/* Project Statistics */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Project Statistics</h2>
-              {loading ? (
-                <div className="text-gray-600">Loading stats...</div>
-              ) : error ? (
-                <div className="text-red-600">{error}</div>
-              ) : profileData && profileData.stats ? (
-                <ul className="space-y-2 text-gray-700">
-                  <li>
-                    <strong>Total Projects:</strong>{" "}
+          </div>
+          
+          {/* Project Statistics */}
+          <div>
+            <h2 className="text-xl font-bold text-gray-800 mb-3">Project Statistics</h2>
+            {loading ? (
+              <div className="text-gray-600">Loading stats...</div>
+            ) : error ? (
+              <div className="text-red-600">{error}</div>
+            ) : profileData && profileData.stats ? (
+              <div className="flex flex-col gap-2">
+                <div className="bg-gradient-to-r from-green-100 to-white rounded-xl p-4 flex items-center shadow">
+                  <span className="text-lg font-semibold text-emerald-800 flex-grow">Total Projects</span>
+                  <span className="text-2xl font-bold text-emerald-700">
                     {profileData.stats.total_projects}
-                  </li>
-                  <li>
-                    <strong>Pending Projects:</strong>{" "}
+                  </span>
+                </div>
+                <div className="bg-gradient-to-r from-yellow-100 to-white rounded-xl p-4 flex items-center shadow">
+                  <span className="text-lg font-semibold text-yellow-800 flex-grow">Pending Projects</span>
+                  <span className="text-2xl font-bold text-yellow-600">
                     {profileData.stats.pending_projects}
-                  </li>
-                  <li>
-                    <strong>Minted Carbon Credits:</strong>{" "}
+                  </span>
+                </div>
+                <div className="bg-gradient-to-r from-blue-100 to-white rounded-xl p-4 flex items-center shadow">
+                  <span className="text-lg font-semibold text-blue-800 flex-grow">Minted Carbon Credits</span>
+                  <span className="text-2xl font-bold text-blue-600">
                     {profileData.stats.minted_carbon_credits}
-                  </li>
-                </ul>
-              ) : (
-                <div className="text-gray-600">No stats available</div>
-              )}
-            </div>
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="text-gray-600">No stats available</div>
+            )}
           </div>
         </section>
 
-        {/* ✅ Recent Projects Activity */}
-        <section className="bg-white p-6 rounded-xl shadow mb-6">
-          <h2 className="text-xl font-semibold mb-4">
+        {/* Recent Projects Activity */}
+        <section className="bg-white rounded-2xl shadow-lg p-10 mb-8 border-l-4 border-yellow-500 animate-fade-in">
+          <h2 className="text-2xl font-bold text-yellow-700 mb-6">
             Recent Project Activity
           </h2>
           {loading ? (
@@ -302,47 +296,49 @@ export default function NGOProfile() {
           ) : profileData &&
             profileData.recent_activity &&
             profileData.recent_activity.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {profileData.recent_activity.map((project) => (
                 <div
                   key={project.project_id}
-                  className="p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition"
+                  className={`p-5 rounded-xl border shadow flex flex-col md:flex-row md:items-center md:justify-between bg-gradient-to-r ${
+                    project.status === "approved"
+                      ? "from-green-50"
+                      : project.status === "pending"
+                      ? "from-yellow-50"
+                      : project.status === "minted"
+                      ? "from-blue-50"
+                      : project.status === "rejected"
+                      ? "from-red-50"
+                      : "from-gray-50"
+                  } to-white`}
                 >
-                  <div className="flex justify-between">
-                    <span className="font-medium">
-                      Project ID: {project.project_id}
-                    </span>
-                    <span
-                      className={`px-2 py-1 rounded text-xs ${
-                        project.status === "approved"
-                          ? "bg-green-100 text-green-800"
-                          : project.status === "pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : project.status === "rejected"
-                          ? "bg-red-100 text-red-800"
-                          : project.status === "minted"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {project.status.toUpperCase()}
-                    </span>
+                  <div>
+                    <div className="font-bold">
+                      {project.project_id} — <span className="capitalize">{project.status}</span>
+                    </div>
+                    <div className="mt-1 text-gray-700">
+                      <span className="font-medium">Location:</span> {project.location} |{" "}
+                      <span className="font-medium">Type:</span> {project.tree_type} |{" "}
+                      <span className="font-medium">CC:</span> {project.estimated_cc}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Created: {new Date(project.created_at).toLocaleDateString()}
+                    </div>
                   </div>
-                  <div className="mt-2">
-                    <p>
-                      <strong>Location:</strong> {project.location}
-                    </p>
-                    <p>
-                      <strong>Tree Type:</strong> {project.tree_type}
-                    </p>
-                    <p>
-                      <strong>Estimated Carbon Credits:</strong>{" "}
-                      {project.estimated_cc}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Created on{" "}
-                      {new Date(project.created_at).toLocaleDateString()}
-                    </p>
+                  <div
+                    className={`px-4 py-2 mt-3 md:mt-0 rounded-xl font-semibold text-sm text-white shadow ${
+                      project.status === "approved"
+                        ? "bg-emerald-600"
+                        : project.status === "pending"
+                        ? "bg-yellow-500"
+                        : project.status === "minted"
+                        ? "bg-blue-600"
+                        : project.status === "rejected"
+                        ? "bg-red-500"
+                        : "bg-gray-500"
+                    }`}
+                  >
+                    {project.status.toUpperCase()}
                   </div>
                 </div>
               ))}
@@ -352,16 +348,15 @@ export default function NGOProfile() {
           )}
         </section>
 
-        {/* ✅ Transactions */}
-        <section className="bg-white p-6 rounded-xl shadow mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Transaction History</h2>
+        {/* Transactions */}
+        <section className="bg-white rounded-2xl shadow-lg p-10 mb-8 border-l-4 border-blue-400 animate-fade-in">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-blue-700">Transaction History</h2>
             <button
               onClick={async () => {
                 try {
                   setTxLoading(true);
                   setTxError("");
-                  // Force reconnect to blockchain
                   await connectWallet();
 
                   if (contract && account) {
@@ -388,11 +383,11 @@ export default function NGOProfile() {
                   setTxLoading(false);
                 }
               }}
-              className="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition flex items-center"
+              className="text-sm bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex items-center shadow"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
+                className="h-5 w-5 mr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -409,9 +404,9 @@ export default function NGOProfile() {
           </div>
 
           {txLoading ? (
-            <div className="flex items-center justify-center py-8">
+            <div className="flex items-center justify-center py-10">
               <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-green-600"
+                className="animate-spin -ml-1 mr-3 h-8 w-8 text-green-600"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -430,10 +425,10 @@ export default function NGOProfile() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <span>Loading transactions...</span>
+              <span className="text-lg text-green-700 font-semibold">Loading transactions...</span>
             </div>
           ) : txError ? (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 text-center">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
               <p className="text-yellow-700">{txError}</p>
               <p className="text-sm text-gray-600 mt-2">
                 Transactions require an active blockchain connection. Please
@@ -441,7 +436,7 @@ export default function NGOProfile() {
               </p>
             </div>
           ) : transactions.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-10 text-gray-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-12 w-12 mx-auto text-gray-400 mb-4"
@@ -456,25 +451,25 @@ export default function NGOProfile() {
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <p>No transactions found</p>
+              <p className="font-semibold">No transactions found</p>
               <p className="text-sm mt-2">
-                When you sell carbon credits, your transactions will appear here
+                When you sell carbon credits, your transactions will appear here.
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {transactions.map((tx, idx) => (
                 <div
                   key={tx.id ? tx.id.toString() : idx}
-                  className="flex flex-col md:flex-row md:justify-between p-3 border rounded-lg bg-gray-50"
+                  className="flex flex-col md:flex-row md:justify-between py-4 px-5 border rounded-xl bg-gradient-to-r from-blue-50 to-white shadow"
                 >
                   <span>
-                    <strong>Type:</strong> {tx.txType} |{" "}
-                    <strong>Credit ID:</strong>{" "}
-                    {tx.creditId?.toString?.() || "-"} <br />
-                    <strong>From:</strong> {tx.from} <br />
-                    <strong>To:</strong> {tx.to} <br />
-                    <strong>Timestamp:</strong>{" "}
+                    <span className="font-semibold">Type:</span> {tx.txType} |{" "}
+                    <span className="font-semibold">Credit ID:</span> {tx.creditId?.toString?.() || "-"}{" "}
+                    <br />
+                    <span className="font-semibold">From:</span> {tx.from} <br />
+                    <span className="font-semibold">To:</span> {tx.to} <br />
+                    <span className="font-semibold">Timestamp:</span>{" "}
                     {tx.timestamp
                       ? new Date(Number(tx.timestamp) * 1000).toLocaleString()
                       : "-"}
@@ -485,20 +480,17 @@ export default function NGOProfile() {
           )}
         </section>
 
-        {/* ✅ Sign Out */}
+        {/* Sign Out */}
         <div className="flex justify-center mt-10">
           <button
             onClick={() => {
-              // Clear all local storage including auth tokens
               localStorage.removeItem("token");
               localStorage.removeItem("user");
               sessionStorage.clear();
-
-              // Navigate to home page
               alert("Signed out successfully!");
               window.location.href = "/";
             }}
-            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            className="px-8 py-3 bg-red-600 text-white rounded-xl text-lg font-semibold shadow-lg hover:bg-red-700 transition-all"
           >
             Sign Out
           </button>

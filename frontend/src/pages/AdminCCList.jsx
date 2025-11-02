@@ -1,12 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-/**
- * AdminCCList.jsx
- * - Shows generated Carbon Credits (CC)
- * - Create a new CC entry (mock)
- * - Object properties follow snake_case convention to align with the backend API contract
- */
 export default function AdminCCList() {
   const [ccList, setCcList] = useState([
     {
@@ -38,37 +32,40 @@ export default function AdminCCList() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between mb-6">
-        <h2 className="text-2xl font-bold">Carbon Credits (CC)</h2>
-        <div className="flex gap-3">
+    <div className="max-w-6xl mx-auto p-10 space-y-8 bg-slate-50 min-h-screen">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-extrabold text-gray-900">Carbon Credits (CC)</h2>
+        <div className="flex gap-6">
           <button
             onClick={generateCC}
-            className="px-4 py-2 bg-red-700 text-white rounded"
+            className="px-6 py-3 bg-red-700 text-white rounded-3xl font-semibold shadow-md hover:bg-red-800 transition"
           >
             Generate New CC
           </button>
-          <Link to="/admin/dashboard" className="text-sm underline">
-            Back
+          <Link
+            to="/admin/dashboard"
+            className="text-indigo-600 hover:underline font-semibold text-lg"
+          >
+            ← Back
           </Link>
         </div>
       </div>
 
-      <div className="grid gap-4">
+      <div className="space-y-6">
         {ccList.map((cc) => (
           <div
             key={cc.id}
-            className="bg-white p-4 rounded-lg shadow flex justify-between items-center"
+            className="bg-white rounded-3xl p-6 shadow-lg border-l-8 border-indigo-600 flex justify-between items-center hover:shadow-xl transition"
           >
             <div>
-              <h3 className="font-semibold">{cc.id}</h3>
-              <p className="text-sm text-gray-600">
-                {cc.project} • Issued to: {cc.issued_to}
+              <h3 className="text-xl font-semibold text-gray-800">{cc.id}</h3>
+              <p className="text-gray-600 text-sm">
+                {cc.project} • Issued to: <span className="font-medium">{cc.issued_to}</span>
               </p>
             </div>
             <div className="text-right">
-              <p className="font-bold">{cc.amount} CC</p>
-              <p className="text-sm text-gray-500">{cc.date}</p>
+              <p className="text-3xl font-extrabold text-indigo-600">{cc.amount} CC</p>
+              <p className="text-gray-500 text-sm">{cc.date}</p>
             </div>
           </div>
         ))}

@@ -52,7 +52,7 @@ function App() {
   );
   const shouldHideFooter = location.pathname.toLowerCase() === "/about";
   return (
-    <div className="min-h-screen flex flex-col bg-[#fcedd3]">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
       {/* ✅ Navbar visible everywhere except NGO/Buyer/Admin routes */}
       {!shouldHideNavbar && <Navbar />}
 

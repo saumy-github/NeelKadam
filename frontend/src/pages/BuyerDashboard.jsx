@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import SellCCModal from "../components/SellCCModal";
 import useWalletConnect from "../hooks/useWalletConnect";
 import buyerApi from "../api/buyer";
@@ -9,7 +9,6 @@ export default function BuyerDashboard() {
   const [walletBalance, setWalletBalance] = useState(null);
   const [sellModalOpen, setSellModalOpen] = useState(false);
 
-  // State for dashboard data
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,9 +42,8 @@ export default function BuyerDashboard() {
   // Fetch dashboard data on mount
   useEffect(() => {
     fetchDashboardData();
-  }, []); // Empty dependency array - runs only once on mount
+  }, []);
 
-  // Fetch blockchain wallet balance
   useEffect(() => {
     async function fetchBalance() {
       await connectWallet();
@@ -59,62 +57,59 @@ export default function BuyerDashboard() {
       }
     }
     fetchBalance();
-    // eslint-disable-next-line
   }, [account, contract]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fcedd3]">
-      {/* ✅ Taskbar */}
-      <nav className="bg-green-700 text-white p-4 flex justify-between items-center shadow">
-        <h1 className="text-xl font-bold">Buyer Dashboard</h1>
-        <ul className="flex gap-6 text-sm font-medium">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
+      {/* Taskbar */}
+      <nav className="bg-green-700 text-white p-4 flex justify-between items-center shadow-lg">
+        <h1 className="text-xl font-bold drop-shadow-md">Buyer Dashboard</h1>
+        <ul className="flex gap-6 text-sm font-semibold">
           <li>
-            <Link to="/" className="hover:underline">
+            <Link to="/" className="hover:underline hover:text-emerald-300 transition">
               Home
             </Link>
           </li>
           <li>
-            <Link to="/about" className="hover:underline">
+            <Link to="/about" className="hover:underline hover:text-emerald-300 transition">
               About
             </Link>
           </li>
           <li>
-            <Link to="/buyer/profile" className="hover:underline">
+            <Link to="/buyer/profile" className="hover:underline hover:text-emerald-300 transition">
               Profile
             </Link>
           </li>
           <li>
-            <Link to="/blog" className="hover:underline">
+            <Link to="/blog" className="hover:underline hover:text-emerald-300 transition">
               Blog
             </Link>
           </li>
         </ul>
       </nav>
 
-      {/* ✅ Main content area */}
-      <main className="flex-grow p-8 space-y-10 overflow-y-auto">
+      {/* Main content */}
+      <main className="flex-grow px-8 py-12 space-y-12 max-w-7xl mx-auto overflow-y-auto">
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-700"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-green-700"></div>
           </div>
         ) : error ? (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            <p>{error}</p>
+          <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow-md">
+            <p className="text-lg font-semibold">{error}</p>
           </div>
         ) : (
           <>
             {/* Welcome */}
-            <h2 className="text-2xl font-bold mb-4">
-              Welcome back, {dashboardData?.profile?.company_name || "Buyer"}
+            <h2 className="text-4xl font-extrabold mb-6 text-gray-800 drop-shadow">
+              Welcome back, <span className="text-green-600">{dashboardData?.profile?.company_name || "Buyer"}</span>
             </h2>
 
-            {/* ✅ Wallet & Transaction Stats */}
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-                <h3 className="text-lg font-semibold text-green-700">
-                  Wallet Balance
-                </h3>
-                <p className="text-3xl font-bold mt-2 text-blue-600">
+            {/* Wallet & Transaction Stats */}
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-white p-8 rounded-2xl shadow-md border-l-4 border-l-blue-500 hover:shadow-lg transition transform hover:-translate-y-1">
+                <h3 className="text-xl font-semibold text-blue-600 mb-4">Wallet Balance</h3>
+                <p className="text-5xl font-extrabold">
                   {walletBalance === null
                     ? "Loading..."
                     : walletBalance === "Error"
@@ -122,19 +117,17 @@ export default function BuyerDashboard() {
                     : `${walletBalance} CC`}
                 </p>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-                <h3 className="text-lg font-semibold text-green-700">
-                  Carbon Credits
-                </h3>
-                <p className="text-3xl font-bold mt-2">
+
+              <div className="bg-white p-8 rounded-2xl shadow-md border-l-4 border-l-emerald-500 hover:shadow-lg transition transform hover:-translate-y-1">
+                <h3 className="text-xl font-semibold text-emerald-700 mb-4">Carbon Credits</h3>
+                <p className="text-5xl font-extrabold">
                   {dashboardData?.stats?.total_credits_owned || 0}
                 </p>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-                <h3 className="text-lg font-semibold text-green-700">
-                  Verified Purchases
-                </h3>
-                <p className="text-3xl font-bold mt-2 text-green-600">
+
+              <div className="bg-white p-8 rounded-2xl shadow-md border-l-4 border-l-amber-500 hover:shadow-lg transition transform hover:-translate-y-1">
+                <h3 className="text-xl font-semibold text-amber-600 mb-4">Verified Purchases</h3>
+                <p className="text-5xl font-extrabold text-amber-600">
                   {dashboardData?.transactions?.length || 0}
                 </p>
               </div>
@@ -142,30 +135,26 @@ export default function BuyerDashboard() {
           </>
         )}
 
-        {/* ✅ Quick Actions */}
-        <div>
-          <h3 className="text-xl font-semibold mb-4">Quick Actions</h3>
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Buy Carbon Credits */}
+        {/* Quick Actions */}
+        <section>
+          <h3 className="text-2xl font-bold mb-8 text-gray-800 drop-shadow">Quick Actions</h3>
+          <div className="grid md:grid-cols-3 gap-8">
             <Link
               to="/buyer/buy-cc"
-              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition block"
+              className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 block"
             >
-              <h4 className="text-lg font-semibold mb-2">💳 Buy CC</h4>
-              <p className="text-gray-600">
+              <h4 className="text-xl font-semibold mb-3">💳 Buy CC</h4>
+              <p className="text-gray-600 text-lg leading-relaxed">
                 Purchase carbon credits securely from verified projects.
               </p>
             </Link>
 
-            {/* Sell Carbon Credits */}
             <button
-              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition block text-left w-full"
+              className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 block text-left w-full"
               onClick={() => setSellModalOpen(true)}
             >
-              <h4 className="text-lg font-semibold mb-2">💰 Sell CC</h4>
-              <p className="text-gray-600">
-                List and sell your carbon credits in the market.
-              </p>
+              <h4 className="text-xl font-semibold mb-3">💰 Sell CC</h4>
+              <p className="text-gray-600 text-lg leading-relaxed">List and sell your carbon credits in the market.</p>
             </button>
             <SellCCModal
               open={sellModalOpen}
@@ -174,75 +163,74 @@ export default function BuyerDashboard() {
               onSuccess={handleTransferSuccess}
             />
 
-            {/* Transaction History */}
             <Link
               to="/buyer/transactions"
-              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition block"
+              className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 block"
             >
-              <h4 className="text-lg font-semibold mb-2">📜 Transactions</h4>
-              <p className="text-gray-600">
+              <h4 className="text-xl font-semibold mb-3">📜 Transactions</h4>
+              <p className="text-gray-600 text-lg leading-relaxed">
                 View your complete transaction history here.
               </p>
             </Link>
           </div>
-        </div>
+        </section>
 
-        {/* ✅ Recent Activity (Buyer-specific) */}
-        <div>
-          <h3 className="text-xl font-semibold mb-4">Recent Activity</h3>
-          <div className="bg-white p-6 rounded-xl shadow space-y-4 max-h-64 overflow-y-auto">
-            <p className="text-sm text-gray-700">
-              ✅ Purchased 100 CC from "Coastal Mangrove Project".
+        {/* Recent Activity (Buyer specific) */}
+        <section>
+          <h3 className="text-2xl font-bold mb-6 text-gray-800 drop-shadow">Recent Activity</h3>
+          <div className="bg-white p-6 rounded-xl shadow-md space-y-4 max-h-72 overflow-y-auto">
+            <p className="text-gray-700 text-sm leading-relaxed">
+              ✅ Purchased 100 CC from <span className="font-semibold">"Coastal Mangrove Project"</span>.
             </p>
-            <p className="text-sm text-gray-700">
-              💰 Bid placed for 75 CC in "Seagrass Plantation".
+            <p className="text-gray-700 text-sm leading-relaxed">
+              💰 Bid placed for 75 CC in <span className="font-semibold">"Seagrass Plantation"</span>.
             </p>
-            <p className="text-sm text-gray-700">
-              📜 Invoice generated for transaction #4521.
+            <p className="text-gray-700 text-sm leading-relaxed">
+              📜 Invoice generated for transaction <span className="font-semibold">#4521</span>.
             </p>
-            <p className="text-sm text-gray-700">
+            <p className="text-gray-700 text-sm leading-relaxed">
               ⚠️ Pending payment confirmation for 50 CC.
             </p>
-            <p className="text-sm text-gray-700">
+            <p className="text-gray-700 text-sm leading-relaxed">
               ✅ Wallet topped up with ₹20,000 for future purchases.
             </p>
           </div>
-        </div>
+        </section>
 
-        {/* ✅ Upcoming Tasks (Buyer-specific) */}
-        <div>
-          <h3 className="text-xl font-semibold mb-4">Upcoming Tasks</h3>
-          <div className="bg-white p-6 rounded-xl shadow space-y-3">
-            <div className="flex items-center justify-between">
-              <span>Review project details before purchasing CC</span>
-              <button className="px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">
+        {/* Upcoming Tasks (Buyer specific) */}
+        <section>
+          <h3 className="text-2xl font-bold mb-6 text-gray-800 drop-shadow">Upcoming Tasks</h3>
+          <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
+            <div className="flex items-center justify-between bg-gradient-to-r from-emerald-50 to-transparent rounded-xl border border-emerald-200 hover:border-emerald-400 transition py-3 px-5">
+              <span className="text-gray-700 font-medium">Review project details before purchasing CC</span>
+              <button className="px-5 py-2 text-sm font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:shadow-lg hover:scale-105 transition">
                 Mark Done
               </button>
             </div>
-            <div className="flex items-center justify-between">
-              <span>Upload KYC documents for verification</span>
-              <button className="px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-transparent rounded-xl border border-blue-200 hover:border-blue-400 transition py-3 px-5">
+              <span className="text-gray-700 font-medium">Upload KYC documents for verification</span>
+              <button className="px-5 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:shadow-lg hover:scale-105 transition">
                 Mark Done
               </button>
             </div>
-            <div className="flex items-center justify-between">
-              <span>Set auto-payment method for faster CC purchases</span>
-              <button className="px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <div className="flex items-center justify-between bg-gradient-to-r from-amber-50 to-transparent rounded-xl border border-amber-200 hover:border-amber-400 transition py-3 px-5">
+              <span className="text-gray-700 font-medium">Set auto-payment method for faster CC purchases</span>
+              <button className="px-5 py-2 text-sm font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:shadow-lg hover:scale-105 transition">
                 Mark Done
               </button>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Wallet Connection Status */}
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="text-lg font-semibold mb-4">Wallet Connection</h3>
+        <section className="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Wallet Connection</h3>
           {account ? (
-            <p className="text-green-600">Connected wallet: {account}</p>
+            <p className="text-green-700 font-medium truncate">Connected wallet: {account}</p>
           ) : (
-            <p className="text-red-600">Connecting to MetaMask...</p>
+            <p className="text-red-600 font-medium">Connecting to MetaMask...</p>
           )}
-        </div>
+        </section>
       </main>
     </div>
   );

@@ -9,111 +9,129 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fcedd3]">
-      {/* ✅ Admin Header */}
-      <nav className="bg-red-700 text-white p-4 flex justify-between items-center shadow">
-        <h1 className="text-xl font-bold">Admin Dashboard</h1>
-        <ul className="flex gap-6 text-sm font-medium">
-          <li><Link to="/" className="hover:underline">Home</Link></li>
-          <li><Link to="/about" className="hover:underline">About</Link></li>
-          <li><Link to="/admin/profile" className="hover:underline">Profile</Link></li>
-          <li><Link to="/blog" className="hover:underline">Blog</Link></li>
-          <li><Link to="/admin/ngos" className="hover:underline">NGOs</Link></li>
-          <li><Link to="/admin/buyers" className="hover:underline">Buyers</Link></li>
-          <li><Link to="/admin/projects" className="hover:underline">Projects</Link></li>
-          {/* ❌ Removed CC List, Transactions, Reports from header */}
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
+      {/* Admin Header */}
+      <nav className="bg-red-700 text-white p-5 flex justify-between items-center shadow-lg">
+        <h1 className="text-2xl font-extrabold tracking-wide drop-shadow-lg">Admin Dashboard</h1>
+        <ul className="flex flex-wrap gap-8 text-base font-semibold">
+          <li><Link to="/" className="hover:underline hover:text-red-300 transition">Home</Link></li>
+          <li><Link to="/about" className="hover:underline hover:text-red-300 transition">About</Link></li>
+          <li><Link to="/admin/profile" className="hover:underline hover:text-red-300 transition">Profile</Link></li>
+          <li><Link to="/blog" className="hover:underline hover:text-red-300 transition">Blog</Link></li>
+          <li><Link to="/admin/ngos" className="hover:underline hover:text-red-300 transition">NGOs</Link></li>
+          <li><Link to="/admin/buyers" className="hover:underline hover:text-red-300 transition">Buyers</Link></li>
+          <li><Link to="/admin/projects" className="hover:underline hover:text-red-300 transition">Projects</Link></li>
         </ul>
       </nav>
 
-      {/* ✅ Main Content */}
-      <main className="flex-grow p-8 space-y-10 overflow-y-auto">
-        <h2 className="text-2xl font-bold text-red-700 mb-6">Welcome, Admin</h2>
+      {/* Main Content */}
+      <main className="flex-grow px-10 py-12 max-w-7xl mx-auto space-y-14 overflow-y-auto">
+        <h2 className="text-3xl font-black text-red-700 drop-shadow-md">Welcome, Admin</h2>
 
         {/* Quick Stats */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-lg font-semibold text-red-700">Total NGOs</h3>
-            <p className="text-3xl font-bold mt-2">54</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-lg font-semibold text-red-700">Total Buyers</h3>
-            <p className="text-3xl font-bold mt-2">78</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-lg font-semibold text-red-700">Total Projects</h3>
-            <p className="text-3xl font-bold mt-2">132</p>
-          </div>
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { label: "Total NGOs", value: 54, color: "emerald" },
+            { label: "Total Buyers", value: 78, color: "blue" },
+            { label: "Total Projects", value: 132, color: "amber" }
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className={`bg-white p-8 rounded-3xl shadow-md border-l-8 border-${stat.color}-500 hover:shadow-xl transition transform hover:-translate-y-1 cursor-default`}
+            >
+              <h3 className={`text-2xl font-bold text-${stat.color}-700 mb-4`}>{stat.label}</h3>
+              <p className={`text-5xl font-extrabold text-${stat.color}-600`}>{stat.value}</p>
+            </div>
+          ))}
         </div>
 
         {/* Management Panels */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-xl font-semibold text-red-700 mb-4">NGO Management</h3>
-            <p className="text-gray-700 mb-4">View, verify, and manage registered NGOs.</p>
-            <Link to="/admin/ngos" className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800">
-              Manage NGOs
-            </Link>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-xl font-semibold text-red-700 mb-4">Buyer Management</h3>
-            <p className="text-gray-700 mb-4">Monitor buyer registrations and activities.</p>
-            <Link to="/admin/buyers" className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800">
-              Manage Buyers
-            </Link>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-xl font-semibold text-red-700 mb-4">Project Verification</h3>
-            <p className="text-gray-700 mb-4">Check NGO project status and approvals.</p>
-            <Link to="/admin/projects" className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800">
-              Verify Projects
-            </Link>
-          </div>
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              title: "NGO Management",
+              description: "View, verify, and manage registered NGOs.",
+              link: "/admin/ngos",
+            },
+            {
+              title: "Buyer Management",
+              description: "Monitor buyer registrations and activities.",
+              link: "/admin/buyers",
+            },
+            {
+              title: "Project Verification",
+              description: "Check NGO project status and approvals.",
+              link: "/admin/projects",
+            },
+          ].map((panel) => (
+            <div
+              key={panel.title}
+              className="bg-white p-8 rounded-3xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1"
+            >
+              <h3 className="text-2xl font-semibold text-red-700 mb-6">{panel.title}</h3>
+              <p className="text-gray-700 mb-6">{panel.description}</p>
+              <Link
+                to={panel.link}
+                className="px-6 py-3 bg-red-700 text-white rounded-xl hover:bg-red-800 shadow-lg transition"
+              >
+                {`Manage ${panel.title.split(" ")[0]}`}
+              </Link>
+            </div>
+          ))}
         </div>
 
-        {/* Additional Panels for CC, Transactions, Reports */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-xl font-semibold text-red-700 mb-4">Carbon Credits</h3>
-            <p className="text-gray-700 mb-4">Track newly generated CC and listings.</p>
-            <Link to="/admin/cc" className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800">
-              View CC List
-            </Link>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-xl font-semibold text-red-700 mb-4">Transactions</h3>
-            <p className="text-gray-700 mb-4">Keep a check on all CC transactions.</p>
-            <Link to="/admin/transactions" className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800">
-              Monitor Transactions
-            </Link>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-            <h3 className="text-xl font-semibold text-red-700 mb-4">Reports</h3>
-            <p className="text-gray-700 mb-4">Generate and review detailed reports.</p>
-            <Link to="/admin/reports" className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800">
-              View Reports
-            </Link>
-          </div>
+        {/* Additional Panels */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              title: "Carbon Credits",
+              description: "Track newly generated CC and listings.",
+              link: "/admin/cc",
+              color: "green"
+            },
+            {
+              title: "Transactions",
+              description: "Keep a check on all CC transactions.",
+              link: "/admin/transactions",
+              color: "yellow"
+            },
+            {
+              title: "Reports",
+              description: "Generate and review detailed reports.",
+              link: "/admin/reports",
+              color: "purple"
+            },
+          ].map((panel) => (
+            <div
+              key={panel.title}
+              className="bg-white p-8 rounded-3xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1"
+            >
+              <h3 className={`text-2xl font-semibold text-red-700 mb-6`}>{panel.title}</h3>
+              <p className="text-gray-700 mb-6">{panel.description}</p>
+              <Link
+                to={panel.link}
+                className="px-6 py-3 bg-red-700 text-white rounded-xl hover:bg-red-800 shadow-lg transition"
+              >
+                {`View ${panel.title}`}
+              </Link>
+            </div>
+          ))}
         </div>
 
         {/* Sign Out */}
-        <div className="flex justify-center mt-10">
-  <button
-    onClick={() => {
-      localStorage.clear();
-      sessionStorage.clear();
-      alert("Signed out successfully!");
-      window.location.href = "/"; // ✅ always go to main home page
-    }}
-    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-  >
-    Sign Out
-  </button>
-</div>
-
+        <div className="flex justify-center mt-12">
+          <button
+            onClick={() => {
+              localStorage.clear();
+              sessionStorage.clear();
+              alert("Signed out successfully!");
+              window.location.href = "/";
+            }}
+            className="px-8 py-3 bg-red-600 text-white rounded-3xl text-xl font-bold shadow-lg hover:bg-red-700 transition-all"
+          >
+            Sign Out
+          </button>
+        </div>
       </main>
     </div>
   );

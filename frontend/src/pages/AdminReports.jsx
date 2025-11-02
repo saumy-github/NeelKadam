@@ -1,11 +1,5 @@
 import { Link } from "react-router-dom";
 
-/**
- * AdminReports.jsx
- * - Simple summary + CSV export for demo
- * - Using snake_case for data properties to match backend API contract
- * - Using seller_id/seller_type to accommodate all seller types (NGO, coastal panchayat, community)
- */
 export default function AdminReports() {
   const sampleData = [
     {
@@ -36,19 +30,22 @@ export default function AdminReports() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between mb-6">
-        <h2 className="text-2xl font-bold">Reports</h2>
-        <Link to="/admin/dashboard" className="text-sm underline">
-          Back
+    <div className="max-w-4xl mx-auto p-10 bg-slate-50 min-h-screen">
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-3xl font-extrabold text-gray-900">Reports</h2>
+        <Link to="/admin/dashboard" className="text-indigo-600 hover:underline font-semibold text-lg">
+          ← Back
         </Link>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow">
-        <p className="mb-4">Quick summary & CSV export for offline analysis.</p>
+      <div className="bg-white p-10 rounded-3xl shadow-lg space-y-6">
+        <p className="text-lg text-gray-700">
+          Quick summary & export your data as CSV for offline analysis.
+        </p>
         <button
           onClick={downloadCSV}
-          className="px-4 py-2 bg-red-700 text-white rounded"
+          className="px-8 py-4 bg-red-700 text-white rounded-full text-lg font-semibold shadow-lg hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-400 transition"
+          type="button"
         >
           Download CSV
         </button>

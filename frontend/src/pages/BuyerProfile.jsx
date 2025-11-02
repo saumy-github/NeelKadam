@@ -10,14 +10,11 @@ export default function BuyerProfile() {
   const [transactions, setTransactions] = useState([]);
   const [txLoading, setTxLoading] = useState(false);
   const [txError, setTxError] = useState("");
-
-  // State for profile data
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const handleSignOut = () => {
-    // Clear auth tokens
     localStorage.removeItem("token");
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
@@ -26,7 +23,6 @@ export default function BuyerProfile() {
     navigate("/login/buyer");
   };
 
-  // Effect for fetching profile data - runs only once on component mount
   useEffect(() => {
     async function fetchProfileData() {
       try {
@@ -46,66 +42,47 @@ export default function BuyerProfile() {
         setLoading(false);
       }
     }
-
     fetchProfileData();
-  }, []); // Empty dependency array - runs only once
+  }, []);
 
-  // Separate effect for blockchain wallet data
   useEffect(() => {
-    let isMounted = true; // Flag to prevent state updates after unmount
+    let isMounted = true;
     let connectionTimeout;
 
     async function fetchBlockchainData() {
       try {
-        // Set a timeout to prevent indefinite loading
         connectionTimeout = setTimeout(() => {
           if (isMounted && txLoading) {
-            console.log("Blockchain transaction fetch timed out");
             setTxLoading(false);
             setTxError(
               "Connection timed out. Please make sure MetaMask is installed and connected."
             );
-
-            // Use API transaction data as fallback if available
             if (profileData && profileData.transactions) {
               setTransactions(profileData.transactions);
             }
           }
-        }, 10000); // 10 second timeout
+        }, 10000);
 
-        // Try to connect wallet
         await connectWallet();
 
-        if (!isMounted) return; // Don't proceed if component unmounted
+        if (!isMounted) return;
 
         if (contract && account) {
-          // Fetch wallet balance
           try {
             const balance = await contract.getWalletBalance(account);
-            if (isMounted) {
-              setWalletBalance(Number(balance));
-            }
-          } catch (err) {
-            console.error("Error fetching wallet balance:", err);
-            if (isMounted) {
-              setWalletBalance("Error");
-            }
+            if (isMounted) setWalletBalance(Number(balance));
+          } catch {
+            if (isMounted) setWalletBalance("Error");
           }
 
-          // Fetch all transactions
           if (isMounted) {
             setTxLoading(true);
             setTxError("");
           }
-
           try {
             const allTx = await contract.getAllTransactions();
-
             if (isMounted) {
-              // Clear timeout since we got a response
               clearTimeout(connectionTimeout);
-
-              // Filter only those where from or to is the current account
               const filtered = allTx.filter(
                 (tx) =>
                   (tx.from &&
@@ -115,40 +92,31 @@ export default function BuyerProfile() {
               setTransactions(filtered);
               setTxLoading(false);
             }
-          } catch (err) {
-            console.error("Error fetching transactions:", err);
+          } catch {
             if (isMounted) {
               clearTimeout(connectionTimeout);
               setTxError("Could not fetch blockchain transactions");
               setTxLoading(false);
-
-              // Use API transaction data as fallback if available
               if (profileData && profileData.transactions) {
                 setTransactions(profileData.transactions);
               }
             }
           }
         } else {
-          // No contract or account available
           if (isMounted) {
             clearTimeout(connectionTimeout);
             setTxLoading(false);
             setTxError("Blockchain wallet not connected");
-
-            // Use API transaction data as fallback if available
             if (profileData && profileData.transactions) {
               setTransactions(profileData.transactions);
             }
           }
         }
-      } catch (err) {
-        console.error("Blockchain data fetch error:", err);
+      } catch {
         if (isMounted) {
           clearTimeout(connectionTimeout);
           setTxLoading(false);
           setTxError("Error connecting to blockchain");
-
-          // Use API transaction data as fallback if available
           if (profileData && profileData.transactions) {
             setTransactions(profileData.transactions);
           }
@@ -158,117 +126,138 @@ export default function BuyerProfile() {
 
     fetchBlockchainData();
 
-    // Cleanup function
     return () => {
       isMounted = false;
-      if (connectionTimeout) {
-        clearTimeout(connectionTimeout);
-      }
+      if (connectionTimeout) clearTimeout(connectionTimeout);
     };
   }, [account, contract, profileData]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fcedd3]">
-      {/* ✅ Same taskbar as BuyerDashboard */}
-      <nav className="bg-green-700 text-white p-4 flex justify-between items-center shadow">
-        <h1 className="text-xl font-bold">Buyer Dashboard</h1>
-        <ul className="flex gap-6 text-sm font-medium">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
+      {/* Taskbar */}
+      <nav className="bg-green-700 text-white p-4 flex justify-between items-center shadow-lg">
+        <h1 className="text-xl font-bold drop-shadow-md">Buyer Dashboard</h1>
+        <ul className="flex gap-6 text-sm font-semibold">
           <li>
-            <Link to="/" className="hover:underline">
+            <Link to="/" className="hover:underline hover:text-emerald-300 transition">
               Home
             </Link>
           </li>
           <li>
-            <Link to="/about" className="hover:underline">
+            <Link to="/about" className="hover:underline hover:text-emerald-300 transition">
               About
             </Link>
           </li>
           <li>
-            <Link to="/buyer/profile" className="hover:underline">
+            <Link to="/buyer/profile" className="hover:underline hover:text-emerald-300 transition">
               Profile
             </Link>
           </li>
           <li>
-            <Link to="/blog" className="hover:underline">
+            <Link to="/blog" className="hover:underline hover:text-emerald-300 transition">
               Blog
             </Link>
           </li>
         </ul>
       </nav>
 
-      {/* ✅ Main content area */}
-      <main className="flex-grow p-8 space-y-8">
-        <h1 className="text-3xl font-bold text-green-700 mb-6">
+      {/* Main */}
+      <main className="flex-grow px-12 py-12 space-y-14 max-w-7xl mx-auto overflow-y-auto">
+        <h1 className="text-4xl font-extrabold text-green-700 mb-10 drop-shadow">
           Buyer Profile
         </h1>
 
-        {/* ✅ Buyer Details */}
-        <section className="bg-white p-6 rounded-xl shadow mb-6">
-          <h2 className="text-xl font-semibold mb-4">Buyer Details</h2>
+        {/* Buyer Details */}
+        <section className="bg-white rounded-2xl shadow-lg p-12 border-l-8 border-emerald-500 mb-12 animate-fade-in">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-semibold text-gray-900">Buyer Details</h2>
+            <button
+              onClick={async () => {
+                try {
+                  setLoading(true);
+                  const response = await buyerApi.getBuyerDashboard();
+                  if (response.success) {
+                    setProfileData(response.dashboard);
+                    setError(null);
+                  } else {
+                    setError("Failed to refresh data");
+                  }
+                } catch (err) {
+                  setError("Error refreshing data");
+                  console.error(err);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              className="text-sm bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition flex items-center shadow"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              Refresh
+            </button>
+          </div>
 
           {loading ? (
-            <div className="flex items-center">
-              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-green-700 mr-2"></div>
-              <span>Loading profile data...</span>
+            <div className="flex items-center gap-4 text-gray-600">
+              <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-b-4 border-green-700"></div>
+              Loading profile data...
             </div>
           ) : error ? (
-            <div className="text-red-600">{error}</div>
+            <div className="text-red-600 font-semibold">{error}</div>
           ) : profileData && profileData.profile ? (
-            <ul className="space-y-2 text-gray-700">
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6 text-gray-800 text-lg">
               <li>
-                <strong>Company Name:</strong>{" "}
-                {profileData.profile.company_name}
+                <span className="font-semibold">Company Name:</span> {profileData.profile.company_name}
               </li>
               <li>
-                <strong>Email:</strong> {profileData.profile.email}
+                <span className="font-semibold">Email:</span> {profileData.profile.email}
               </li>
               <li>
-                <strong>PAN No:</strong> {profileData.profile.pan_no}
+                <span className="font-semibold">PAN No:</span> {profileData.profile.pan_no}
               </li>
               <li>
-                <strong>Account Holder:</strong>{" "}
-                {profileData.profile.account_holder_name}
+                <span className="font-semibold">Account Holder:</span> {profileData.profile.account_holder_name}
               </li>
               <li>
-                <strong>Account Number:</strong>{" "}
-                {profileData.profile.account_number
-                  ? "•••••" + profileData.profile.account_number.slice(-4)
-                  : ""}
+                <span className="font-semibold">Account Number:</span> {profileData.profile.account_number ? "•••••" + profileData.profile.account_number.slice(-4) : ""}
               </li>
               <li>
-                <strong>IFSC Code:</strong> {profileData.profile.ifsc_code}
+                <span className="font-semibold">IFSC Code:</span> {profileData.profile.ifsc_code}
               </li>
               <li className="flex items-center justify-between">
                 <div>
-                  <strong>Wallet Address:</strong>{" "}
+                  <span className="font-semibold">Wallet Address:</span>{" "}
                   {profileData.profile.wallet_address ? (
-                    <span className="font-mono text-sm">
-                      {profileData.profile.wallet_address}
-                    </span>
+                    <span className="font-mono text-sm">{profileData.profile.wallet_address}</span>
                   ) : account ? (
-                    <div className="flex items-center">
-                      <span className="font-mono text-sm bg-yellow-50 px-1">
-                        {account}
-                      </span>
-                      <span className="ml-2 text-xs text-yellow-600">
-                        (from MetaMask, not saved)
-                      </span>
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-sm bg-yellow-50 px-2 rounded">{account}</span>
+                      <span className="text-xs text-yellow-600">(from MetaMask, not saved)</span>
                     </div>
                   ) : (
-                    <span className="text-red-500">Not connected</span>
+                    <span className="text-red-500 font-semibold">Not connected</span>
                   )}
                 </div>
-
                 {!profileData.profile.wallet_address && account && (
                   <button
-                    className="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded-md"
+                    type="button"
+                    className="text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded-lg shadow"
                     onClick={async () => {
                       try {
-                        const response = await buyerApi.updateWalletAddress(
-                          account
-                        );
+                        const response = await buyerApi.updateWalletAddress(account);
                         if (response.success) {
-                          // Update local state to reflect the change
                           setProfileData({
                             ...profileData,
                             profile: {
@@ -278,17 +267,10 @@ export default function BuyerProfile() {
                           });
                           alert("Wallet address saved successfully!");
                         } else {
-                          alert(
-                            "Failed to save wallet address: " +
-                              (response.error || "Unknown error")
-                          );
+                          alert("Failed to save wallet address: " + (response.error || "Unknown error"));
                         }
                       } catch (err) {
-                        console.error("Error saving wallet address:", err);
-                        alert(
-                          "Error saving wallet address: " +
-                            (err.message || "Unknown error")
-                        );
+                        alert("Error saving wallet address: " + (err.message || "Unknown error"));
                       }
                     }}
                   >
@@ -297,76 +279,73 @@ export default function BuyerProfile() {
                 )}
               </li>
               <li>
-                <strong>Member Since:</strong>{" "}
+                <span className="font-semibold">Member Since:</span>{" "}
                 {new Date(profileData.profile.created_at).toLocaleDateString()}
               </li>
             </ul>
           ) : (
-            <div className="text-gray-600">No profile data available</div>
+            <div className="text-gray-600 text-lg">No profile data available</div>
           )}
         </section>
 
-        {/* ✅ Wallet Info */}
-        <section className="bg-white p-6 rounded-xl shadow mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Blockchain Wallet */}
+        {/* Wallet Info */}
+        <section className="bg-white rounded-2xl shadow-lg p-10 mb-10 max-w-[60rem] mx-auto border-l-8 border-blue-600 animate-fade-in">
+          <div className="grid md:grid-cols-2 gap-10">
             <div>
-              <h2 className="text-xl font-semibold mb-4">Blockchain Wallet</h2>
-              <p className="text-gray-700">
-                <strong>Balance:</strong>{" "}
-                {walletBalance === null
-                  ? "Loading..."
-                  : walletBalance === "Error"
-                  ? "Error"
-                  : `${walletBalance} CC`}
+              <h2 className="text-3xl font-bold mb-6 text-gray-900 drop-shadow">Blockchain Wallet</h2>
+              <p className="text-lg text-gray-800">
+                <span className="font-semibold">Balance:</span>{" "}
+                {walletBalance === null ? (
+                  "Loading..."
+                ) : walletBalance === "Error" ? (
+                  <span className="text-red-600 font-semibold">Error</span>
+                ) : (
+                  <span className="font-bold text-green-700">{walletBalance} CC</span>
+                )}
               </p>
             </div>
-
-            {/* System Credits */}
             <div>
-              <h2 className="text-xl font-semibold mb-4">Carbon Credits</h2>
+              <h2 className="text-3xl font-bold mb-6 text-gray-900 drop-shadow">Carbon Credits</h2>
               {loading ? (
-                <div>Loading...</div>
+                <div className="text-gray-600 text-lg">Loading...</div>
               ) : error ? (
-                <div className="text-red-600">Error loading data</div>
+                <div className="text-red-600 font-semibold text-lg">Error loading data</div>
               ) : profileData ? (
-                <p className="text-gray-700">
-                  <strong>Total Credits:</strong>{" "}
+                <p className="text-lg text-gray-800">
+                  <span className="font-semibold">Total Credits:</span>{" "}
                   {profileData.stats.total_credits_owned || 0} CC
                 </p>
               ) : (
-                <p>No data available</p>
+                <p className="text-gray-600 text-lg">No data available</p>
               )}
             </div>
           </div>
         </section>
 
-        {/* ✅ Transactions */}
-        <section className="bg-white p-6 rounded-xl shadow mb-6">
-          <h2 className="text-xl font-semibold mb-4">Transaction History</h2>
+        {/* Transactions */}
+        <section className="bg-white rounded-2xl shadow-lg p-12 mb-10 max-w-[60rem] mx-auto border-l-8 border-amber-500 animate-fade-in">
+          <h2 className="text-4xl font-bold mb-8 text-gray-900 drop-shadow">Transaction History</h2>
           {txLoading ? (
-            <div>Loading transactions...</div>
+            <div className="flex items-center gap-6 text-gray-600">
+              <div className="animate-spin rounded-full h-7 w-7 border-t-4 border-b-4 border-green-700"></div>
+              Loading transactions...
+            </div>
           ) : txError ? (
-            <div className="text-red-600">{txError}</div>
+            <div className="text-red-600 font-semibold text-lg">{txError}</div>
           ) : transactions.length === 0 ? (
-            <div>No transaction found</div>
+            <div className="text-gray-600 text-lg">No transaction found</div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-6 text-gray-800">
               {transactions.map((tx, idx) => (
                 <div
                   key={tx.id ? tx.id.toString() : idx}
-                  className="flex flex-col md:flex-row md:justify-between p-3 border rounded-lg bg-gray-50"
+                  className="flex flex-col md:flex-row md:justify-between p-8 border rounded-xl bg-gray-50 shadow-lg"
                 >
-                  <span>
-                    <strong>Type:</strong> {tx.txType} |{" "}
-                    <strong>Credit ID:</strong>{" "}
-                    {tx.creditId?.toString?.() || "-"} <br />
+                  <span className="text-lg">
+                    <strong>Type:</strong> {tx.txType} | <strong>Credit ID:</strong> {tx.creditId?.toString?.() || "-"} <br />
                     <strong>From:</strong> {tx.from} <br />
                     <strong>To:</strong> {tx.to} <br />
-                    <strong>Timestamp:</strong>{" "}
-                    {tx.timestamp
-                      ? new Date(Number(tx.timestamp) * 1000).toLocaleString()
-                      : "-"}
+                    <strong>Timestamp:</strong> {tx.timestamp ? new Date(Number(tx.timestamp) * 1000).toLocaleString() : "-"}
                   </span>
                 </div>
               ))}
@@ -374,10 +353,11 @@ export default function BuyerProfile() {
           )}
         </section>
 
-        <div className="flex justify-center mt-10">
+        {/* Sign Out */}
+        <div className="flex justify-center mt-16">
           <button
             onClick={handleSignOut}
-            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            className="px-12 py-4 bg-red-600 text-white rounded-3xl text-2xl font-bold shadow-lg hover:bg-red-700 transition-all"
           >
             Sign Out
           </button>

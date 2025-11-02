@@ -27,26 +27,48 @@ export default function BuyerTransactions() {
   }, [account, contract]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fcedd3] p-8">
-      <h1 className="text-3xl font-bold text-green-700 mb-6">All Transactions</h1>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 p-10 max-w-7xl mx-auto">
+      <h1 className="text-4xl font-extrabold text-green-700 mb-8 drop-shadow">
+        All Transactions
+      </h1>
+
       {loading ? (
-        <div>Loading transactions...</div>
+        <div className="flex justify-center items-center h-40">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-green-700"></div>
+        </div>
       ) : error ? (
-        <div className="text-red-600">{error}</div>
+        <div className="bg-red-100 border border-red-400 text-red-700 px-5 py-3 rounded-lg shadow mb-4">
+          {error}
+        </div>
       ) : transactions.length === 0 ? (
-        <div>No transaction found</div>
+        <div className="text-gray-600 text-lg text-center py-20">
+          No transactions found.
+        </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {transactions.map((tx, idx) => (
             <div
               key={tx.id ? tx.id.toString() : idx}
-              className="p-4 border rounded-lg bg-white shadow"
+              className="p-6 border rounded-2xl bg-white shadow-lg hover:shadow-2xl transition"
             >
-              <div><strong>Type:</strong> {tx.txType}</div>
-              <div><strong>Credit ID:</strong> {tx.creditId?.toString?.() || "-"}</div>
-              <div><strong>From:</strong> {tx.from}</div>
-              <div><strong>To:</strong> {tx.to}</div>
-              <div><strong>Timestamp:</strong> {tx.timestamp ? new Date(Number(tx.timestamp) * 1000).toLocaleString() : "-"}</div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-gray-800 text-lg">
+                <div>
+                  <span className="font-semibold">Type:</span> {tx.txType}
+                </div>
+                <div>
+                  <span className="font-semibold">Credit ID:</span> {tx.creditId?.toString?.() || "-"}
+                </div>
+                <div>
+                  <span className="font-semibold">From:</span> {tx.from}
+                </div>
+                <div>
+                  <span className="font-semibold">To:</span> {tx.to}
+                </div>
+                <div className="col-span-full mt-2 md:mt-0">
+                  <span className="font-semibold">Timestamp:</span>{" "}
+                  {tx.timestamp ? new Date(Number(tx.timestamp) * 1000).toLocaleString() : "-"}
+                </div>
+              </div>
             </div>
           ))}
         </div>

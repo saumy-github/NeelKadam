@@ -3,12 +3,6 @@ import { Link } from "react-router-dom";
 import { adminApi } from "../api/admin";
 import AdminMetaMaskVerificationModal from "../components/AdminMetaMaskVerificationModal";
 
-/**
- * AdminProjects.jsx
- * - List of projects submitted by NGOs
- * - Inspect details, approve/reject, add notes
- * - Using snake_case for data properties to match backend API contract
- */
 export default function AdminProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +27,6 @@ export default function AdminProjects() {
         setLoading(false);
       }
     }
-
     fetchProjects();
   }, []);
 
@@ -51,13 +44,11 @@ export default function AdminProjects() {
 
     try {
       setActionLoading(true);
-      setShowVerificationModal(false);
 
       // Call the backend to approve/reject the project
       const approved = status === "approved";
       const result = await adminApi.approveProject(projectId, approved);
 
-      // Update local state with the response
       setProjects((prev) =>
         prev.map((p) =>
           p.project_id === projectId
@@ -70,21 +61,19 @@ export default function AdminProjects() {
         )
       );
 
-      // Show success notification with admin wallet info
+      // Show success notification
       setNotification({
         type: "success",
-        message: `${result.message} (Verified by: ${verifiedAddress.substring(0, 10)}...${verifiedAddress.substring(verifiedAddress.length - 8)})`,
+        message: result.message,
       });
     } catch (err) {
       console.error("Error updating project status:", err);
       setNotification({
         type: "error",
-        message:
-          err.error || "Failed to update project status. Please try again.",
+        message: err.error || "Failed to update project status. Please try again.",
       });
     } finally {
       setActionLoading(false);
-      setPendingAction(null);
 
       // Clear notification after 5 seconds
       setTimeout(() => {
@@ -100,70 +89,72 @@ export default function AdminProjects() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between mb-6">
-        <h2 className="text-2xl font-bold">Project Verification</h2>
-        <Link to="/admin/dashboard" className="text-sm underline">
-          Back to Admin
+    <div className="max-w-7xl mx-auto p-10 space-y-10 min-h-screen bg-slate-50">
+      <div className="flex justify-between mb-6 items-center">
+        <h2 className="text-3xl font-extrabold text-gray-900">Project Verification</h2>
+        <Link to="/admin/dashboard" className="text-indigo-600 hover:underline text-lg font-semibold">
+          ← Back to Admin
         </Link>
       </div>
 
-      {/* Notification display */}
       {notification && (
         <div
-          className={`mb-4 p-4 rounded-lg ${
-            notification.type === "success"
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
-          }`}
+          className={`p-4 rounded-lg font-semibold ${
+            notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+          } shadow-md`}
         >
           {notification.message}
         </div>
       )}
 
       {loading ? (
-        <div className="flex justify-center items-center h-40">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-700"></div>
+        <div className="flex justify-center items-center h-48">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-700"></div>
         </div>
       ) : error ? (
-        <div className="bg-red-100 text-red-700 p-4 rounded-lg">{error}</div>
+        <div className="bg-red-100 text-red-700 p-6 rounded-lg text-center text-lg font-semibold">{error}</div>
       ) : projects.length === 0 ? (
-        <div className="bg-gray-100 p-4 rounded-lg text-center">
+        <div className="bg-gray-100 p-6 rounded-lg text-center font-medium text-gray-700">
           No projects found for verification.
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-8">
           {projects.map((p) => (
-            <div key={p.project_id} className="bg-white p-4 rounded-lg shadow">
-              <div className="flex justify-between">
-                <div>
-                  <h3 className="font-semibold">
-                    {p.plantation_area || "Unnamed Project"}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Seller: {p.seller_name} • Type: {p.seller_type} • Estimated
-                    CC: {p.estimated_cc || 0}
-                    {p.actual_cc ? ` • Actual CC: ${p.actual_cc}` : ""}
+            <div
+              key={p.project_id}
+              className="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-indigo-600 hover:shadow-xl transition"
+            >
+              <div className="flex justify-between items-start flex-wrap md:flex-nowrap gap-4">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-2xl font-semibold text-gray-900 truncate">{p.plantation_area || "Unnamed Project"}</h3>
+                  <p className="mt-1 text-gray-600 text-sm sm:text-base">
+                    Seller: <span className="font-medium">{p.seller_name}</span> • Type: <span>{p.seller_type}</span> • Estimated CC: <span>{p.estimated_cc || 0}</span>
+                    {p.actual_cc && (
+                      <>
+                        {" "}• Actual CC: <span>{p.actual_cc}</span>
+                      </>
+                    )}
                   </p>
-                  <p className="text-sm text-gray-600">
-                    Location: {p.location || "Not specified"} • Trees:{" "}
-                    {p.tree_no || 0} • Type: {p.tree_type || "Not specified"}
+                  <p className="mt-1 text-gray-600 text-sm sm:text-base">
+                    Location: <span>{p.location || "Not specified"}</span> • Trees: <span>{p.tree_no || 0}</span> • Type: <span>{p.tree_type || "Not specified"}</span>
                   </p>
                 </div>
-                <div className="flex gap-2 items-center">
+
+                <div className="flex items-center gap-4 flex-shrink-0">
                   <span
-                    className={`px-2 py-1 rounded text-sm ${
+                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
                       p.status === "approved"
-                        ? "bg-green-100 text-green-700"
+                        ? "bg-green-100 text-green-800"
                         : p.status === "rejected"
-                        ? "bg-red-100 text-red-700"
+                        ? "bg-red-100 text-red-800"
                         : p.status === "minted"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-yellow-100 text-yellow-700"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-yellow-100 text-yellow-800"
                     }`}
                   >
-                    {p.status}
+                    {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
                   </span>
+
                   {p.status === "pending" && !actionLoading && (
                     <>
                       <button
@@ -182,14 +173,15 @@ export default function AdminProjects() {
                       </button>
                     </>
                   )}
+
                   {actionLoading && (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-700"></div>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-700"></div>
                   )}
                 </div>
               </div>
 
-              <div className="mt-3 text-sm text-gray-700">
-                <p>Created: {new Date(p.created_at).toLocaleDateString()}</p>
+              <div className="mt-4 text-gray-700 text-sm sm:text-base">
+                Created: {new Date(p.created_at).toLocaleDateString()}
               </div>
             </div>
           ))}

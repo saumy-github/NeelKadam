@@ -84,7 +84,7 @@ with more liquidity, transparency, and accountability...`,
   ];
 
   return (
-    <div className="min-h-screen bg-[#fcedd3] py-12 px-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 py-12 px-6">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold text-green-900 text-center mb-12">
           🌍 Blue Carbon Blog

@@ -28,12 +28,12 @@ export default function NGOLogin() {
     setError("");
 
     try {
-      // Basic validation
+      if (!window.ethereum) {
+        throw new Error("Please install MetaMask first and create a wallet.");
+      }
       if (!formData.email || !formData.password) {
         throw new Error("Both email and password are required!");
       }
-
-      // Email validation
       const isEmail = /\S+@\S+\.\S+/.test(formData.email);
       if (!isEmail) {
         throw new Error("Please enter a valid email address!");
@@ -44,11 +44,8 @@ export default function NGOLogin() {
         email: formData.email,
         password: formData.password,
       });
-
-      // Store authentication data
       login(response.token, response.ngo);
-
-      // Navigate to dashboard
+      await connectWallet();
       navigate("/ngo/dashboard");
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
@@ -58,60 +55,87 @@ export default function NGOLogin() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fcedd3]">
-      {/* Center form slightly higher */}
-      <main className="flex-grow flex justify-center items-start pt-32">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
+      <main className="flex-grow flex justify-center items-start pt-28">
         <form
           onSubmit={handleLogin}
-          className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md border border-gray-200"
+          className="relative bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md border border-gray-200"
         >
+          {/* Animated emoji/logo accent */}
+          <div className="absolute -top-10 left-1/2 transform -translate-x-1/2">
+            <span className="text-5xl animate-bounce drop-shadow">🪴</span>
+          </div>
+
           {/* Title */}
-          <h1 className="text-3xl font-bold text-center mb-8 text-green-700">
+          <h1 className="text-4xl font-bold text-center mb-8 text-green-700 drop-shadow">
             Seller Login
           </h1>
 
           {/* Error display */}
           {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <div className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-xl font-semibold flex items-center gap-2">
+              <span className="text-xl">⚠️</span>
               {error}
             </div>
           )}
 
           {/* Email */}
-          <input
-            type="email"
-            name="email"
-            placeholder="Enter Email Address"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-            disabled={loading}
-          />
+          <div className="mb-4">
+            <label className="block text-gray-600 font-semibold mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter Email Address"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg bg-gradient-to-r from-emerald-50 to-white transition"
+              required
+              disabled={loading}
+            />
+          </div>
 
           {/* Password */}
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full p-3 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-            disabled={loading}
-          />
+          <div className="mb-6">
+            <label className="block text-gray-600 font-semibold mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 text-lg bg-gradient-to-r from-blue-50 to-white transition"
+              required
+              disabled={loading}
+            />
+          </div>
 
           {/* Login button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 rounded-xl font-semibold text-lg bg-gradient-to-r from-emerald-500 via-green-600 to-emerald-400 text-white hover:bg-green-800 shadow-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" 
+                    stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 
+                    5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 
+                    7.938l3-2.647z"></path>
+                </svg>
+                Logging in...
+              </span>
+            ) : "Login"}
           </button>
 
           {/* Footer links */}
-          <div className="mt-6 text-center text-sm text-gray-700 space-y-2">
+          <div className="mt-8 text-center text-base text-gray-700 space-y-2">
             <p>
               Don’t have an account?{" "}
               <Link
