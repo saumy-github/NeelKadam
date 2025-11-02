@@ -40,6 +40,7 @@ import AdminProjects from "./pages/AdminProjects";
 import AdminCCList from "./pages/AdminCCList";
 import AdminTransactions from "./pages/AdminTransactions";
 import AdminReports from "./pages/AdminReports";
+import AdminProfile from "./pages/AdminProfile";
 
 function App() {
   const location = useLocation();
@@ -95,6 +96,7 @@ function App() {
 
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/profile" element={<AdminProfile />} />
           <Route path="/admin/ngos" element={<AdminNGOs />} />
           <Route path="/admin/buyers" element={<AdminBuyers />} />
           <Route path="/admin/projects" element={<AdminProjects />} />

@@ -24,12 +24,12 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Features → Blogs / Login */}
+        {/* Features → Blogs */}
         <div>
           <h3 className="text-white font-semibold mb-4">EXPLORE</h3>
           <ul className="space-y-2">
             <li><Link to="/blogs" className="hover:text-white">Blogs</Link></li>
-            <li><Link to="/login" className="hover:text-white">Login</Link></li>
+            {/* Login link removed from footer */}
           </ul>
         </div>
 
