@@ -4,7 +4,7 @@ import apiClient from "./config";
 const cache = {
   data: {},
   timestamp: {},
-  maxAge: 60000, // 1 minute cache
+  maxAge: 30000, // 30 seconds cache (reduced for demo purposes)
 
   get(key) {
     const now = Date.now();

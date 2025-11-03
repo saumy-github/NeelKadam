@@ -8,7 +8,7 @@ console.log("🌐 API client configured with base URL:", API_BASE_URL);
 // Create axios instance with default config
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 60000, // Increased to 60 seconds for blockchain transactions
+  timeout: 300000, // Increased to 5 min for blockchain transactions
   headers: {
     "Content-Type": "application/json",
   },

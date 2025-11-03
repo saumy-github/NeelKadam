@@ -21,9 +21,9 @@ export const getNgoDashboard = async (req, res) => {
     }
 
     // Set cache headers to prevent excessive requests
-    // Cache for 1 minute on the client side
-    res.setHeader("Cache-Control", "private, max-age=60");
-    res.setHeader("Expires", new Date(Date.now() + 60000).toUTCString());
+    // Cache for 30 seconds on the client side (reduced for demo purposes)
+    res.setHeader("Cache-Control", "private, max-age=30");
+    res.setHeader("Expires", new Date(Date.now() + 30000).toUTCString());
 
     const result = await getNgoDashboardService(ngoId);
 
