@@ -1,16 +1,8 @@
-/**
- * Buyer Service
- * Handles business logic for buyer operations
- */
+// Buyer service - business logic for buyer operations
 
 import * as BuyerModel from "../models/buyer.model.js";
 
-/**
- * Get buyer dashboard data service
- * @param {string} buyerId - Buyer ID from JWT
- * @param {string} sellerType - Seller type from JWT
- * @returns {Object} - Dashboard data
- */
+// Get buyer dashboard data service
 export const getBuyerDashboardService = async (buyerId, sellerType) => {
   if (!buyerId || sellerType !== "buyer") {
     throw new Error("Invalid user credentials or not a buyer account");
@@ -41,13 +33,7 @@ export const getBuyerDashboardService = async (buyerId, sellerType) => {
   };
 };
 
-/**
- * Update buyer wallet address service
- * @param {string} buyerId - Buyer ID from JWT
- * @param {string} sellerType - Seller type from JWT
- * @param {string} wallet_address - New wallet address
- * @returns {Object} - Updated wallet data
- */
+// Update buyer wallet address service
 export const updateBuyerWalletService = async (
   buyerId,
   sellerType,

@@ -1,14 +1,8 @@
-/**
- * Dashboard Controller
- * Handles HTTP requests and responses for dashboard operations
- */
+// Dashboard controller - HTTP handlers for dashboard operations
 
 import { getNgoDashboardService } from "../services/dashboard.service.js";
 
-/**
- * Get NGO dashboard data
- * GET /api/dashboard/ngo
- */
+// Get NGO dashboard data - GET /api/dashboard/ngo
 export const getNgoDashboard = async (req, res) => {
   try {
     const ngoId = req.user.seller_id;

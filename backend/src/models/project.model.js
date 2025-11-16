@@ -1,15 +1,8 @@
-/**
- * Project Model
- * Handles database operations for the project table
- */
+// Project model - database operations for the `project` table
 
 import pool from "../config/database.config.js";
 
-/**
- * Create a new project
- * @param {Object} projectData - Project data to insert
- * @returns {Object} - Created project record
- */
+// Create a new project
 export const createProject = async (projectData) => {
   const {
     seller_id,
@@ -45,11 +38,7 @@ export const createProject = async (projectData) => {
   return result.rows[0];
 };
 
-/**
- * Get all projects with optional filters
- * @param {Object} filters - Query filters (status, seller_type, location)
- * @returns {Array} - Array of project records
- */
+// Get all projects with optional filters
 export const getAllProjects = async (filters = {}) => {
   const { status, seller_type, location } = filters;
 
@@ -82,11 +71,7 @@ export const getAllProjects = async (filters = {}) => {
   return result.rows;
 };
 
-/**
- * Get project by ID
- * @param {number} projectId - Project ID
- * @returns {Object|null} - Project record or null
- */
+// Get project by ID
 export const getProjectById = async (projectId) => {
   const result = await pool.query(
     "SELECT * FROM project WHERE project_id = $1",
@@ -96,12 +81,7 @@ export const getProjectById = async (projectId) => {
   return result.rows[0] || null;
 };
 
-/**
- * Get projects by user (seller) ID
- * @param {number} sellerId - Seller ID
- * @param {string} sellerType - Seller type (optional)
- * @returns {Array} - Array of project records
- */
+// Get projects by user (seller) ID
 export const getProjectsByUserId = async (sellerId, sellerType = null) => {
   let query = "SELECT * FROM project WHERE seller_id = $1";
   const params = [sellerId];
@@ -118,12 +98,7 @@ export const getProjectsByUserId = async (sellerId, sellerType = null) => {
   return result.rows;
 };
 
-/**
- * Update project
- * @param {number} projectId - Project ID
- * @param {Object} updateData - Data to update
- * @returns {Object|null} - Updated project record or null
- */
+// Update project (partial updates supported)
 export const updateProject = async (projectId, updateData) => {
   const fields = Object.keys(updateData);
   const values = Object.values(updateData);
@@ -147,12 +122,7 @@ export const updateProject = async (projectId, updateData) => {
   return result.rows[0] || null;
 };
 
-/**
- * Update project status
- * @param {number} projectId - Project ID
- * @param {string} status - New status
- * @returns {Object|null} - Updated project record or null
- */
+// Update project status
 export const updateProjectStatus = async (projectId, status) => {
   const result = await pool.query(
     `UPDATE project 
@@ -165,11 +135,7 @@ export const updateProjectStatus = async (projectId, status) => {
   return result.rows[0] || null;
 };
 
-/**
- * Delete project
- * @param {number} projectId - Project ID
- * @returns {Object|null} - Deleted project record or null
- */
+// Delete project
 export const deleteProject = async (projectId) => {
   const result = await pool.query(
     "DELETE FROM project WHERE project_id = $1 RETURNING *",

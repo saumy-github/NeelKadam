@@ -1,15 +1,8 @@
-/**
- * Buyer Model
- * Handles database operations for the buyer table
- */
+// Buyer model - database operations for the `buyer` table
 
 import pool from "../config/database.config.js";
 
-/**
- * Create a new buyer
- * @param {Object} buyerData - Buyer data to insert
- * @returns {Object} - Created buyer record
- */
+// Create a new buyer
 export const createBuyer = async (buyerData) => {
   const {
     company_name,
@@ -44,11 +37,7 @@ export const createBuyer = async (buyerData) => {
   return result.rows[0];
 };
 
-/**
- * Get buyer by email
- * @param {string} email - Buyer email
- * @returns {Object|null} - Buyer record or null
- */
+// Get buyer by email
 export const getBuyerByEmail = async (email) => {
   const result = await pool.query("SELECT * FROM buyer WHERE email = $1", [
     email,
@@ -57,11 +46,7 @@ export const getBuyerByEmail = async (email) => {
   return result.rows[0] || null;
 };
 
-/**
- * Get buyer by ID
- * @param {number} buyerId - Buyer ID
- * @returns {Object|null} - Buyer record or null
- */
+// Get buyer by ID
 export const getBuyerById = async (buyerId) => {
   const result = await pool.query("SELECT * FROM buyer WHERE buyer_id = $1", [
     buyerId,
@@ -70,12 +55,7 @@ export const getBuyerById = async (buyerId) => {
   return result.rows[0] || null;
 };
 
-/**
- * Update buyer
- * @param {number} buyerId - Buyer ID
- * @param {Object} updateData - Data to update
- * @returns {Object|null} - Updated buyer record or null
- */
+// Update buyer (partial updates supported)
 export const updateBuyer = async (buyerId, updateData) => {
   const fields = Object.keys(updateData);
   const values = Object.values(updateData);
@@ -99,11 +79,7 @@ export const updateBuyer = async (buyerId, updateData) => {
   return result.rows[0] || null;
 };
 
-/**
- * Delete buyer
- * @param {number} buyerId - Buyer ID
- * @returns {Object|null} - Deleted buyer record or null
- */
+// Delete buyer
 export const deleteBuyer = async (buyerId) => {
   const result = await pool.query(
     "DELETE FROM buyer WHERE buyer_id = $1 RETURNING *",

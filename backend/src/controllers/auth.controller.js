@@ -1,7 +1,4 @@
-/**
- * Authentication Controller
- * Handles HTTP requests and responses for authentication operations
- */
+// Authentication controller - HTTP handlers for auth operations
 
 import {
   ngoRegisterService,
@@ -14,10 +11,7 @@ import {
 
 // ==================== NGO AUTHENTICATION ====================
 
-/**
- * NGO Registration
- * POST /api/auth/ngo/register
- */
+// NGO registration - POST /api/auth/ngo/register
 export const ngoRegister = async (req, res) => {
   console.log("🔵 NGO Registration route hit!");
   console.log("📦 Request body:", req.body);
@@ -50,10 +44,7 @@ export const ngoRegister = async (req, res) => {
   }
 };
 
-/**
- * NGO Login
- * POST /api/auth/ngo/login
- */
+// NGO login - POST /api/auth/ngo/login
 export const ngoLogin = async (req, res) => {
   console.log("🔵 NGO Login route hit!");
   console.log("📧 Login attempt for:", req.body.email);
@@ -85,10 +76,7 @@ export const ngoLogin = async (req, res) => {
 
 // ==================== BUYER AUTHENTICATION ====================
 
-/**
- * Buyer Registration
- * POST /api/auth/buyer/register
- */
+// Buyer registration - POST /api/auth/buyer/register
 export const buyerRegister = async (req, res) => {
   try {
     const result = await buyerRegisterService(req.body);
@@ -104,10 +92,7 @@ export const buyerRegister = async (req, res) => {
   }
 };
 
-/**
- * Buyer Login
- * POST /api/auth/buyer/login
- */
+// Buyer login - POST /api/auth/buyer/login
 export const buyerLogin = async (req, res) => {
   try {
     const result = await buyerLoginService(req.body);
@@ -123,10 +108,7 @@ export const buyerLogin = async (req, res) => {
   }
 };
 
-/**
- * Get Buyer Profile
- * GET /api/auth/buyer/profile
- */
+// Get buyer profile - GET /api/auth/buyer/profile
 export const getBuyerProfile = async (req, res) => {
   try {
     const { buyer_id } = req.query;
@@ -147,10 +129,7 @@ export const getBuyerProfile = async (req, res) => {
   }
 };
 
-/**
- * Update Buyer Profile
- * PUT /api/auth/buyer/profile
- */
+// Update buyer profile - PUT /api/auth/buyer/profile
 export const updateBuyerProfile = async (req, res) => {
   try {
     const { buyer_id, ...updateData } = req.body;

@@ -1,7 +1,4 @@
-/**
- * Project Controller
- * Handles HTTP requests and responses for project operations
- */
+// Project controller - HTTP handlers for project operations
 
 import {
   createProjectService,
@@ -15,10 +12,7 @@ import {
   uploadProjectPhotosService,
 } from "../services/project.service.js";
 
-/**
- * Create new project (authenticated)
- * POST /api/projects
- */
+// Create new project (authenticated) - POST /api/projects
 export const createProject = async (req, res) => {
   try {
     const seller_id = req.user.seller_id;
@@ -35,10 +29,7 @@ export const createProject = async (req, res) => {
   }
 };
 
-/**
- * Submit new project (authenticated)
- * POST /api/projects/submit
- */
+// Submit new project (authenticated) - POST /api/projects/submit
 export const submitProject = async (req, res) => {
   try {
     const seller_id = req.user.seller_id;
@@ -58,10 +49,7 @@ export const submitProject = async (req, res) => {
   }
 };
 
-/**
- * Get all projects with optional filters
- * GET /api/projects
- */
+// Get all projects with optional filters - GET /api/projects
 export const getAllProjects = async (req, res) => {
   try {
     const result = await getAllProjectsService(req.query);
@@ -74,10 +62,7 @@ export const getAllProjects = async (req, res) => {
   }
 };
 
-/**
- * Get project by ID
- * GET /api/projects/:id
- */
+// Get project by ID - GET /api/projects/:id
 export const getProjectById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -98,10 +83,7 @@ export const getProjectById = async (req, res) => {
   }
 };
 
-/**
- * Update project
- * PUT /api/projects/:id
- */
+// Update project - PUT /api/projects/:id
 export const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
@@ -122,10 +104,7 @@ export const updateProject = async (req, res) => {
   }
 };
 
-/**
- * Delete project
- * DELETE /api/projects/:id
- */
+// Delete project - DELETE /api/projects/:id
 export const deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
@@ -146,10 +125,7 @@ export const deleteProject = async (req, res) => {
   }
 };
 
-/**
- * Get projects by seller
- * GET /api/projects/seller/:sellerId
- */
+// Get projects by seller - GET /api/projects/seller/:sellerId
 export const getProjectsBySeller = async (req, res) => {
   try {
     const { sellerId } = req.params;
@@ -165,10 +141,7 @@ export const getProjectsBySeller = async (req, res) => {
   }
 };
 
-/**
- * Update project status
- * PATCH /api/projects/:id/status
- */
+// Update project status - PATCH /api/projects/:id/status
 export const updateProjectStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -197,10 +170,7 @@ export const updateProjectStatus = async (req, res) => {
   }
 };
 
-/**
- * Upload project photos
- * POST /api/projects/:id/photos
- */
+// Upload project photos - POST /api/projects/:id/photos
 export const uploadProjectPhotos = async (req, res) => {
   try {
     const { id } = req.params;

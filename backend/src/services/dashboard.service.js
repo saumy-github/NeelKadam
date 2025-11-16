@@ -1,16 +1,9 @@
-/**
- * Dashboard Service
- * Handles business logic for dashboard operations
- */
+// Dashboard service - business logic for dashboard operations
 
 import * as SellerModel from "../models/seller.model.js";
 import * as ProjectModel from "../models/project.model.js";
 
-/**
- * Get NGO dashboard data service
- * @param {string} ngoId - NGO ID from JWT
- * @returns {Object} - Dashboard data with profile, stats, and recent activity
- */
+// Get NGO dashboard data service
 export const getNgoDashboardService = async (ngoId) => {
   if (!ngoId) {
     throw new Error("Invalid user credentials");

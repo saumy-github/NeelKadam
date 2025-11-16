@@ -1,17 +1,8 @@
-/**
- * Project Service
- * Handles business logic for project operations
- */
+// Project service - business logic for project operations
 
 import * as ProjectModel from "../models/project.model.js";
 
-/**
- * Create new project service
- * @param {string} seller_id - Seller ID from JWT
- * @param {string} seller_type - Seller type from JWT
- * @param {Object} projectData - Project data
- * @returns {Object} - Created project
- */
+// Create new project service
 export const createProjectService = async (
   seller_id,
   seller_type,
@@ -45,13 +36,7 @@ export const createProjectService = async (
   };
 };
 
-/**
- * Submit new project service
- * @param {string} seller_id - Seller ID from JWT
- * @param {string} seller_type - Seller type from JWT
- * @param {Object} projectData - Project data
- * @returns {Object} - Submitted project
- */
+// Submit new project service
 export const submitProjectService = async (
   seller_id,
   seller_type,
@@ -97,11 +82,7 @@ export const submitProjectService = async (
   };
 };
 
-/**
- * Get all projects with filters
- * @param {Object} filters - Query filters (status, seller_type, location)
- * @returns {Object} - List of projects
- */
+// Get all projects with filters
 export const getAllProjectsService = async (filters) => {
   const { status, seller_type, location } = filters;
 
@@ -117,11 +98,7 @@ export const getAllProjectsService = async (filters) => {
   };
 };
 
-/**
- * Get project by ID
- * @param {string} id - Project ID
- * @returns {Object} - Project data
- */
+// Get project by ID
 export const getProjectByIdService = async (id) => {
   // Get project using model
   const project = await ProjectModel.getProjectById(id);
@@ -135,12 +112,7 @@ export const getProjectByIdService = async (id) => {
   };
 };
 
-/**
- * Update project
- * @param {string} id - Project ID
- * @param {Object} updateData - Data to update
- * @returns {Object} - Updated project
- */
+// Update project
 export const updateProjectService = async (id, updateData) => {
   // Update project using model
   const updatedProject = await ProjectModel.updateProject(id, updateData);
@@ -155,11 +127,7 @@ export const updateProjectService = async (id, updateData) => {
   };
 };
 
-/**
- * Delete project
- * @param {string} id - Project ID
- * @returns {Object} - Success message
- */
+// Delete project
 export const deleteProjectService = async (id) => {
   // Delete project using model
   const deletedProject = await ProjectModel.deleteProject(id);
@@ -173,12 +141,7 @@ export const deleteProjectService = async (id) => {
   };
 };
 
-/**
- * Get projects by seller
- * @param {string} sellerId - Seller ID
- * @param {string} sellerType - Seller type (optional)
- * @returns {Object} - List of projects
- */
+// Get projects by seller
 export const getProjectsBySellerService = async (sellerId, sellerType) => {
   // Get projects using model
   const projects = await ProjectModel.getProjectsByUserId(sellerId, sellerType);
@@ -188,12 +151,7 @@ export const getProjectsBySellerService = async (sellerId, sellerType) => {
   };
 };
 
-/**
- * Update project status
- * @param {string} id - Project ID
- * @param {string} status - New status
- * @returns {Object} - Updated project
- */
+// Update project status
 export const updateProjectStatusService = async (id, status) => {
   if (
     !status ||
@@ -217,12 +175,7 @@ export const updateProjectStatusService = async (id, status) => {
   };
 };
 
-/**
- * Upload project photos
- * @param {string} id - Project ID
- * @param {Array} photos - Array of photo URLs
- * @returns {Object} - Updated project
- */
+// Upload project photos
 export const uploadProjectPhotosService = async (id, photos) => {
   if (!photos || !Array.isArray(photos)) {
     throw new Error("Photos array is required");

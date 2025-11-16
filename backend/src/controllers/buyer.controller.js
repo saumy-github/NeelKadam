@@ -1,7 +1,4 @@
-/**
- * Buyer Controller
- * Handles HTTP requests and responses for buyer operations
- */
+// Buyer controller - HTTP handlers for buyer operations
 
 import {
   getBuyerDashboardService,
@@ -9,10 +6,7 @@ import {
 } from "../services/buyer.service.js";
 import { getBuyerByCompanyName } from "../models/transfer.model.js";
 
-/**
- * Get buyer dashboard data
- * GET /api/buyer/dashboard
- */
+// Get buyer dashboard data - GET /api/buyer/dashboard
 export const getBuyerDashboard = async (req, res) => {
   try {
     const buyerId = req.user.seller_id;
@@ -42,10 +36,7 @@ export const getBuyerDashboard = async (req, res) => {
   }
 };
 
-/**
- * Update buyer wallet address
- * PATCH /api/buyer/update-wallet
- */
+// Update buyer wallet address - PATCH /api/buyer/update-wallet
 export const updateBuyerWallet = async (req, res) => {
   try {
     const { wallet_address } = req.body;
@@ -87,10 +78,7 @@ export const updateBuyerWallet = async (req, res) => {
   }
 };
 
-/**
- * Lookup buyer by company name
- * GET /api/buyer/lookup/:companyName
- */
+// Lookup buyer by company name - GET /api/buyer/lookup/:companyName
 export const lookupBuyerByCompanyName = async (req, res) => {
   try {
     const companyName = decodeURIComponent(req.params.companyName);

@@ -1,15 +1,8 @@
-/**
- * Seller Model (NGO)
- * Handles database operations for the NGO table
- */
+// Seller model (NGO) - database operations for the `ngo` table
 
 import pool from "../config/database.config.js";
 
-/**
- * Create a new NGO seller
- * @param {Object} sellerData - NGO data to insert
- * @returns {Object} - Created NGO record
- */
+// Create a new NGO seller
 export const createSeller = async (sellerData) => {
   const {
     license_no,
@@ -52,11 +45,7 @@ export const createSeller = async (sellerData) => {
   return result.rows[0];
 };
 
-/**
- * Get NGO seller by email
- * @param {string} email - Seller email
- * @returns {Object|null} - NGO record or null
- */
+// Get NGO seller by email
 export const getSellerByEmail = async (email) => {
   const result = await pool.query("SELECT * FROM ngo WHERE email = $1", [
     email,
@@ -65,11 +54,7 @@ export const getSellerByEmail = async (email) => {
   return result.rows[0] || null;
 };
 
-/**
- * Get NGO seller by ID
- * @param {number} ngoId - NGO ID
- * @returns {Object|null} - NGO record or null
- */
+// Get NGO seller by ID
 export const getSellerById = async (ngoId) => {
   const result = await pool.query("SELECT * FROM ngo WHERE ngo_id = $1", [
     ngoId,
@@ -78,12 +63,7 @@ export const getSellerById = async (ngoId) => {
   return result.rows[0] || null;
 };
 
-/**
- * Update NGO seller
- * @param {number} ngoId - NGO ID
- * @param {Object} updateData - Data to update
- * @returns {Object|null} - Updated NGO record or null
- */
+// Update NGO seller (partial updates supported)
 export const updateSeller = async (ngoId, updateData) => {
   const fields = Object.keys(updateData);
   const values = Object.values(updateData);
@@ -107,11 +87,7 @@ export const updateSeller = async (ngoId, updateData) => {
   return result.rows[0] || null;
 };
 
-/**
- * Delete NGO seller
- * @param {number} ngoId - NGO ID
- * @returns {Object|null} - Deleted NGO record or null
- */
+// Delete NGO seller
 export const deleteSeller = async (ngoId) => {
   const result = await pool.query(
     "DELETE FROM ngo WHERE ngo_id = $1 RETURNING *",

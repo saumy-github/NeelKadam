@@ -8,10 +8,10 @@ import morgan from "morgan";
 import pool from "./src/config/database.config.js";
 
 // Import routes from new organized structure
-import apiRoutes from "./src/routes/index.js";
+import apiRoutes from "./src/routes/index.routes.js";
 
 // Import admin proxy routes (forwards to admin microservice)
-import adminRoutes from "./src/routes/admin.js";
+import adminRoutes from "./src/routes/admin.routes.js";
 
 // Initialize Express app
 const app = express();

@@ -1,5 +1,5 @@
 // Central exports for utility functions
-// Import from here: `import { buildWhereClause } from "../utils/index.js"`
+// Import from here: `import { buildWhereClause } from "../utils/index.utils.js"`
 
 // Database utilities
 export {
