@@ -3,7 +3,7 @@
 // Updates both seller and buyer balances atomically
 
 import express from "express";
-import { authMiddleware } from "../middleware/index.js";
+import { authMiddleware } from "../middleware/index.middleware.js";
 import { transferCarbonCredits } from "../controllers/transfer.controller.js";
 
 const router = express.Router();

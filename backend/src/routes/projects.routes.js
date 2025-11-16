@@ -12,7 +12,7 @@
  */
 
 import express from "express";
-import { authMiddleware } from "../middleware/index.js";
+import { authMiddleware } from "../middleware/index.middleware.js";
 import {
   createProject,
   submitProject,

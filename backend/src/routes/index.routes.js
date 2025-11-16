@@ -6,12 +6,12 @@
  */
 
 import express from "express";
-import ngoAuthRoutes from "./auth/ngo.js";
-import buyerAuthRoutes from "./auth/buyer.js";
-import projectRoutes from "./projects.js";
-import buyerRoutes from "./buyer.js";
-import dashboardRoutes from "./dashboard.js";
-import transferRoutes from "./transfer.js";
+import ngoAuthRoutes from "./auth/ngo.routes.js";
+import buyerAuthRoutes from "./auth/buyer.routes.js";
+import projectRoutes from "./projects.routes.js";
+import buyerRoutes from "./buyer.routes.js";
+import dashboardRoutes from "./dashboard.routes.js";
+import transferRoutes from "./transfer.routes.js";
 
 const router = express.Router();
 
